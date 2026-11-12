@@ -25,6 +25,41 @@ class AuditVerificationTests(unittest.TestCase):
                                      "--revision", str(r)], capture_output=True, encoding="utf-8", timeout=10)
             return result, json.loads(result.stdout)
 
+    def test_contextual_number_words_and_equivalent_times(self):
+        cases = [
+            (1, "Sei libera domani?", "Hai tempo domani?", 0),
+            (2, "Sei sicuro di voler annullare l'ordine?", "Vuoi davvero annullare l'ordine?", 0),
+            (3, "Sei in ritardo?", "Stai arrivando?", 0),
+            (4, "Ti mando uno schema riassuntivo.", "Ti mando lo schema riassuntivo.", 0),
+            (5, "Mille grazie per l'aiuto.", "Grazie di cuore per l'aiuto.", 0),
+            (6, "Grazie mille, a domani.", "Grazie, a domani.", 0),
+            (7, "Siamo aperti dalle 9:30.", "Siamo aperti dalle 9.30.", 0),
+            (8, "Consegna entro le 18:00.", "Consegna entro le 18.00.", 0),
+            (9, "Ci sentiamo verso le 15:00.", "Ci sentiamo verso le 15.00.", 0),
+            (10, "Ho sei giorni di ferie.", "Ho cinque giorni di ferie.", 1),
+            (11, "Sei persone hanno confermato.", "Cinque persone hanno confermato.", 1),
+            (12, "Sono passati sei mesi.", "Sono passati sette mesi.", 1),
+            (13, "Ci vediamo alle sei.", "Ci vediamo alle sette.", 1),
+            (14, "Manca uno dei documenti.", "Mancano due dei documenti.", 1),
+            (15, "Abbiamo mille pezzi in magazzino.", "Abbiamo cento pezzi in magazzino.", 1),
+            (16, "Uno dei tre preventivi è scaduto.", "Uno dei due preventivi è scaduto.", 1),
+            (17, "Siamo aperti dalle 9:30.", "Siamo aperti dalle 10:30.", 1),
+        ]
+        for number, source, revision, expected in cases:
+            with self.subTest(case=number):
+                result = subprocess.run([sys.executable, str(SCRIPT), "audit", "--stdin-json"],
+                                        input=json.dumps({"source": source, "revision": revision}),
+                                        capture_output=True, encoding="utf-8", timeout=10)
+                self.assertEqual(result.returncode, expected, result.stderr or result.stdout)
+                report = json.loads(result.stdout)
+                self.assertEqual(report["deterministic_status"], "issues_found" if expected else "passed")
+                self.assertEqual(report["review_status"], "required" if expected else "not_required")
+                if expected:
+                    self.assertTrue(any(item["kind"] == "number" for item in report["findings"]))
+                else:
+                    self.assertEqual(report["findings"], [])
+                    self.assertEqual(report["review_flags"], [])
+
     def test_dates_word_numbers_weekdays_and_amount_changes_are_findings(self):
         pairs = [
             ("La riunione è il 15 marzo.", "La riunione è il 15 maggio."),

@@ -29,7 +29,8 @@ NUMBER_PATTERN = re.compile(
     r"(?<![\w])(?:(?:[+\-−][^\S\r\n]*)?[€$£][^\S\r\n]*)?(?:[+\-−][^\S\r\n]*)?\d+(?:[.,:/-]\d+)*(?:[^\S\r\n]*(?:%|€|\$|£))?(?!\d)"
 )
 QUOTE_PATTERN = re.compile(r'«([^«»\n]{1,2000})»|“([^“”\n]{1,2000})”|"([^"\n]{1,2000})"')
-TIME_PATTERN = re.compile(r"\b(?:alle|ore)\s+([01]?\d|2[0-3])[:.]([0-5]\d)\b", re.I)
+TIME_INTRODUCER = r"(?:alle|dalle|ore|(?:entro|verso|dopo|circa|per|tra|fra)\s+le|prima\s+delle)"
+TIME_PATTERN = re.compile(r"\b" + TIME_INTRODUCER + r"\s+([01]?\d|2[0-3])[:.]([0-5]\d)\b", re.I)
 NUMBER_WORDS = dict(zip(
     ("uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci",
      "undici", "dodici", "tredici", "quattordici", "quindici", "sedici", "diciassette",
@@ -38,6 +39,25 @@ NUMBER_WORDS = dict(zip(
     (*range(1, 21), 30, 40, 50, 60, 70, 80, 90, 100, 1000),
 ))
 NUMBER_WORD_PATTERN = re.compile(r"\b(?:" + "|".join(NUMBER_WORDS) + r")\b", re.I)
+# Indizi lessicali/grammaticali, non frasi da escludere: gli omografi
+# irrisolti restano visibili come segnali di revisione.
+COUNT_WORDS = {
+    "unità", "euro", "auto", "moto", "radio", "città", "film", "file", "re",
+    "persone", "cose", "ore", "settimane", "volte", "pagine", "righe", "copie",
+    "scatole", "tonnellate", "buste", "specie", "serie", "dita", "uova",
+    "braccia", "paia", "centinaia", "migliaia", "mura", "ossa", "labbra",
+}
+COUNT_LABELS = {"numero", "numeri", "codice", "pagina", "capitolo", "articolo", "punto", "caso"}
+NUMBER_CONTEXT_CHARS = 128
+COPULAR_WORDS = {
+    stem + ending for stem in ("liber", "sicur", "pront", "stanc", "occupat", "convint", "cert", "content")
+    for ending in ("o", "a")
+} | {"disponibile", "capace", "felice", "gentile", "presente", "assente"}
+COPULAR_LINKS = {"in", "un", "una", "uno"}
+ARTICLE_HEAD_PATTERN = re.compile(r"\b(?:lo|il|un|uno|questo|quello)\s+([^\W\d_]+)\b", re.I)
+WORD_BEFORE = re.compile(r"([^\W\d_]+)\s*$")
+WORD_AFTER = re.compile(r"\s+([^\W\d_]+)")
+
 CALENDAR_PATTERN = re.compile(
     r"\b(?:luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica|"
     r"gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\b", re.I
@@ -219,7 +239,60 @@ def _urls(text: str) -> list[str]:
     return result
 
 
-def _numbers(text: str) -> list[str]:
+def _word_numbers(text: str, article_heads: set[str]) -> tuple[list[str], list[str]]:
+    """Separa quantità certe e omografi incerti, senza interpretazione semantica."""
+    numbers, ambiguous = [], []
+    for match in NUMBER_WORD_PATTERN.finditer(text):
+        word = match.group().casefold()
+        if word not in {"uno", "sei", "mille"}:
+            numbers.append(str(NUMBER_WORDS[word]))
+            continue
+        # Finestre limitate evitano scansioni ripetute dell'intero testo.
+        left = text[max(0, match.start() - NUMBER_CONTEXT_CHARS):match.start()]
+        right = text[match.end():match.end() + NUMBER_CONTEXT_CHARS]
+        before, after = WORD_BEFORE.search(left), WORD_AFTER.match(right)
+        previous = before[1].casefold() if before else ""
+        following = after[1].casefold() if after else ""
+        if word == "mille" and "grazie" in (previous, following):
+            continue
+        temporal = re.search(r"\b" + TIME_INTRODUCER + r"\s+$", left, re.I)
+        partitive = (re.search(r"\bne\s+[^\W\d_]+\s+$", left, re.I)
+                     or previous.endswith(("ane", "ine", "ene")))
+        quantitative = (temporal or partitive or previous in COUNT_LABELS
+                        or following in COUNT_WORDS or re.match(r"\s*[€$£%]", right))
+        if word == "uno" and not quantitative:
+            # La fonetica da sola non distingue articolo+nome e pronome+
+            # aggettivo: risolvi l'articolo solo se l'altro testo conserva
+            # la stessa testa nominale con un articolo/determinante.
+            if re.match(r"(?:s[bcdfghjklmnpqrstvwxyz]|z|gn|ps|pn|x|y)", following):
+                if following not in article_heads:
+                    ambiguous.append("1")
+                continue
+        if word == "sei":
+            quantitative = (quantitative or previous in {"in", "sono", "siamo", "erano", "eravamo", "saremo", "saranno"}
+                            or re.match(r"\s+in\s+(?:tutto|totale)\b", right, re.I))
+            if not quantitative:
+                verbal_position = ((match.start() <= NUMBER_CONTEXT_CHARS and not left.strip())
+                                   or re.search(r"[.!?;:,]\s*$", left)
+                                   or previous in {"tu", "non", "se", "che", "quando", "come", "quanto", "dove", "perché", "perche"})
+                if verbal_position and following in COPULAR_WORDS | COPULAR_LINKS:
+                    continue
+                if following in COPULAR_WORDS | COPULAR_LINKS or not following.endswith("i"):
+                    ambiguous.append("6")
+                    continue
+        numbers.append(str(NUMBER_WORDS[word]))
+    return numbers, ambiguous
+
+
+def _article_heads(text: str) -> set[str]:
+    return {match[1].casefold() for match in ARTICLE_HEAD_PATTERN.finditer(URL_PATTERN.sub(" ", text))}
+
+
+def _ambiguous_numbers(text: str, article_heads: set[str]) -> list[str]:
+    return _word_numbers(URL_PATTERN.sub(" ", text), article_heads)[1]
+
+
+def _numbers(text: str, article_heads: set[str] | None = None) -> list[str]:
     # Il contenuto degli URL è controllato separatamente, non come numeri nel testo.
     masked = URL_PATTERN.sub(" ", text)
     times = []
@@ -246,7 +319,7 @@ def _numbers(text: str) -> list[str]:
                 fraction = fraction.rstrip("0").ljust(2, "0")
                 value = f"€{sign}{integer},{fraction}"
         numbers.append(value)
-    numbers.extend(str(NUMBER_WORDS[m.group().casefold()]) for m in NUMBER_WORD_PATTERN.finditer(masked))
+    numbers.extend(_word_numbers(masked, article_heads or set())[0])
     return numbers + times
 
 
@@ -305,9 +378,11 @@ def audit_text(source: str, revision: str, constraints=None, include_diff: bool 
     for value in constraints["preserve_exact"]:
         if value not in source:
             raise TextError("Un vincolo preserve_exact non compare nella fonte.")
+    source_heads, revision_heads = _article_heads(source), _article_heads(revision)
     findings = []
     for kind, extractor in (("number", _numbers), ("calendar", _calendar), ("url", _urls), ("quoted_text", _quotes)):
-        before, after = Counter(extractor(source)), Counter(extractor(revision))
+        before = Counter(_numbers(source, revision_heads) if kind == "number" else extractor(source))
+        after = Counter(_numbers(revision, source_heads) if kind == "number" else extractor(revision))
         for value in sorted(before.keys() | after.keys()):
             if before[value] == after[value]:
                 continue
@@ -325,6 +400,12 @@ def audit_text(source: str, revision: str, constraints=None, include_diff: bool 
         if value in revision:
             findings.append({"kind": "forbidden_text", "change": "added", "value": value})
     review_flags = []
+    ambiguous_source = Counter(_ambiguous_numbers(source, revision_heads))
+    ambiguous_revision = Counter(_ambiguous_numbers(revision, source_heads))
+    if ambiguous_source != ambiguous_revision:
+        review_flags.append({"category": "number_context", "source_markers": dict(ambiguous_source),
+                             "revision_markers": dict(ambiguous_revision),
+                             "message": "Uso numerico o grammaticale incerto: rileggere nel contesto."})
     marker_source = re.sub(r"\s+", " ", unicodedata.normalize("NFC", source))
     marker_revision = re.sub(r"\s+", " ", unicodedata.normalize("NFC", revision))
     for category, pattern in MARKER_PATTERNS.items():

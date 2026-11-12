@@ -116,9 +116,13 @@ Il rapporto distingue:
   generare una segnalazione.
 - Confronta anche giorni della settimana, mesi e numeri scritti come parole:
   uno–venti, decine fino a novanta, cento e mille. Le parole numeriche sono
-  confrontate con le cifre corrispondenti; i termini ambigui richiedono contesto.
+  confrontate con le cifre corrispondenti; gli usi grammaticali riconosciuti
+  di «sei» e «uno» e le formule con «mille» adiacente a «grazie» sono esclusi,
+  i contesti irrisolti producono segnali di revisione e gli orari equivalenti
+  sono normalizzati anche dopo «dalle», «entro le» e «verso le».
   Sono equivalenti posizione/spazi del simbolo euro nella notazione italiana e
-  orari come `9:30`/`9.30` dopo «alle» o «ore». Le citazioni e i vincoli espliciti
+  orari come `9:30`/`9.30` negli introduttori orari supportati (anche «alle» e
+  «ore»). Le citazioni e i vincoli espliciti
   rimangono letterali. Non si normalizzano arbitrariamente codici o unità.
 - **Segnali di revisione:** differenze su negazione o incertezza sono euristiche.
   Sono controllati anche condizioni e marcatori di scadenza, inclusi «entro»,

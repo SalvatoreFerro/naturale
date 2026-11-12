@@ -2,6 +2,7 @@
 
 ## 0.2.1 — preparazione, non rilasciata
 
+- Audit: ridotti i falsi allarmi sugli omografi numerici e sugli orari equivalenti, conservando i controlli sulle quantità.
 - Audit testi: calendario italiano, numeri in lettere, scadenze, negazioni e
   incertezza; normalizzazione di euro e orari, JSON su stdin ed exit `3` per
   segnali che richiedono revisione. Responsabilità e significato restano
