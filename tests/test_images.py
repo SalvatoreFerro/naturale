@@ -147,7 +147,19 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
             self.assertEqual(original.info.get("icc_profile"), cleaned.info.get("icc_profile"))
             self.assertEqual(dict(original.getexif()), dict(cleaned.getexif()))
 
-    def signed_fixture(self):
+    def private_metadata(self, path):
+        completed = subprocess.run([
+            EXIFTOOL, "-config", "", "-overwrite_original",
+            "-GPSLatitude=37.751", "-GPSLatitudeRef=N",
+            "-GPSLongitude=14.9934", "-GPSLongitudeRef=E",
+            "-EXIF:OwnerName=PRIVATE-OWNER", "-EXIF:SerialNumber=PRIVATE-SERIAL",
+            "-EXIF:LensSerialNumber=PRIVATE-LENS", "-EXIF:CameraSerialNumber=PRIVATE-CAMERA",
+            "-XMP-exif:GPSLatitude=37,45.06N", "-XMP-aux:OwnerName=PRIVATE-XMP-OWNER",
+            "-XMP-aux:SerialNumber=PRIVATE-XMP-SERIAL", str(path),
+        ], capture_output=True, text=True, check=False)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+
+    def signed_fixture(self, private=False):
         """Create original C2PA credentials with ephemeral local keys, never fetched fixtures."""
         try:
             import c2pa
@@ -205,6 +217,8 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
             }]}}],
         }
         source = self.fixture("unsigned-for-signing.png")
+        if private:
+            self.private_metadata(source)
         signed = self.tmp / "signed.png"
         with c2pa.Signer.from_info(c2pa.C2paSignerInfo("es256", chain, private, None)) as signer:
             with c2pa.Builder(manifest, context=context) as builder:
@@ -368,8 +382,8 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
         source = self.fixture("cli.png", xmp=True)
         output = self.tmp / "cli-clean.png"
         for arguments, operation in (
-            (["inspect", str(source)], "inspect"),
-            (["clean", str(source), "--output", str(output)], "clean"),
+            (["inspect", str(source), "--full-report"], "inspect"),
+            (["clean", str(source), "--output", str(output), "--full-report"], "clean"),
         ):
             with self.subTest(operation=operation):
                 completed = subprocess.run(
@@ -560,6 +574,189 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
         self.assertFalse(output.exists())
         self.assertFalse(Path(str(output) + ".report.json").exists())
         self.assertEqual(sorted(self.tmp.iterdir()), [source])
+
+    def test_privacy_removes_only_selected_identifiers_and_preserves_rendering(self):
+        for suffix in (".png", ".jpg"):
+            with self.subTest(suffix=suffix):
+                source = self.fixture("personal" + suffix, xmp=True)
+                self.private_metadata(source)
+                original = source.read_bytes()
+                output = self.tmp / ("privacy-copy" + suffix)
+                report = self.images.clean_image(source, output, profile="privacy")
+                self.assertEqual(source.read_bytes(), original)
+                self.assertTrue(self.images._privacy_targets(report["metadata"]["before"]))
+                self.assertFalse(self.images._privacy_targets(report["metadata"]["after"]))
+                self.assertTrue(report["metadata"]["removed_tags"])
+                self.assertIn("GPS", report["metadata"]["removed_groups"])
+                self.assertEqual(report["metadata"]["after"]["XMP-xmp:CreatorTool"], "AI fixture creator")
+                with Image.open(source) as before, Image.open(output) as after:
+                    self.assertEqual(before.tobytes(), after.tobytes())
+                    self.assertEqual(before.info["icc_profile"], after.info["icc_profile"])
+                    self.assertEqual(after.getexif()[0x0112], 6)
+                    self.assertEqual(after.getexif()[0x0131], before.getexif()[0x0131])
+                    self.assertEqual(self.images._exif_without_private(self.images._exif_snapshot(before)),
+                                     self.images._exif_snapshot(after))
+
+    def test_privacy_preserves_signed_c2pa_container_and_reports_limitations(self):
+        source = self.signed_fixture(private=True)
+        original = source.read_bytes()
+        output = self.tmp / "signed-privacy.png"
+        report = self.images.clean_image(source, output, validate_c2pa=True, profile="privacy")
+        self.assertEqual(source.read_bytes(), original)
+        self.assertEqual(report["c2pa"]["before"]["validation"], "valid")
+        self.assertEqual(report["c2pa"]["after"]["embedded"], "present")
+        self.assertTrue(report["c2pa_container_unchanged"])
+        self.assertEqual(self.images._jumbf_digest(source), self.images._jumbf_digest(output))
+        self.assertFalse(self.images._privacy_targets(report["metadata"]["after"]))
+        summary = self.images.summarize_report(report)
+        self.assertIn("retained_credentials_may_contain_personal_data", summary["warnings"])
+        self.assertIn("c2pa_may_be_invalidated", summary["warnings"])
+        self.assertIn("targeted_privacy_cleanup_not_anonymization", summary["warnings"])
+
+    def test_privacy_refuses_to_certify_preservation_when_jumbf_extraction_is_empty(self):
+        source = self.signed_fixture(private=True)
+        output = self.tmp / "unverifiable-privacy.png"
+        original = source.read_bytes()
+        real_run = subprocess.run
+
+        def omit_binary_data(command, *args, **kwargs):
+            if "-b" in command and "-JUMBF" in command:
+                return subprocess.CompletedProcess(command, 0, b"", b"")
+            return real_run(command, *args, **kwargs)
+
+        with patch.object(self.images.subprocess, "run", side_effect=omit_binary_data):
+            with self.assertRaises(self.images.ImageError):
+                self.images.clean_image(source, output, profile="privacy")
+        self.assertEqual(source.read_bytes(), original)
+        self.assertFalse(output.exists())
+        self.assertFalse(Path(str(output) + ".report.json").exists())
+
+    def test_default_cli_summary_hides_values_paths_and_raw_sdk_warnings(self):
+        source = self.fixture("personal-values.png", xmp=True)
+        self.private_metadata(source)
+        completed = subprocess.run([sys.executable, str(SCRIPT), "inspect", str(source)],
+                                   capture_output=True, text=True, check=False)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        summary = json.loads(completed.stdout)
+        self.assertEqual(summary["detail"], "summary")
+        self.assertEqual(summary["input"]["name"], source.name)
+        for sensitive in ("PRIVATE-OWNER", "PRIVATE-SERIAL", "37.751", str(self.tmp), "sha256"):
+            self.assertNotIn(sensitive, completed.stdout)
+        full = self.images.inspect_image(source)
+        full["c2pa"]["before"]["validation_details"] = {"claim": "SENSITIVE-CLAIM"}
+        full["warnings"].append("PRIVATE-RAW-WARNING " + str(self.tmp))
+        shown = json.dumps(self.images.summarize_report(full))
+        self.assertNotIn("SENSITIVE-CLAIM", shown)
+        self.assertNotIn("PRIVATE-RAW-WARNING", shown)
+
+    def test_inspect_can_save_full_local_report_without_exposing_values(self):
+        source = self.fixture("save-report.png", xmp=True)
+        self.private_metadata(source)
+        report_path = self.tmp / "private-report.json"
+        completed = subprocess.run([sys.executable, str(SCRIPT), "inspect", str(source),
+                                    "--report", str(report_path)], capture_output=True, text=True)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(json.loads(completed.stdout)["report_file"], report_path.name)
+        self.assertNotIn("PRIVATE-OWNER", completed.stdout)
+        self.assertIn("PRIVATE-OWNER", report_path.read_text())
+        if os.name == "posix":
+            self.assertEqual(stat.S_IMODE(report_path.stat().st_mode), 0o600)
+        original_report = report_path.read_bytes()
+        repeated = subprocess.run([sys.executable, str(SCRIPT), "inspect", str(source),
+                                   "--report", str(report_path)], capture_output=True, text=True)
+        self.assertNotEqual(repeated.returncode, 0)
+        self.assertEqual(report_path.read_bytes(), original_report)
+        self.assertNotIn(str(self.tmp), repeated.stderr)
+
+    def test_default_clean_summary_keeps_full_sidecar_local(self):
+        source = self.fixture("summary-clean.png", xmp=True)
+        self.private_metadata(source)
+        output = self.tmp / "summary-copy.png"
+        completed = subprocess.run([sys.executable, str(SCRIPT), "clean", str(source),
+                                    "--output", str(output), "--profile", "privacy"],
+                                   capture_output=True, text=True, check=False)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        summary = json.loads(completed.stdout)
+        self.assertEqual(summary["profile"], "privacy")
+        self.assertNotIn("PRIVATE-OWNER", completed.stdout)
+        self.assertNotIn(str(self.tmp), completed.stdout)
+        full = json.loads(Path(str(output) + ".report.json").read_text())
+        self.assertEqual(full["metadata"]["before"]["ExifIFD:OwnerName"], "PRIVATE-OWNER")
+
+    def test_batch_continues_after_corrupt_files_and_skips_nested_images(self):
+        inputs = self.tmp / "inputs"
+        inputs.mkdir()
+        output = self.tmp / "copies"
+        a = self.fixture("inputs/a.jpg", xmp=True)
+        b = self.fixture("inputs/b.png", xmp=True)
+        (inputs / "broken.png").write_bytes(b"not a png")
+        (inputs / "notes.txt").write_text("not an image")
+        (inputs / "nested").mkdir()
+        self.fixture("inputs/nested/hidden.png", xmp=True)
+        original = {p.name: sha256(p) for p in (a, b)}
+        report = self.images.batch_images(inputs, output)
+        self.assertEqual(report["total"], 3)
+        self.assertEqual(report["success"], 2)
+        self.assertEqual(report["failed"], 1)
+        self.assertEqual([r["input_name"] for r in report["results"]], ["a.jpg", "b.png", "broken.png"])
+        self.assertFalse((output / "hidden-clean.png").exists())
+        self.assertTrue((output / "a-clean.jpg").exists())
+        self.assertTrue((output / "b-clean.png.report.json").exists())
+        self.assertNotIn(str(self.tmp), json.dumps(report))
+        for p in (a, b):
+            self.assertEqual(sha256(p), original[p.name])
+
+    def test_batch_dry_run_creates_no_output_and_collisions_are_not_overwritten(self):
+        inputs = self.tmp / "source-folder"
+        inputs.mkdir()
+        self.fixture("source-folder/a.png", xmp=True)
+        self.fixture("source-folder/b.png", xmp=True)
+        self.private_metadata(inputs / "a.png")
+        output = self.tmp / "planned-folder"
+        report = self.images.batch_images(inputs, output, profile="privacy", dry_run=True)
+        self.assertEqual(report["planned"], 2)
+        self.assertFalse(output.exists())
+        self.assertEqual(report["results"][0]["plan"]["profile"], "privacy")
+        self.assertGreater(report["results"][0]["plan"]["targeted_tag_count"], 0)
+        self.assertIn("GPS", report["results"][0]["plan"]["groups_to_remove"])
+        output.mkdir()
+        existing = output / "a-privacy.png"
+        existing.write_bytes(b"preexisting output")
+        report = self.images.batch_images(inputs, output, profile="privacy")
+        self.assertEqual(report["failed"], 1)
+        self.assertEqual(report["success"], 1)
+        self.assertEqual(existing.read_bytes(), b"preexisting output")
+
+    def test_batch_refuses_symlink_files_without_reading_their_targets(self):
+        inputs = self.tmp / "links"
+        inputs.mkdir()
+        outside = self.fixture("outside.png", xmp=True)
+        linked = inputs / "linked.png"
+        try:
+            linked.symlink_to(outside)
+        except (OSError, NotImplementedError):
+            self.skipTest("Symlink creation unavailable")
+        original = outside.read_bytes()
+        report = self.images.batch_images(inputs, self.tmp / "link-results")
+        self.assertEqual(report["failed"], 1)
+        self.assertEqual(report["success"], 0)
+        self.assertEqual(outside.read_bytes(), original)
+        self.assertNotIn(str(outside), json.dumps(report))
+
+    def test_batch_cli_returns_failure_when_one_file_fails_without_raw_error_paths(self):
+        inputs = self.tmp / "mixed-cli"
+        inputs.mkdir()
+        self.fixture("mixed-cli/good.png", xmp=True)
+        (inputs / "bad.png").write_bytes(b"broken")
+        completed = subprocess.run([sys.executable, str(SCRIPT), "batch", str(inputs),
+                                    "--output-dir", str(self.tmp / "mixed-results")],
+                                   capture_output=True, text=True, check=False)
+        self.assertEqual(completed.returncode, 1, completed.stderr)
+        result = json.loads(completed.stdout)
+        self.assertEqual(result["success"], 1)
+        self.assertEqual(result["failed"], 1)
+        self.assertNotIn(str(self.tmp), completed.stdout)
+        self.assertNotIn("Traceback", completed.stdout + completed.stderr)
 
 
 class ImageDependencyAndCliTests(unittest.TestCase):

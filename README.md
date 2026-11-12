@@ -2,9 +2,18 @@
 
 Una skill open source in italiano per Claude Code e Codex: revisione di e-mail, messaggi e riassunti, con un modulo locale per ispezionare e rimuovere metadati XMP e contenitori JUMBF dalle immagini.
 
-**Stato: anteprima 0.1.0.** L'efficacia editoriale non è ancora stata misurata con una valutazione umana: lo stato del benchmark è `not_validated`.
+**Stato: anteprima 0.2.0.** L'efficacia editoriale non è ancora stata misurata con una valutazione umana: lo stato del benchmark è `not_validated`. Le ricerche utilizzate e i relativi limiti sono descritti in [Ricerca](docs/RESEARCH.md).
 
-Il modulo testi guida la revisione di chiarezza, ritmo e tono, richiedendo di conservare il significato. Il modulo immagini lavora su una copia e controlla che pixel decodificati, EXIF e profilo ICC restino invariati. **Non rimuove watermark incorporati nei pixel, non rileva SynthID e non garantisce l'assenza dell'etichetta AI su Instagram.**
+Il modulo testi guida la revisione di chiarezza, ritmo e tono, richiedendo di conservare il significato. Il modulo immagini lavora su una copia e controlla pixel, orientamento, colore e le modifiche ai metadati ammesse dal profilo scelto. **Non rimuove watermark incorporati nei pixel, non rileva SynthID e non garantisce l'assenza dell'etichetta AI su Instagram.**
+
+| Funzione | Cosa fa |
+| --- | --- |
+| Voce personale | Usa un profilo stilistico locale, salvato soltanto quando lo chiedi. |
+| Intensità | Revisione minima, maggiore fluidità o ristrutturazione del testo. |
+| Controllo e differenze | Segnala cambiamenti di numeri, citazioni, link e vincoli; mostra le modifiche su richiesta. |
+| Immagini | Elabora singoli file o cartelle, con rapporti sintetici e un profilo distinto per metadati personali. |
+| Installazione | Controlla i requisiti e aggiorna da una versione locale scelta, con backup e ripristino. |
+| Valutazione | Prepara confronti ciechi per revisori umani e ammette nuovi dataset autorizzati. |
 
 ## Installa chiedendolo al tuo agente
 
@@ -61,12 +70,12 @@ non occorre altro. Per le immagini segui la sezione successiva, usando un
 ambiente Python dedicato. Il download iniziale e l'installazione delle
 dipendenze richiedono normalmente Internet; l'elaborazione immagini resta locale.
 
-Per aggiornare, scarica e controlla la nuova versione; conserva una copia della
-skill installata prima di sostituirla manualmente. Non ci sono aggiornamenti
-automatici. Puoi rimuovere la cartella clonata dopo l'installazione, ma conserva
-l'eventuale ambiente Python se lo usi per il modulo immagini. Per disinstallare,
-rimuovi soltanto la cartella `naturale` dalla directory skill del tuo agente,
-controllando prima che non contenga personalizzazioni da salvare.
+Non ci sono aggiornamenti automatici: [diagnosi, aggiornamento e ripristino](#diagnosi-aggiornamento-e-ripristino)
+sono operazioni esplicite. Conserva la copia locale della repository per usare
+questi strumenti. Per disinstallare, rimuovi soltanto la cartella `naturale`
+dalla directory skill del tuo agente, controllando prima che non contenga
+personalizzazioni da salvare. I profili personali sono separati e non vengono
+rimossi dalla disinstallazione della skill.
 
 ## Requisiti
 
@@ -184,6 +193,72 @@ Conserva le decisioni, le scadenze e le incertezze:
 
 Puoi fornire destinatario, tono, lunghezza o esempi del tuo stile. La qualità va valutata su chiarezza e fedeltà al contenuto, senza trattare il punteggio di un rilevatore AI come prova di qualità o di paternità umana.
 
+### Intensità e voce personale
+
+```text
+Usa Naturale con intervento minimo: correggi solo ciò che serve e mantieni il mio tono.
+```
+
+```text
+Usa Naturale in modalità strutturale: riordina questa e-mail per renderla chiara,
+senza cambiare condizioni, impegni o grado di certezza. Mostrami anche le modifiche.
+```
+
+La modalità predefinita è **fluidità**, con intervento conservativo. Una modalità
+più intensa non autorizza l'aggiunta di fatti o promesse. Il riassunto rimane
+un'operazione distinta e deve essere richiesto esplicitamente.
+
+Puoi chiedere all'agente di ricavare un profilo da alcuni tuoi esempi, mostrandoti
+le caratteristiche individuate. Il profilo viene salvato solo se lo chiedi;
+contiene indicazioni stilistiche e non una copia dei testi originali. Per esempio:
+
+```text
+Da questi esempi ricava il mio stile per le e-mail di lavoro e mostrami il profilo.
+```
+
+```text
+Salva questo profilo come "lavoro". Poi usalo per riscrivere la prossima e-mail.
+```
+
+Per gestirlo direttamente, prepara un JSON approvato da te:
+
+```json
+{"register":"professionale, cordiale e diretto","conciseness":"breve","preferred_phrases":[],"avoided_phrases":["con la presente"],"punctuation":["punteggiatura sobria"],"notes":["conserva il tu o il Lei della fonte"]}
+```
+
+```sh
+python skills/naturale/scripts/text.py profiles create lavoro --from-json profilo-approvato.json
+python skills/naturale/scripts/text.py profiles show lavoro
+python skills/naturale/scripts/text.py profiles list
+python skills/naturale/scripts/text.py profiles delete lavoro
+```
+
+I profili risiedono normalmente in `~/.naturale/profiles`, fuori dalla
+repository e dalle installazioni degli agenti. Puoi modificare il JSON locale;
+il caricamento ne controlla il formato. Nessun profilo viene raccolto o
+sincronizzato automaticamente. Se lo fai leggere a un assistente cloud, il suo
+contenuto entra nel contesto di quell'assistente.
+
+### Controllo locale e confronto
+
+Su due file già presenti:
+
+```sh
+python skills/naturale/scripts/text.py audit --source originale.txt --revision rivisto.txt --diff
+```
+
+L'audit controlla elementi riconoscibili come numeri, citazioni e URL. I segnali
+su negazioni e incertezza sono euristici, da rivedere: il rapporto mantiene
+`semantic_equivalence: not_verified`. Un controllo superato non dimostra che il
+significato sia identico. Per richieste delicate l'agente confronta anche fatti,
+responsabilità, condizioni e impegni con la fonte.
+
+Puoi indicare vincoli esatti in un JSON, per esempio
+`{"preserve_exact":["non è un ordine"],"forbid":["ordine confermato"]}`, e passarlo
+con `--constraints vincoli.json`. Per un riassunto aggiungi `--operation summarize`:
+le omissioni sono ammesse, mentre i vincoli espliciti rimangono controllati.
+Consulta [i dettagli degli strumenti testo](skills/naturale/references/text-tools.md).
+
 ## Uso sulle immagini
 
 Esegui i comandi dalla radice del repository, con l'ambiente Python attivo. Per una skill già copiata puoi sostituire il percorso dello script con quello della sua directory di installazione.
@@ -212,11 +287,77 @@ Con verifica C2PA:
 python skills/naturale/scripts/images.py clean immagine.png --output immagine-copia.png --validate-c2pa
 ```
 
-Il comando `clean` produce il file richiesto e un report JSON accanto alla copia, nell'esempio `immagine-copia.png.report.json`. Rifiuta l'operazione se la destinazione o il report esistono già. L'originale resta invariato e l'elaborazione verifica la conservazione dei pixel decodificati, dei dati EXIF e del profilo ICC.
+Il comando `clean` produce il file richiesto e un report JSON accanto alla copia, nell'esempio `immagine-copia.png.report.json`. Rifiuta l'operazione se la destinazione o il report esistono già. L'originale resta invariato; nel profilo predefinito `provenance` l'elaborazione verifica la conservazione dei pixel decodificati, dei dati EXIF e del profilo ICC.
+
+La CLI restituisce normalmente un **riepilogo sintetico**, senza i valori
+grezzi dei metadati e senza i percorsi completi. Il rapporto locale completo
+può contenere dati personali: non condividerlo automaticamente con il modello.
+Per richiederlo esplicitamente su stdout usa `--full-report`; per salvarlo durante
+un'ispezione usa `inspect immagine.png --report rapporto-locale.json`.
 
 La rimozione riguarda **solo XMP e JUMBF**, che possono contenere anche informazioni diverse dalla provenienza AI. Non è una cancellazione selettiva della sola dicitura “generato con AI”, né una pulizia completa dei metadati: EXIF, incluso l'eventuale GPS, viene conservato. Rimuovere un contenitore di credenziali interrompe la disponibilità di quelle informazioni di provenienza nella copia.
 
 Le credenziali C2PA, i watermark invisibili incorporati nel contenuto e i classificatori di immagini sono tecnologie diverse. Un segnale assente o rimosso non dimostra che l'immagine sia di origine umana. I report non certificano immagini “AI-free” e non prevedono l'esito dei sistemi di etichettatura di piattaforme esterne.
+
+### Metadati personali e cartelle
+
+Il profilo predefinito `provenance` mantiene la pulizia XMP/JUMBF descritta
+sopra. Il nuovo profilo `privacy` rimuove invece i tag di posizione e gli
+identificativi indicati nella [guida immagini](skills/naturale/references/images.md),
+conservando orientamento, colore, pixel e il contenitore C2PA. Non è
+anonimizzazione completa: altri campi e le stesse credenziali conservate
+potrebbero contenere informazioni personali. Le credenziali possono diventare
+non valide dopo una modifica del file.
+
+```sh
+python skills/naturale/scripts/images.py clean immagine.jpg --output immagine-privacy.jpg --profile privacy
+python skills/naturale/scripts/images.py batch foto --output-dir foto-elaborate --dry-run
+python skills/naturale/scripts/images.py batch foto --output-dir foto-elaborate --profile privacy
+```
+
+Il batch considera soltanto i file JPEG/PNG al primo livello della cartella,
+senza seguire collegamenti simbolici. Un file non elaborabile viene segnalato
+senza interrompere gli altri; nessuna copia o rapporto esistente viene sovrascritto.
+
+## Diagnosi, aggiornamento e ripristino
+
+```sh
+python scripts/doctor.py --host codex
+```
+
+La diagnosi controlla l'installazione e i requisiti presenti. Non installa
+pacchetti, non legge credenziali e non effettua chiamate di rete. Il modulo
+testi può essere disponibile anche quando mancano strumenti facoltativi delle
+immagini. Usa `--host claude` o `--host both` per gli altri casi.
+
+Gli aggiornamenti lavorano sul checkout locale che hai scelto e controllato:
+
+```sh
+git fetch --tags origin
+git checkout v0.2.0
+python scripts/install.py --host codex --update --dry-run
+python scripts/install.py --host codex --update
+```
+
+L'installer confronta gli hash della ricevuta con i file installati. Se trova
+personalizzazioni, contenuti sconosciuti o un ambiente virtuale interno alla
+skill, si ferma senza cancellarli. Se i controlli passano, salva un backup e
+mostra dove trovarlo. Per ripristinarlo usa il percorso restituito:
+
+```sh
+python scripts/install.py --host codex --rollback /percorso/del/backup
+```
+
+I profili in `~/.naturale/profiles` non vengono toccati. Non viene effettuata
+una fusione automatica delle personalizzazioni. Se i file cambiano durante un
+aggiornamento o un ripristino interrotto, l'installer conserva le copie coinvolte
+e indica dove recuperarle manualmente, evitando di cancellare le nuove modifiche.
+
+**Migrazione dalla 0.1:** le vecchie installazioni non hanno una ricevuta di
+gestione. Copia o sposta la cartella installata in un backup scelto da te,
+controllando eventuali modifiche personali, poi esegui l'installazione della
+0.2 nella destinazione liberata. L'aggiornamento automatico rifiuta una vecchia
+copia senza ricevuta, così da non attribuirsi la gestione di file sconosciuti.
 
 ## Sviluppo e verifiche
 
@@ -228,9 +369,9 @@ python scripts/evaluate.py --validate-cases evals/cases.jsonl
 
 La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows, con Python 3.11 e 3.12; la configurazione non attesta che siano già passati su tutti questi ambienti. Linux usa il sorgente ufficiale di ExifTool 13.63; macOS e Windows usano rispettivamente Homebrew e Chocolatey. Una configurazione Linux installa anche l'integrazione C2PA facoltativa.
 
-Il [benchmark editoriale](evals/README.md) include 80 casi sintetici e un protocollo di confronto cieco. Il comando sopra controlla la struttura del dataset; senza voti umani restituisce `not_validated`. Non genera riscritture e non misura da solo la loro qualità. Consulta le [conclusioni della ricerca](docs/RESEARCH.md) per le fonti e i limiti della prima versione.
+Il [benchmark editoriale](evals/README.md) include 80 casi sintetici e un protocollo di confronto cieco, ora estensibile a nuovi dataset autorizzati. È disponibile un modello sintetico di formato e uno strumento per preparare pacchetti A/B per revisori, con associazioni private separate. Senza voti umani lo stato resta `not_validated`. Nessuno strumento genera automaticamente risultati di efficacia. Consulta le [conclusioni della ricerca](docs/RESEARCH.md) per fonti, scelte adottate e limiti.
 
-Le [verifiche eseguite](docs/VALIDATION.md) riportano ambiente, 52 test passati, rilevamento reale in Codex e controlli ancora da completare.
+Le [verifiche eseguite](docs/VALIDATION.md) riportano ambiente, 144 test locali passati, rilevamento reale in Codex e controlli ancora da completare.
 
 Per contribuire, apri un issue o una pull request con il comportamento atteso, un esempio minimo e la verifica eseguita. Usa soltanto testi e immagini che puoi condividere; rimuovi dati personali dalle fixture pubbliche. Per le modifiche editoriali includi esempi prima/dopo e controlla che non cambino fatti, negazioni, responsabilità o gradi di certezza.
 

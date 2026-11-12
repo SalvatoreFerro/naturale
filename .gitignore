@@ -16,3 +16,6 @@ dist/
 Thumbs.db
 .coverage
 htmlcov/
+.naturale/
+private/
+outputs/
