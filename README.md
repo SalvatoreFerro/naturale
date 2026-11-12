@@ -2,7 +2,7 @@
 
 Una skill open source in italiano per Claude Code e Codex: revisione di e-mail, messaggi e riassunti, con un modulo locale per ispezionare e rimuovere metadati XMP e contenitori JUMBF dalle immagini.
 
-**Stato: anteprima 0.2.0.** L'efficacia editoriale non è ancora stata misurata con una valutazione umana: lo stato del benchmark è `not_validated`. Le ricerche utilizzate e i relativi limiti sono descritti in [Ricerca](docs/RESEARCH.md).
+**Stato: anteprima 0.2.1, preparata senza tag o release.** L'efficacia editoriale non è ancora stata misurata con una valutazione umana: lo stato del benchmark è `not_validated`. Le ricerche utilizzate e i relativi limiti sono descritti in [Ricerca](docs/RESEARCH.md).
 
 Il modulo testi guida la revisione di chiarezza, ritmo e tono, richiedendo di conservare il significato. Il modulo immagini lavora su una copia e controlla pixel, orientamento, colore e le modifiche ai metadati ammesse dal profilo scelto. **Non rimuove watermark incorporati nei pixel, non rileva SynthID e non garantisce l'assenza dell'etichetta AI su Instagram.**
 
@@ -389,8 +389,8 @@ immagini. Usa `--host claude` o `--host both` per gli altri casi.
 Gli aggiornamenti lavorano sul checkout locale che hai scelto e controllato:
 
 ```sh
-git fetch --tags origin
-git checkout v0.2.0
+# Seleziona prima un commit verificato nel tuo checkout locale.
+# La preparazione 0.2.1 non crea un tag v0.2.1.
 python scripts/install.py --host codex --update --dry-run
 python scripts/install.py --host codex --update
 ```
@@ -424,7 +424,7 @@ python -m pytest
 python scripts/evaluate.py --validate-cases evals/cases.jsonl
 ```
 
-La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows, con Python 3.11 e 3.12; la configurazione non attesta che siano già passati su tutti questi ambienti. Linux usa il sorgente ufficiale di ExifTool 13.63; macOS e Windows usano rispettivamente Homebrew e Chocolatey. Una configurazione Linux installa anche l'integrazione C2PA facoltativa.
+La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows, con Python 3.11 e 3.12, più Linux con Python 3.13; la configurazione non attesta che siano già passati su tutti questi ambienti. Linux usa il sorgente ufficiale di ExifTool 13.63; macOS e Windows usano rispettivamente Homebrew e Chocolatey. Una configurazione Linux installa anche l'integrazione C2PA facoltativa.
 
 Il [benchmark editoriale](evals/README.md) include 80 casi sintetici e un protocollo di confronto cieco, ora estensibile a nuovi dataset autorizzati. È disponibile un modello sintetico di formato e uno strumento per preparare pacchetti A/B per revisori, con associazioni private separate. Senza voti umani lo stato resta `not_validated`. Nessuno strumento genera automaticamente risultati di efficacia. Consulta le [conclusioni della ricerca](docs/RESEARCH.md) per fonti, scelte adottate e limiti.
 
