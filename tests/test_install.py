@@ -21,7 +21,7 @@ class InstallerTests(unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
         self.addCleanup(self.directory.cleanup)
-        self.base = Path(self.directory.name)
+        self.base = Path(self.directory.name).resolve()
         self.home = self.base / "home"
         self.home.mkdir()
         self.source = self.base / "source"
