@@ -1,6 +1,6 @@
 ---
 name: naturale
-description: "Rivede testi italiani, e-mail e riassunti mantenendo significato e voce; offre intensità minima, fluidità e strutturale, profili di stile locali su richiesta, confronto delle modifiche e controlli di fedeltà. Ispeziona ed elabora localmente immagini JPEG/PNG, anche in cartella, con profili di provenienza o privacy e rapporti sintetici. Usa per editing, adattamento del tono, riassunti e gestione dei metadati; non promette di eludere rilevatori o etichette Instagram."
+description: "Rivede testi italiani, e-mail e riassunti preservando significato e voce. Offre profili di stile e audit locali, più strumenti locali per ispezionare e pulire metadati di immagini JPEG/PNG."
 license: MIT
 compatibility: "Claude Code e Codex. Editing con il modello dell'host; strumenti testi locali con Python 3.11 e libreria standard. Immagini con Python 3.11+, Pillow ed ExifTool; SDK C2PA facoltativo."
 ---

@@ -43,6 +43,26 @@ class SkillContractTests(unittest.TestCase):
             self.assertTrue(resolved.exists(), f"Missing skill reference: {target}")
         self.assertTrue(local, "Use explicit links to the skill's local references")
 
+    def test_description_is_short_and_focuses_on_supported_operations(self):
+        frontmatter = self.text.split("---", 2)[1]
+        description = re.search(r"(?m)^description:\s*(\S.*)$", frontmatter)
+        self.assertIsNotNone(description)
+        value = description.group(1).strip()
+        if value.startswith(('"', "'")) and value[-1] == value[0]:
+            value = value[1:-1]
+        with self.subTest(requirement="Claude app character limit"):
+            self.assertLessEqual(len(value), 200)
+        for word in ("rilevator", "detector", "instagram"):
+            with self.subTest(unwanted_description_term=word):
+                self.assertNotIn(word, value.casefold())
+
+    def test_image_and_detector_limits_remain_in_skill_body(self):
+        body = self.text.split("---", 2)[-1]
+        self.assertIn("I punteggi dei detector non sono un obiettivo né una prova di qualità.", body)
+        self.assertIn("Watermark invisibili", body)
+        self.assertIn("l'eventuale etichettatura resta sconosciuta", body)
+        self.assertIn("Non ritoccare i pixel per tentare di rimuovere watermark invisibili.", body)
+
     def test_image_script_exists_and_has_no_external_runtime_requirement(self):
         script = SKILL_DIRECTORY / "scripts" / "images.py"
         self.assertTrue(script.is_file())
