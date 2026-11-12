@@ -103,7 +103,10 @@ class ReportAssertions:
         self.assertIsInstance(report["warnings"], list)
 
 
-@unittest.skipUnless(Image is not None and EXIFTOOL, "Pillow and ExifTool required")
+@unittest.skipUnless(
+    Image is not None and EXIFTOOL and images_module()._exiftool_runtime.exiftool_report()["compatible"],
+    "Pillow and a supported ExifTool are required; older versions are rejected with exiftool_too_old",
+)
 class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
@@ -362,7 +365,7 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
             if command[-1] == "-":
                 self.assertIsNotNone(kwargs.get("stdin"))
                 self.assertFalse(kwargs["stdin"].closed)
-            else:
+            elif command[-1] != "-ver":
                 self.assertIsNotNone(kwargs.get("cwd"))
                 self.assertEqual(Path(command[-1]).name, command[-1])
                 if "-TagsFromFile" in command:

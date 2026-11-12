@@ -81,7 +81,7 @@ rimossi dalla disinstallazione della skill.
 
 - Claude Code oppure Codex per usare la skill; il modulo immagini può essere eseguito anche dalla riga di comando.
 - Python 3.11 o successivo per l'installer; per gli script immagini serve anche Pillow `>=11,<13`.
-- Solo per le immagini: [ExifTool](https://exiftool.org/) installato separatamente e disponibile come `exiftool` nel `PATH`.
+- Solo per le immagini: [ExifTool](https://exiftool.org/) **13.60 o successivo**, installato separatamente e disponibile come `exiftool` nel `PATH`.
 - Facoltativo: `c2pa-python` per richiedere la verifica delle credenziali C2PA.
 
 Il modulo immagini supporta JPEG e PNG statici, con limiti di **100 MiB per file** e **40 milioni di pixel**. Non supporta APNG, JPEG con contenitori MPF, immagini animate o altri formati.
@@ -114,10 +114,6 @@ Se l'attivazione dell'ambiente non è disponibile, usa direttamente `.venv/bin/p
 Installa ExifTool con uno dei seguenti metodi:
 
 ```sh
-# Debian / Ubuntu
-sudo apt-get update
-sudo apt-get install libimage-exiftool-perl
-
 # macOS con Homebrew
 brew install exiftool
 ```
@@ -133,7 +129,29 @@ In alternativa, segui le [istruzioni ufficiali di ExifTool](https://exiftool.org
 exiftool -ver
 ```
 
-I gestori di pacchetti possono fornire versioni meno recenti. La CI Linux usa ExifTool 13.63; se la tua versione non gestisce i contenitori JUMBF del file, installa una distribuzione recente dalle fonti ufficiali.
+**Ubuntu 24.04:** il pacchetto apt `libimage-exiftool-perl` fornisce la 12.76,
+che non è supportata per il modulo immagini. La 13.59 riproduce lo stesso errore
+nei PNG firmati; la 13.60 è la prima versione adiacente verificata che include
+la correzione ufficiale e supera la suite. `doctor.py` restituisce
+`exiftool_too_old` e `images_ready: false` sotto questa soglia; anche i comandi
+immagini si fermano prima di elaborare o pubblicare file.
+
+Per usare il sorgente ufficiale 13.63, fissato allo stesso commit della CI,
+su Linux con Git e Perl disponibili:
+
+```sh
+mkdir -p "$HOME/.local/share" "$HOME/.local/bin"
+git clone --no-checkout https://github.com/exiftool/exiftool.git "$HOME/.local/share/naturale-exiftool-13.63"
+git -C "$HOME/.local/share/naturale-exiftool-13.63" checkout --detach 1da714924f67763b6a8a7013dd2aa1983a16f87b
+ln -s "$HOME/.local/share/naturale-exiftool-13.63/exiftool" "$HOME/.local/bin/exiftool"
+export PATH="$HOME/.local/bin:$PATH"
+exiftool -ver
+```
+
+La procedura non usa `sudo` e non sovrascrive directory o link già esistenti.
+Per le sessioni future aggiungi la directory al PATH secondo il tuo ambiente.
+Il requisito minimo è definito una sola volta in
+`skills/naturale/scripts/exiftool_runtime.py`, condiviso da immagini e diagnosi.
 
 Per abilitare la verifica C2PA:
 

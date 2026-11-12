@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -13,6 +14,11 @@ import subprocess
 import sys
 import tempfile
 import warnings
+
+_runtime_spec = importlib.util.spec_from_file_location(
+    "naturale_image_runtime", Path(__file__).resolve().with_name("exiftool_runtime.py"))
+_exiftool_runtime = importlib.util.module_from_spec(_runtime_spec)
+_runtime_spec.loader.exec_module(_exiftool_runtime)
 
 SCHEMA_VERSION = "1.0"
 MAX_FILE_BYTES = 100 * 1024 * 1024
@@ -34,6 +40,19 @@ PRIVACY_REMOVE_ARGS = (
 
 class ImageError(Exception):
     """Errore operativo leggibile, senza interpretazioni sull'origine AI."""
+
+    def __init__(self, message, code="operation_failed"):
+        super().__init__(message)
+        self.code = code
+
+
+def _require_exiftool():
+    report = _exiftool_runtime.exiftool_report()
+    if report["problem"] == "exiftool_too_old":
+        raise ImageError(f"ExifTool troppo vecchio: serve almeno {report['minimum_version']}.",
+                         code="exiftool_too_old")
+    if not report["available"]:
+        raise ImageError("ExifTool non trovato o non verificabile nel PATH.")
 
 
 def _sha256(path: Path) -> str:
@@ -261,6 +280,7 @@ def _report(operation: str, before: dict, metadata: dict, validate: bool, path: 
 
 def inspect_image(path: str | Path, validate_c2pa: bool = False) -> dict:
     """Rapporto locale: non scrive file né prova a identificare l'origine dai pixel."""
+    _require_exiftool()
     source = _input_path(path)
     before = _snapshot(source)
     metadata = _metadata(source)
@@ -292,6 +312,7 @@ def clean_image(input_path: str | Path, output_path: str | Path,
     """Applica un profilo su copia, verifica e pubblica immagine e rapporto locale."""
     if profile not in PROFILES:
         raise ImageError("Profilo non supportato: usare provenance o privacy.")
+    _require_exiftool()
     source = _input_path(input_path)
     destination = Path(output_path).expanduser().absolute()
     # Canonicalizza alias del parent (/var su macOS, nomi corti su Windows),
@@ -436,6 +457,9 @@ def _save_report(report: dict, destination: str | Path) -> Path:
 
 def _safe_error(error: Exception) -> dict:
     """Non copiare messaggi parser/filepath o metadati nello stdout dell'agente."""
+    if getattr(error, "code", None) == "exiftool_too_old":
+        minimum = ".".join(map(str, _exiftool_runtime.MIN_EXIFTOOL_VERSION))
+        return {"code": "exiftool_too_old", "message": f"ExifTool non supportato: serve almeno {minimum}."}
     detail = str(error).lower()
     if "exiftool non trovato" in detail:
         return {"code": "exiftool_missing", "message": "ExifTool non disponibile nel PATH."}
@@ -450,6 +474,7 @@ def batch_images(input_directory: str | Path, output_directory: str | Path,
     """Elabora file indipendenti, senza ricorsione, mantenendo i rapporti su disco."""
     if profile not in PROFILES:
         raise ImageError("Profilo non supportato.")
+    _require_exiftool()
     raw_source = Path(input_directory).expanduser().absolute()
     if raw_source.is_symlink() or not raw_source.is_dir():
         raise ImageError("La directory di input manca o è un collegamento simbolico.")
