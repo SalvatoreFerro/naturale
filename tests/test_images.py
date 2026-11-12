@@ -1,0 +1,578 @@
+"""Behavior tests for the local image CLI; all images are temporary fixtures."""
+
+from __future__ import annotations
+
+import contextlib
+from datetime import datetime, timedelta, timezone
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import stat
+import struct
+import subprocess
+import sys
+import tempfile
+from types import SimpleNamespace
+import unittest
+from unittest.mock import MagicMock, patch
+import zlib
+
+try:
+    from PIL import Image, ImageCms
+except ImportError:
+    Image = ImageCms = None
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "skills" / "naturale" / "scripts" / "images.py"
+EXIFTOOL = shutil.which("exiftool")
+_MODULE = None
+
+
+def images_module():
+    global _MODULE
+    if _MODULE is None:
+        spec = importlib.util.spec_from_file_location("naturale_test_images", SCRIPT)
+        if spec is None or spec.loader is None:
+            raise AssertionError(f"Cannot load image module: {SCRIPT}")
+        _MODULE = importlib.util.module_from_spec(spec)
+        sys.modules[spec.name] = _MODULE
+        spec.loader.exec_module(_MODULE)
+    return _MODULE
+
+
+def sha256(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def contains_group(value, group):
+    """Handle ExifTool reports with either flat or nested group dictionaries."""
+    if not isinstance(value, dict):
+        return False
+    return any(
+        group.lower() in key.lower() or contains_group(item, group)
+        for key, item in value.items()
+    )
+
+
+@contextlib.contextmanager
+def working_directory(path):
+    old = Path.cwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(old)
+
+
+class ReportAssertions:
+    def assert_report(self, report, operation, source, destination=None):
+        self.assertEqual(report["schema_version"], "1.0")
+        self.assertEqual(report["operation"], operation)
+        for key, path in (("input", source), ("output", destination)):
+            if path is None:
+                self.assertIsNone(report[key])
+                continue
+            record = report[key]
+            self.assertEqual(Path(record["path"]), Path(path).resolve())
+            self.assertEqual(record["sha256"], sha256(path))
+            self.assertIn(record["format"], {"PNG", "JPEG"})
+            self.assertGreater(record["width"], 0)
+            self.assertGreater(record["height"], 0)
+        self.assertIsInstance(report["metadata"]["before"], dict)
+        self.assertIsInstance(report["metadata"]["removed_groups"], list)
+        for stage in ("before", "after"):
+            details = report["c2pa"][stage]
+            if stage == "after" and destination is None:
+                self.assertIsNone(details)
+                continue
+            self.assertIn(
+                details["embedded"],
+                {"present", "not_found", "unreadable", "not_checked"},
+            )
+            self.assertIn(
+                details["validation"],
+                {"valid", "invalid", "not_checked", "unavailable"},
+            )
+            self.assertEqual(details["remote_manifest"], "not_fetched")
+        self.assertEqual(report["invisible_watermark"], "not_checked")
+        self.assertEqual(report["instagram_label"], "unknown")
+        self.assertIsInstance(report["warnings"], list)
+
+
+@unittest.skipUnless(Image is not None and EXIFTOOL, "Pillow and ExifTool required")
+class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
+    def setUp(self):
+        self.directory = tempfile.TemporaryDirectory()
+        self.addCleanup(self.directory.cleanup)
+        self.tmp = Path(self.directory.name)
+        self.images = images_module()
+
+    def fixture(self, name="input.png", *, xmp=False, mode="RGB"):
+        path = self.tmp / name
+        fmt = "JPEG" if path.suffix.lower() in {".jpg", ".jpeg"} else "PNG"
+        color = (55, 100, 180, 110) if mode == "RGBA" else (55, 100, 180)
+        image = Image.new(mode, (43, 29), color)
+        exif = Image.Exif()
+        exif[0x0112] = 6
+        exif[0x0131] = "Fixture generator retained in EXIF"
+        profile = ImageCms.ImageCmsProfile(ImageCms.createProfile("sRGB")).tobytes()
+        image.save(path, format=fmt, exif=exif, icc_profile=profile)
+        if xmp:
+            result = subprocess.run(
+                [
+                    EXIFTOOL,
+                    "-config", "",
+                    "-overwrite_original",
+                    "-XMP:CreatorTool=AI fixture creator",
+                    "-XMP-dc:Description=Description for cleanup test",
+                    str(path),
+                ],
+                capture_output=True, text=True, check=False,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+        return path
+
+    def assert_same_image(self, before, after):
+        with Image.open(before) as original, Image.open(after) as cleaned:
+            original.load()
+            cleaned.load()
+            self.assertEqual(original.format, cleaned.format)
+            self.assertEqual(original.mode, cleaned.mode)
+            self.assertEqual(original.size, cleaned.size)
+            self.assertEqual(original.tobytes(), cleaned.tobytes())
+            self.assertEqual(original.info.get("icc_profile"), cleaned.info.get("icc_profile"))
+            self.assertEqual(dict(original.getexif()), dict(cleaned.getexif()))
+
+    def signed_fixture(self):
+        """Create original C2PA credentials with ephemeral local keys, never fetched fixtures."""
+        try:
+            import c2pa
+            from cryptography import x509
+            from cryptography.hazmat.primitives import hashes, serialization
+            from cryptography.hazmat.primitives.asymmetric import ec
+            from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
+        except ImportError:
+            self.skipTest("Optional c2pa-python and cryptography required")
+        if not hasattr(c2pa, "Context"):
+            self.skipTest("A C2PA SDK with per-reader offline Context is required")
+        now = datetime.now(timezone.utc)
+        root_key = ec.generate_private_key(ec.SECP256R1())
+        leaf_key = ec.generate_private_key(ec.SECP256R1())
+        root_name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "Naturale test root")])
+        leaf_name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, "Naturale test signer")])
+        root = (
+            x509.CertificateBuilder()
+            .subject_name(root_name).issuer_name(root_name)
+            .public_key(root_key.public_key()).serial_number(x509.random_serial_number())
+            .not_valid_before(now - timedelta(days=1)).not_valid_after(now + timedelta(days=2))
+            .add_extension(x509.BasicConstraints(ca=True, path_length=0), critical=True)
+            .add_extension(x509.KeyUsage(False, False, False, False, False, True, True, False, False), critical=True)
+            .add_extension(x509.SubjectKeyIdentifier.from_public_key(root_key.public_key()), critical=False)
+            .sign(root_key, hashes.SHA256())
+        )
+        leaf = (
+            x509.CertificateBuilder()
+            .subject_name(leaf_name).issuer_name(root_name)
+            .public_key(leaf_key.public_key()).serial_number(x509.random_serial_number())
+            .not_valid_before(now - timedelta(days=1)).not_valid_after(now + timedelta(days=1))
+            .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
+            .add_extension(x509.KeyUsage(True, True, False, False, False, False, False, False, False), critical=True)
+            .add_extension(x509.ExtendedKeyUsage([ExtendedKeyUsageOID.EMAIL_PROTECTION]), critical=False)
+            .add_extension(x509.AuthorityKeyIdentifier.from_issuer_public_key(root_key.public_key()), critical=False)
+            .add_extension(x509.SubjectKeyIdentifier.from_public_key(leaf_key.public_key()), critical=False)
+            .sign(root_key, hashes.SHA256())
+        )
+        chain = leaf.public_bytes(serialization.Encoding.PEM) + root.public_bytes(serialization.Encoding.PEM)
+        private = leaf_key.private_bytes(
+            serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8, serialization.NoEncryption()
+        )
+        settings = c2pa.Settings()
+        settings.update({
+            "verify": {"remote_manifest_fetch": False, "ocsp_fetch": False},
+            "builder": {"thumbnail": {"enabled": False}},
+        })
+        context = c2pa.Context(settings=settings)
+        manifest = {
+            "claim_generator_info": [{"name": "naturale-tests"}],
+            "title": "Ephemeral local test fixture", "format": "image/png",
+            "assertions": [{"label": "c2pa.actions", "data": {"actions": [{
+                "action": "c2pa.created",
+                "digitalSourceType": "http://cv.iptc.org/newscodes/digitalsourcetype/trainedAlgorithmicMedia",
+            }]}}],
+        }
+        source = self.fixture("unsigned-for-signing.png")
+        signed = self.tmp / "signed.png"
+        with c2pa.Signer.from_info(c2pa.C2paSignerInfo("es256", chain, private, None)) as signer:
+            with c2pa.Builder(manifest, context=context) as builder:
+                with source.open("rb") as original, signed.open("w+b") as destination:
+                    builder.sign(signer, "image/png", original, destination)
+        return signed
+
+    def test_inspection_is_read_only_and_reports_unknown_detection(self):
+        source = self.fixture(xmp=True)
+        original = source.read_bytes()
+        report = self.images.inspect_image(source)
+        self.assert_report(report, "inspect", source)
+        self.assertEqual(source.read_bytes(), original)
+        self.assertTrue(contains_group(report["metadata"]["before"], "xmp"))
+        self.assertIsNone(report["metadata"]["after"])
+        self.assertIsNone(report["pixel_data_unchanged"])
+        self.assertEqual(report["c2pa"]["before"]["validation"], "not_checked")
+        self.assertEqual(sorted(p.name for p in self.tmp.iterdir()), [source.name])
+
+    def test_clean_png_and_jpeg_removes_xmp_preserves_pixels_exif_and_icc(self):
+        for suffix in (".png", ".jpg"):
+            with self.subTest(suffix=suffix):
+                source = self.fixture(f"source{suffix}", xmp=True)
+                output = self.tmp / f"clean{suffix}"
+                original_hash = sha256(source)
+                report = self.images.clean_image(source, output)
+                self.assert_report(report, "clean", source, output)
+                self.assertEqual(sha256(source), original_hash)
+                self.assertTrue(report["pixel_data_unchanged"])
+                self.assertTrue(contains_group(report["metadata"]["before"], "xmp"))
+                self.assertFalse(contains_group(report["metadata"]["after"], "xmp"))
+                self.assertTrue(any("xmp" in group.lower() for group in report["metadata"]["removed_groups"]))
+                self.assert_same_image(source, output)
+                sidecar = Path(str(output) + ".report.json")
+                self.assertEqual(json.loads(sidecar.read_text(encoding="utf-8")), report)
+
+    def test_alpha_channel_is_preserved(self):
+        source = self.fixture("alpha.png", xmp=True, mode="RGBA")
+        output = self.tmp / "clean-alpha.png"
+        self.images.clean_image(source, output)
+        self.assert_same_image(source, output)
+
+    def test_embedded_jumbf_container_is_removed_without_claiming_authenticity(self):
+        source = self.fixture("embedded.png")
+
+        def box(kind, payload):
+            return struct.pack(">I", len(payload) + 8) + kind + payload
+
+        # This is a JUMBF container, not a signed or trusted C2PA credential.
+        description = bytes.fromhex("6332706100110010800000aa00389b71")
+        description += b"\x03c2pa\x00"
+        jumbf = box(b"jumb", box(b"jumd", description) + box(b"json", b'{"fixture":true}'))
+        chunk = struct.pack(">I", len(jumbf)) + b"caBX" + jumbf
+        chunk += struct.pack(">I", zlib.crc32(b"caBX" + jumbf) & 0xFFFFFFFF)
+        data = source.read_bytes()
+        # The first PNG chunk is IHDR: insert the ancillary JUMBF chunk after it.
+        first_chunk_end = 8 + 12 + struct.unpack(">I", data[8:12])[0]
+        source.write_bytes(data[:first_chunk_end] + chunk + data[first_chunk_end:])
+        output = self.tmp / "without-jumbf.png"
+        report = self.images.clean_image(source, output)
+        self.assertIn(report["c2pa"]["before"]["embedded"], {"present", "unreadable"})
+        self.assertEqual(report["c2pa"]["before"]["validation"], "not_checked")
+        self.assertEqual(report["c2pa"]["after"]["embedded"], "not_found")
+        self.assertFalse(contains_group(report["metadata"]["after"], "jumbf"))
+        self.assertTrue(any("jumbf" in group.lower() for group in report["metadata"]["removed_groups"]))
+        self.assert_same_image(source, output)
+
+    def test_no_target_metadata_is_valid_noop(self):
+        source = self.fixture()
+        output = self.tmp / "clean.png"
+        report = self.images.clean_image(source, output)
+        self.assertEqual(report["metadata"]["removed_groups"], [])
+        self.assertEqual(report["c2pa"]["after"]["embedded"], "not_found")
+        self.assert_same_image(source, output)
+
+    def test_existing_output_and_existing_sidecar_are_not_overwritten(self):
+        source = self.fixture(xmp=True)
+        for collision in ("output", "sidecar"):
+            with self.subTest(collision=collision):
+                output = self.tmp / f"{collision}.png"
+                sidecar = Path(str(output) + ".report.json")
+                existing = output if collision == "output" else sidecar
+                existing.write_bytes(b"DO NOT OVERWRITE")
+                with self.assertRaises(self.images.ImageError):
+                    self.images.clean_image(source, output)
+                self.assertEqual(existing.read_bytes(), b"DO NOT OVERWRITE")
+                self.assertFalse(sidecar.exists() if collision == "output" else output.exists())
+
+    def test_input_cannot_be_its_own_output(self):
+        source = self.fixture(xmp=True)
+        original = source.read_bytes()
+        with self.assertRaises(self.images.ImageError):
+            self.images.clean_image(source, source)
+        self.assertEqual(source.read_bytes(), original)
+
+    def test_unicode_and_option_like_input_filenames(self):
+        for name in ("immagine è vulcano.png", "-overwrite_original.png"):
+            with self.subTest(name=name):
+                source = self.fixture(name, xmp=True)
+                output = self.tmp / (source.stem + "-clean.png")
+                with working_directory(self.tmp):
+                    report = self.images.clean_image(Path(source.name), Path(output.name))
+                self.assert_report(report, "clean", source, output)
+                self.assertFalse(contains_group(report["metadata"]["after"], "xmp"))
+                self.assert_same_image(source, output)
+
+    def test_actual_format_and_extension_must_match(self):
+        source = self.fixture("actual.jpg")
+        mismatch = self.tmp / "disguised.png"
+        mismatch.write_bytes(source.read_bytes())
+        with self.assertRaises(self.images.ImageError):
+            self.images.inspect_image(mismatch)
+
+    def test_output_extension_cannot_request_silent_format_conversion(self):
+        source = self.fixture("source.png")
+        output = self.tmp / "wrong-format.jpg"
+        with self.assertRaises(self.images.ImageError):
+            self.images.clean_image(source, output)
+        self.assertFalse(output.exists())
+
+    def test_unsupported_formats_and_corrupt_files_are_rejected(self):
+        unsupported = self.tmp / "image.gif"
+        Image.new("RGB", (4, 4)).save(unsupported)
+        corrupt = self.tmp / "broken.png"
+        corrupt.write_bytes(b"\x89PNG\r\n\x1a\ntruncated image")
+        for source in (unsupported, corrupt, self.tmp / "missing.png"):
+            with self.subTest(source=source.name):
+                with self.assertRaises(self.images.ImageError):
+                    self.images.inspect_image(source)
+
+    def test_animated_png_is_rejected(self):
+        source = self.tmp / "animation.png"
+        first = Image.new("RGB", (8, 8), "red")
+        second = Image.new("RGB", (8, 8), "blue")
+        first.save(source, save_all=True, append_images=[second], duration=100, loop=0)
+        with self.assertRaises(self.images.ImageError):
+            self.images.inspect_image(source)
+
+    def test_cli_inspect_and_clean_emit_json(self):
+        source = self.fixture("cli.png", xmp=True)
+        output = self.tmp / "cli-clean.png"
+        for arguments, operation in (
+            (["inspect", str(source)], "inspect"),
+            (["clean", str(source), "--output", str(output)], "clean"),
+        ):
+            with self.subTest(operation=operation):
+                completed = subprocess.run(
+                    [sys.executable, str(SCRIPT), *arguments],
+                    capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr)
+                report = json.loads(completed.stdout)
+                self.assert_report(report, operation, source, output if operation == "clean" else None)
+
+    def test_optional_c2pa_adapter_disables_remote_manifest_and_ocsp_fetch(self):
+        source = self.fixture("offline.png")
+        configured = {}
+        readers = []
+
+        class Settings:
+            def update(self, values):
+                configured.update(values)
+
+        class Context:
+            def __init__(self, settings=None):
+                self.settings = settings
+
+        class Reader:
+            def __init__(inner, path, context=None):
+                self.assertIsNotNone(context)
+                self.assertIs(configured["verify"]["remote_manifest_fetch"], False)
+                self.assertIs(configured["verify"]["ocsp_fetch"], False)
+                readers.append(path)
+
+            def __enter__(inner):
+                return inner
+
+            def __exit__(inner, *_):
+                return False
+
+            def json(inner):
+                return '{"validation_status": []}'
+
+        sdk = SimpleNamespace(Settings=Settings, Context=Context, Reader=Reader)
+        real_import = self.images.importlib.import_module
+
+        def import_sdk(name, *args, **kwargs):
+            return sdk if name == "c2pa" else real_import(name, *args, **kwargs)
+
+        with patch.object(self.images.importlib, "import_module", side_effect=import_sdk):
+            report = self.images.inspect_image(source, validate_c2pa=True)
+        self.assertEqual(readers, [str(source.resolve())])
+        self.assertEqual(report["c2pa"]["before"]["remote_manifest"], "not_fetched")
+
+    def test_real_optional_sdk_on_unsigned_image_does_not_claim_valid_signature(self):
+        try:
+            import c2pa  # noqa: F401 - this test requires the optional real SDK
+        except ImportError:
+            self.skipTest("Optional c2pa-python required")
+        source = self.fixture("unsigned.png")
+        report = self.images.inspect_image(source, validate_c2pa=True)
+        self.assertEqual(report["c2pa"]["before"]["embedded"], "not_found")
+        self.assertEqual(report["c2pa"]["before"]["validation"], "not_checked")
+        self.assertEqual(report["c2pa"]["before"]["remote_manifest"], "not_fetched")
+
+    def test_real_signed_c2pa_is_valid_but_not_implicitly_trusted_and_can_be_cleaned(self):
+        source = self.signed_fixture()
+        output = self.tmp / "signed-clean.png"
+        report = self.images.clean_image(source, output, validate_c2pa=True)
+        self.assertEqual(report["c2pa"]["before"]["embedded"], "present")
+        self.assertEqual(report["c2pa"]["before"]["validation"], "valid")
+        self.assertNotEqual(report["c2pa"]["before"].get("signer_trust"), "trusted")
+        self.assertEqual(report["c2pa"]["after"]["embedded"], "not_found")
+        self.assertEqual(report["c2pa"]["after"]["validation"], "not_checked")
+        self.assert_same_image(source, output)
+
+    def test_real_c2pa_hash_mismatch_is_invalid_although_png_still_decodes(self):
+        source = self.signed_fixture()
+        data = source.read_bytes()
+        chunks = []
+        offset = 8
+        while offset < len(data):
+            size = struct.unpack(">I", data[offset:offset + 4])[0]
+            kind = data[offset + 4:offset + 8]
+            payload = data[offset + 8:offset + 8 + size]
+            chunks.append((kind, payload))
+            offset += size + 12
+        pixels = bytearray(zlib.decompress(b"".join(payload for kind, payload in chunks if kind == b"IDAT")))
+        pixels[1] ^= 1
+        replacement = zlib.compress(pixels)
+        rebuilt = bytearray(data[:8])
+        replaced = False
+        for kind, payload in chunks:
+            if kind == b"IDAT":
+                if replaced:
+                    continue
+                payload = replacement
+                replaced = True
+            rebuilt.extend(struct.pack(">I", len(payload)) + kind + payload)
+            rebuilt.extend(struct.pack(">I", zlib.crc32(kind + payload) & 0xFFFFFFFF))
+        tampered = self.tmp / "tampered.png"
+        tampered.write_bytes(rebuilt)
+        with Image.open(tampered) as readable:
+            readable.load()
+        report = self.images.inspect_image(tampered, validate_c2pa=True)
+        self.assertEqual(report["c2pa"]["before"]["embedded"], "present")
+        self.assertEqual(report["c2pa"]["before"]["validation"], "invalid")
+        self.assertEqual(report["c2pa"]["before"]["remote_manifest"], "not_fetched")
+
+    def test_missing_optional_c2pa_dependency_does_not_break_inspection(self):
+        source = self.fixture("without-sdk.png")
+        real_import = self.images.importlib.import_module
+
+        def without_sdk(name, *args, **kwargs):
+            if name == "c2pa":
+                raise ImportError("Optional SDK intentionally unavailable")
+            return real_import(name, *args, **kwargs)
+
+        with patch.object(self.images.importlib, "import_module", side_effect=without_sdk):
+            report = self.images.inspect_image(source, validate_c2pa=True)
+        self.assertEqual(report["c2pa"]["before"]["validation"], "unavailable")
+        self.assertTrue(report["warnings"])
+
+    def test_incomplete_sdk_results_cannot_imply_a_valid_signature(self):
+        source = self.fixture("incomplete-c2pa-report.png")
+        real_import = self.images.importlib.import_module
+        for response in ({}, {"validation_state": "Valid", "active_manifest": "missing", "manifests": {}}):
+            with self.subTest(response=response):
+                settings = MagicMock()
+                reader = MagicMock()
+                reader.return_value.__enter__.return_value.json.return_value = json.dumps(response)
+                sdk = SimpleNamespace(Settings=lambda: settings, Context=lambda settings: object(), Reader=reader)
+
+                def import_sdk(name, *args, **kwargs):
+                    return sdk if name == "c2pa" else real_import(name, *args, **kwargs)
+
+                with patch.object(self.images.importlib, "import_module", side_effect=import_sdk):
+                    report = self.images.inspect_image(source, validate_c2pa=True)
+                self.assertEqual(report["c2pa"]["before"]["validation"], "not_checked")
+
+    @unittest.skipUnless(os.name == "posix", "Unix file permissions")
+    def test_published_image_and_report_are_private_to_the_user(self):
+        source = self.fixture("private-input.png", xmp=True)
+        output = self.tmp / "private-output.png"
+        previous_umask = os.umask(0)
+        try:
+            self.images.clean_image(source, output)
+        finally:
+            os.umask(previous_umask)
+        self.assertEqual(stat.S_IMODE(output.stat().st_mode), 0o600)
+        self.assertEqual(stat.S_IMODE(Path(str(output) + ".report.json").stat().st_mode), 0o600)
+
+    def test_exiftool_write_failure_publishes_nothing(self):
+        source = self.fixture("write-fails.png", xmp=True)
+        output = self.tmp / "must-not-exist.png"
+        original = source.read_bytes()
+        real_run = subprocess.run
+
+        def fail_write(command, *args, **kwargs):
+            if "-XMP:all=" in command:
+                return subprocess.CompletedProcess(command, 1, "", "Simulated write failure")
+            return real_run(command, *args, **kwargs)
+
+        with patch.object(self.images.subprocess, "run", side_effect=fail_write):
+            with self.assertRaises(self.images.ImageError):
+                self.images.clean_image(source, output)
+        self.assertEqual(source.read_bytes(), original)
+        self.assertFalse(output.exists())
+        self.assertFalse(Path(str(output) + ".report.json").exists())
+        self.assertEqual(sorted(self.tmp.iterdir()), [source])
+
+    def test_pixel_verification_failure_publishes_nothing(self):
+        source = self.fixture("verify-fails.png", xmp=True)
+        output = self.tmp / "must-not-be-published.png"
+        original = source.read_bytes()
+        real_run = subprocess.run
+
+        def corrupt_after_write(command, *args, **kwargs):
+            result = real_run(command, *args, **kwargs)
+            if "-XMP:all=" in command and result.returncode == 0:
+                temporary = Path(command[-1])
+                with Image.open(temporary) as image:
+                    image.load()
+                    image.putpixel((0, 0), (255, 0, 0))
+                    image.save(temporary)
+            return result
+
+        with patch.object(self.images.subprocess, "run", side_effect=corrupt_after_write):
+            with self.assertRaises(self.images.ImageError):
+                self.images.clean_image(source, output)
+        self.assertEqual(source.read_bytes(), original)
+        self.assertFalse(output.exists())
+        self.assertFalse(Path(str(output) + ".report.json").exists())
+        self.assertEqual(sorted(self.tmp.iterdir()), [source])
+
+
+class ImageDependencyAndCliTests(unittest.TestCase):
+    def test_missing_publish_source_does_not_reserve_an_empty_destination(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "missing-source.png"
+            destination = Path(directory) / "no-residue.png"
+            with self.assertRaises(OSError):
+                images_module()._publish_exclusive(source, destination)
+            self.assertFalse(destination.exists())
+
+    def test_missing_exiftool_is_a_clear_cli_error(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = Path(directory) / "input.png"
+            if Image is None:
+                self.skipTest("Pillow required to create test image")
+            Image.new("RGB", (3, 3)).save(source)
+            env = dict(os.environ, PATH="")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "inspect", str(source)],
+                capture_output=True, text=True, env=env, check=False,
+            )
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("exiftool", result.stderr.lower())
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_cli_usage_error_is_not_a_python_traceback(self):
+        result = subprocess.run(
+            [sys.executable, str(SCRIPT), "clean"],
+            capture_output=True, text=True, check=False,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn("Traceback", result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main()
