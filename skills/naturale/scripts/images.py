@@ -41,7 +41,7 @@ def _sha256(path: Path) -> str:
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def _exiftool(*args: str) -> str:
+def _exiftool(*args: str, cwd: str | Path | None = None, stdin=None) -> str:
     executable = shutil.which("exiftool")
     if not executable:
         raise ImageError("ExifTool non trovato nel PATH. Installarlo prima di elaborare immagini.")
@@ -50,7 +50,7 @@ def _exiftool(*args: str) -> str:
         result = subprocess.run(
             [executable, "-config", "", *args], capture_output=True,
             encoding="utf-8", errors="replace", timeout=TIMEOUT_SECONDS,
-            check=False, shell=False,
+            check=False, shell=False, cwd=cwd, stdin=stdin,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise ImageError(f"ExifTool non eseguibile o scaduto: {exc}") from exc
@@ -61,7 +61,10 @@ def _exiftool(*args: str) -> str:
 
 def _metadata(path: Path) -> dict:
     try:
-        data = json.loads(_exiftool("-json", "-G1", "-s", "-n", "-struct", str(path)))
+        # Python apre il nome Unicode; ExifTool legge il descriptor già aperto.
+        # Anche i surrogate-pair Windows non vengono interpretati da Perl/argv.
+        with path.open("rb") as source:
+            data = json.loads(_exiftool("-json", "-G1", "-s", "-n", "-struct", "-", stdin=source))
     except (ValueError, TypeError) as exc:
         raise ImageError("Rapporto ExifTool non leggibile.") from exc
     if not isinstance(data, list) or len(data) != 1 or not isinstance(data[0], dict):
@@ -71,6 +74,7 @@ def _metadata(path: Path) -> dict:
         if key.split(":")[-1] == "Error":
             raise ImageError(f"ExifTool non riesce a leggere il file: {value}")
     # Date/permessi di filesystem del temporaneo non descrivono l'output finale.
+    metadata["SourceFile"] = str(path)
     return {key: value for key, value in metadata.items() if not key.startswith("System:")}
 
 
@@ -127,10 +131,11 @@ def _jumbf_digest(path: Path, required: bool = False) -> str:
     if not executable:
         raise ImageError("ExifTool non trovato nel PATH.")
     try:
-        result = subprocess.run(
-            [executable, "-config", "", "-b", "-JUMBF", str(path)],
-            capture_output=True, timeout=TIMEOUT_SECONDS, check=False, shell=False,
-        )
+        with path.open("rb") as source:
+            result = subprocess.run(
+                [executable, "-config", "", "-b", "-JUMBF", "-"],
+                stdin=source, capture_output=True, timeout=TIMEOUT_SECONDS, check=False, shell=False,
+            )
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise ImageError("Estrazione locale JUMBF non completata.") from exc
     if result.returncode or (required and not result.stdout):
@@ -326,8 +331,12 @@ def clean_image(input_path: str | Path, output_path: str | Path,
             technical = {36864: "ExifVersion", 37121: "ComponentsConfiguration", 40960: "FlashpixVersion", 40961: "ColorSpace"}
             retain = [f"-EXIF:{name}" for key, name in technical.items() if key in before["_exif"]["exif"]]
             if retain:
-                remove_args = (*remove_args, "-TagsFromFile", str(source), *retain)
-        _exiftool("-overwrite_original", *remove_args, str(temp))
+                original = Path(tempdir) / ("original" + destination.suffix.lower())
+                shutil.copyfile(source, original)
+                remove_args = (*remove_args, "-TagsFromFile", original.name, *retain)
+        # Tutti i nomi passati a ExifTool sono relativi e ASCII. Il cwd Unicode
+        # è impostato da Python tramite le API native del sistema operativo.
+        _exiftool("-overwrite_original", *remove_args, temp.name, cwd=Path(tempdir))
         after = _snapshot(temp)
         metadata_after = _metadata(temp)
         leftovers = _groups(metadata_after) if profile == "provenance" else _privacy_targets(metadata_after)

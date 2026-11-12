@@ -79,6 +79,11 @@ pubblicare l'output, lo script confronta formato, dimensioni, pixel decodificati
 trasparenza, palette, proprietà di colore, ICC e gli EXIF non autorizzati alla
 rimozione. In caso di errore non pubblica l'output o il suo rapporto.
 
+I percorsi con accenti o emoji sono gestiti da Python: le letture ExifTool usano
+file già aperti su stdin e le scritture nomi ASCII in una directory temporanea.
+Non è necessario rinominare gli originali per aggirare i limiti dei nomi Unicode
+di ExifTool su Windows.
+
 ## Cartelle e anteprima
 
 `batch` seleziona soltanto JPEG/PNG al primo livello, in ordine stabile, senza

@@ -10,7 +10,7 @@ eseguiti, non una garanzia universale sul comportamento dei modelli o di Meta.
 | Ambiente | Linux, Python 3.12.14 |
 | Pillow / ExifTool | 12.3.0 / 13.63 |
 | SDK C2PA facoltativo | c2pa-python 0.38.1 |
-| Suite Python completa locale | 144 test passati, 37 sottocasi passati; nessun test saltato |
+| Suite Python completa locale | 146 test passati, 37 sottocasi passati; nessun test saltato |
 | Dataset editoriale | 80 casi validi, 40 sviluppo e 40 heldout |
 | Valutazione umana | Non eseguita; `not_validated` |
 | Codex reale | 0.167.0-alpha.4: rilevamento `naturale` riuscito via `skills/list`, skill abilitata, nessun errore |
@@ -56,6 +56,8 @@ I comandi del pacchetto copiato sono eseguiti anche da una directory indipendent
 - Audit: numeri, citazioni, URL, vincoli, riassunti e diff; limiti dimostrati con
   scambi di responsabilità che un confronto meccanico non può certificare.
 - Output CLI UTF-8 anche con codifica di pipe Windows simulata, inclusi emoji.
+- Nomi e directory immagini Unicode: letture ExifTool da stdin e scritture su
+  staging con nomi relativi ASCII, includendo contenitori JUMBF firmati.
 - Diagnosi locale e rapporti privi di percorsi o messaggi grezzi degli strumenti.
 - Formato di valutazione estensibile, pacchetti ciechi, assegnazioni bilanciate,
   modello/versione registrati, soglia per caso, copertura minima e dati autorizzati

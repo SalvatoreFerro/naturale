@@ -355,6 +355,7 @@ e indica dove recuperarle manualmente, evitando di cancellare le nuove modifiche
 
 **Migrazione dalla 0.1:** le vecchie installazioni non hanno una ricevuta di
 gestione. Copia o sposta la cartella installata in un backup scelto da te,
+fuori dalla directory delle skill dell'agente,
 controllando eventuali modifiche personali, poi esegui l'installazione della
 0.2 nella destinazione liberata. L'aggiornamento automatico rifiuta una vecchia
 copia senza ricevuta, così da non attribuirsi la gestione di file sconosciuti.
@@ -371,7 +372,7 @@ La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows,
 
 Il [benchmark editoriale](evals/README.md) include 80 casi sintetici e un protocollo di confronto cieco, ora estensibile a nuovi dataset autorizzati. È disponibile un modello sintetico di formato e uno strumento per preparare pacchetti A/B per revisori, con associazioni private separate. Senza voti umani lo stato resta `not_validated`. Nessuno strumento genera automaticamente risultati di efficacia. Consulta le [conclusioni della ricerca](docs/RESEARCH.md) per fonti, scelte adottate e limiti.
 
-Le [verifiche eseguite](docs/VALIDATION.md) riportano ambiente, 144 test locali passati, rilevamento reale in Codex e controlli ancora da completare.
+Le [verifiche eseguite](docs/VALIDATION.md) riportano ambiente, 146 test locali passati, rilevamento reale in Codex e controlli ancora da completare.
 
 Per contribuire, apri un issue o una pull request con il comportamento atteso, un esempio minimo e la verifica eseguita. Usa soltanto testi e immagini che puoi condividere; rimuovi dati personali dalle fixture pubbliche. Per le modifiche editoriali includi esempi prima/dopo e controlla che non cambino fatti, negazioni, responsabilità o gradi di certezza.
 

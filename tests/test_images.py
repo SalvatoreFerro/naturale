@@ -346,6 +346,64 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
         sidecar = Path(str(output) + ".report.json")
         self.assertEqual(json.loads(sidecar.read_text(encoding="utf-8")), report)
 
+    def test_emoji_filename_and_parent_are_not_passed_to_exiftool_arguments(self):
+        prepared = self.fixture("prepared-for-unicode.png", xmp=True)
+        self.private_metadata(prepared)
+        folder = self.tmp / "cartella riservata è 🌋"
+        folder.mkdir()
+        source = folder / "foto proprietà 🌈.png"
+        prepared.replace(source)
+        original = source.read_bytes()
+        calls = []
+        real_run = subprocess.run
+
+        def ascii_arguments(command, *args, **kwargs):
+            self.assertTrue(all(str(argument).isascii() for argument in command[1:]), command[1:])
+            if command[-1] == "-":
+                self.assertIsNotNone(kwargs.get("stdin"))
+                self.assertFalse(kwargs["stdin"].closed)
+            else:
+                self.assertIsNotNone(kwargs.get("cwd"))
+                self.assertEqual(Path(command[-1]).name, command[-1])
+                if "-TagsFromFile" in command:
+                    tag_source = command[command.index("-TagsFromFile") + 1]
+                    self.assertTrue(tag_source.startswith("original."))
+                    self.assertTrue((Path(kwargs["cwd"]) / tag_source).is_file())
+            calls.append(command)
+            return real_run(command, *args, **kwargs)
+
+        with patch.object(self.images.subprocess, "run", side_effect=ascii_arguments):
+            inspection = self.images.inspect_image(source)
+            self.assertEqual(inspection["metadata"]["before"]["SourceFile"], str(source.resolve()))
+            for profile in ("provenance", "privacy"):
+                output = folder / ("copia 🌋 " + profile + ".png")
+                report = self.images.clean_image(source, output, profile=profile)
+                self.assert_report(report, "clean", source, output)
+                self.assertEqual(report["metadata"]["after"]["SourceFile"], str(output.resolve()))
+                self.assertTrue(report["pixel_data_unchanged"])
+                if profile == "privacy":
+                    self.assertFalse(self.images._privacy_targets(report["metadata"]["after"]))
+                else:
+                    self.assertFalse(self.images._groups(report["metadata"]["after"]))
+        self.assertEqual(source.read_bytes(), original)
+        self.assertTrue(any("-TagsFromFile" in command for command in calls))
+        self.assertTrue(any(command[-1] == "-" for command in calls))
+
+    def test_emoji_signed_image_preserves_jumbf_through_binary_stdin(self):
+        prepared = self.signed_fixture(private=True)
+        folder = self.tmp / "credenziali 🔏"
+        folder.mkdir()
+        source = folder / "origine 🌋.png"
+        prepared.replace(source)
+        output = folder / "copia privata 🌈.png"
+        original = source.read_bytes()
+        report = self.images.clean_image(source, output, profile="privacy")
+        self.assertTrue(report["c2pa_container_unchanged"])
+        self.assertEqual(report["c2pa"]["after"]["embedded"], "present")
+        self.assertEqual(self.images._jumbf_digest(source, required=True),
+                         self.images._jumbf_digest(output, required=True))
+        self.assertEqual(source.read_bytes(), original)
+
     def test_actual_format_and_extension_must_match(self):
         source = self.fixture("actual.jpg")
         mismatch = self.tmp / "disguised.png"
@@ -560,7 +618,7 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
         def corrupt_after_write(command, *args, **kwargs):
             result = real_run(command, *args, **kwargs)
             if "-XMP:all=" in command and result.returncode == 0:
-                temporary = Path(command[-1])
+                temporary = Path(kwargs.get("cwd", Path.cwd())) / command[-1]
                 with Image.open(temporary) as image:
                     image.load()
                     image.putpixel((0, 0), (255, 0, 0))
