@@ -48,6 +48,9 @@ il singolo comando, sceglie una directory diversa. `create` non sovrascrive un
 profilo esistente. `show` e `list` leggono soltanto; `delete` elimina un profilo e
 va usato solo dopo una richiesta esplicita di cancellazione. La creazione
 protegge il file con permessi privati dove supportati dal sistema.
+La home e la base di `--directory` vengono risolte nel percorso reale, anche
+quando passano da un collegamento simbolico. Restano rifiutati i collegamenti
+in `.naturale/profiles`, nella directory finale scelta e nei file dei profili.
 
 Per modificare un profilo, mostrare prima quello esistente e applicare soltanto
 le modifiche richieste al suo JSON locale; mantenerne schema e limiti e

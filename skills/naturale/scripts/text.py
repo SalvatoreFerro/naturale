@@ -125,7 +125,13 @@ def validate_profile(data, name: str | None = None) -> dict:
 
 
 def _profile_directory(directory: str | Path | None = None, create: bool = False) -> Path:
-    target = Path(directory).expanduser().absolute() if directory is not None else Path.home() / ".naturale" / "profiles"
+    if directory is None:
+        target = Path.home().expanduser().resolve() / ".naturale" / "profiles"
+    else:
+        target = Path(directory).expanduser().absolute()
+        # Risolve gli alias della base, non il deposito finale: un link a
+        # profiles deve restare visibile ai controlli qui sotto.
+        target = target.parent.resolve() / target.name
     current = Path(target.anchor)
     for part in target.parts[1:]:
         current = current / part
