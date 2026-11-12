@@ -347,10 +347,13 @@ def clean_image(input_path: str | Path, output_path: str | Path,
         shutil.copyfile(source, temp)
         remove_args = ("-XMP:all=", "-JUMBF:all=") if profile == "provenance" else PRIVACY_REMOVE_ARGS
         if profile == "privacy":
-            # ExifTool può eliminare un ExifIFD rimasto con soli campi tecnici.
-            # Ricopia soltanto quelli già presenti: mai reintrodurre i tag privati.
+            # Togliendo gli ultimi tag privati ExifTool può eliminare anche
+            # IFD0/ExifIFD rimasti con soli campi tecnici. Ricopia soltanto i
+            # valori già presenti: mai creare default o reintrodurre dati privati.
             technical = {36864: "ExifVersion", 37121: "ComponentsConfiguration", 40960: "FlashpixVersion", 40961: "ColorSpace"}
             retain = [f"-EXIF:{name}" for key, name in technical.items() if key in before["_exif"]["exif"]]
+            ifd0_technical = {282: "XResolution", 283: "YResolution", 296: "ResolutionUnit", 531: "YCbCrPositioning"}
+            retain.extend(f"-IFD0:{name}" for key, name in ifd0_technical.items() if key in before["_exif"]["ifd0"])
             if retain:
                 original = Path(tempdir) / ("original" + destination.suffix.lower())
                 shutil.copyfile(source, original)

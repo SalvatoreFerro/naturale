@@ -67,6 +67,13 @@ Non elimina tutti i dati personali: altri campi XMP/IPTC, descrizioni, persone
 visibili, nomi di file o credenziali possono ancora contenerli. I campi tecnici
 EXIF già presenti vengono conservati; non vengono introdotti nuovi dati personali.
 
+Se il GPS era l'unico contenuto non tecnico dell'EXIF, ExifTool può rimuovere
+anche l'intero blocco. Lo script conserva dalla fonte soltanto gli eventuali
+`XResolution`, `YResolution`, `ResolutionUnit` e `YCbCrPositioning` di IFD0,
+oltre ai campi tecnici ExifIFD già gestiti. Non inventa valori mancanti e non
+ammette altre perdite: qualsiasi ulteriore variazione EXIF continua a bloccare
+la pubblicazione dell'output.
+
 Nel profilo `privacy`, il contenitore JUMBF viene confrontato byte per byte prima
 e dopo e deve restare identico. Le credenziali mantenute possono contenere copie
 o asserzioni di dati personali e riferimenti. Una modifica dei metadati può
