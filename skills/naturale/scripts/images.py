@@ -27,6 +27,7 @@ TIMEOUT_SECONDS = 60
 SUFFIXES = {"JPEG": {".jpg", ".jpeg"}, "PNG": {".png"}}
 PROFILES = {"provenance", "privacy"}
 MAX_BATCH_FILES = 1000
+RETENTION_WARNINGS = ("nothing_removed", "generation_text_retained", "gps_retained")
 EXIF_PRIVATE_IDS = {0xA430, 0xA431, 0xA435, 0xC62F}
 PRIVATE_NAMES = {"OwnerName", "SerialNumber", "LensSerialNumber", "CameraSerialNumber"}
 EXIF_GROUPS = {"IFD0", "IFD1", "ExifIFD", "InteropIFD"}
@@ -119,6 +120,47 @@ def _privacy_targets(metadata: dict) -> set[str]:
         elif group.startswith("XMP-") and (name.startswith("GPS") or name in PRIVATE_NAMES):
             targets.add(key)
     return targets
+
+
+def _png_has_text(path: Path) -> bool:
+    """Inspect chunk types only: never decode, decompress or expose text values."""
+    size = path.stat().st_size
+    with path.open("rb") as stream:
+        if stream.read(8) != b"\x89PNG\r\n\x1a\n":
+            raise ImageError("Struttura PNG non verificabile.", code="verification_failed")
+        offset = 8
+        while offset < size:
+            header = stream.read(8)
+            if len(header) != 8:
+                raise ImageError("Chunk PNG non verificabile.", code="verification_failed")
+            length, kind = int.from_bytes(header[:4], "big"), header[4:]
+            if length > size - offset - 12:
+                raise ImageError("Lunghezza chunk PNG non verificabile.", code="verification_failed")
+            if kind in {b"tEXt", b"iTXt", b"zTXt"}:
+                return True
+            if kind == b"IEND":
+                return False
+            stream.seek(length + 4, 1)
+            offset += length + 12
+    raise ImageError("Fine PNG non verificabile.", code="verification_failed")
+
+
+def _retained_warning_codes(path: Path, report: dict) -> list[str]:
+    metadata = report["metadata"]
+    result = []
+    if not metadata["removed_groups"] and not metadata.get("removed_tags"):
+        result.append("nothing_removed")
+    if report["output"]["format"] == "PNG":
+        has_text = _png_has_text(path)
+    else:
+        has_text = any(key.split(":")[-1] in {"Comment", "UserComment", "ImageDescription"}
+                       for key in metadata["after"])
+    if has_text:
+        result.append("generation_text_retained")
+    if report["profile"] == "provenance" and any(
+            key.startswith("GPS:") for key in metadata["after"]):
+        result.append("gps_retained")
+    return result
 
 
 def _exif_snapshot(image) -> dict:
@@ -391,6 +433,7 @@ def clean_image(input_path: str | Path, output_path: str | Path,
             report["c2pa_container_unchanged"] = True if "JUMBF" in _groups(metadata_before) else None
         report["pixel_data_unchanged"] = True
         report["c2pa"]["after"] = _c2pa(temp, metadata_after, validate_c2pa, report["warnings"])
+        report["warnings"].extend(_retained_warning_codes(temp, report))
         temp_report = Path(tempdir) / "report.json"
         temp_report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         image_published = False
@@ -431,6 +474,7 @@ def summarize_report(report: dict) -> dict:
         "warnings": ["invisible_watermark_not_checked", "instagram_label_unknown"],
         "local_warning_count": len(report["warnings"]),
     }
+    result["warnings"].extend(code for code in RETENTION_WARNINGS if code in report["warnings"])
     if "profile" in report:
         result["profile"] = report["profile"]
     if report.get("profile") == "privacy":

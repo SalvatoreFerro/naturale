@@ -127,6 +127,16 @@ viene applicata implicitamente.
 - `retained_credentials_may_contain_personal_data` ricorda il limite del profilo
   privacy quando rimangono credenziali; `local_report_contains_original_metadata`
   ricorda che il rapporto conserva i dati prima della pulizia.
+- `nothing_removed`: non è stata verificata alcuna rimozione dei gruppi o tag
+  mirati. La copia può essere stata scritta, ma non va presentata come pulita.
+- `generation_text_retained`: restano chunk PNG `tEXt`, `iTXt` o `zTXt`, oppure
+  commenti/descrizioni JPEG. Comprende `parameters`, `prompt`, `workflow`,
+  `Comment`, `Description` e keyword non note. Non prova che il testo sia di
+  origine AI; lo scanner controlla i contenitori senza leggerne o decomprimerne
+  i valori. Il profilo `provenance` continua a rimuovere solo XMP/JUMBF.
+- `gps_retained`: dopo `provenance` restano tag EXIF GPS. Non presentare quella
+  copia come privata o priva di posizione. I codici compaiono anche nel rapporto
+  completo; il riepilogo non espone i valori conservati.
 - `invisible_watermark: not_checked` e `instagram_label: unknown` rimangono sempre
   espliciti. Nessuna rimozione SynthID o previsione delle etichette Meta è verificata.
 
