@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import importlib.metadata as metadata
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -18,6 +19,10 @@ HOSTS = {"claude": ".claude", "codex": ".agents"}
 MAX_DOCUMENT_BYTES = 1024 * 1024
 EXIFTOOL_TIMEOUT = 10
 VERSION_PATTERN = re.compile(r"\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?\Z")
+_runtime_spec = importlib.util.spec_from_file_location(
+    "naturale_doctor_runtime", Path(__file__).resolve().parents[1] / "skills/naturale/scripts/exiftool_runtime.py")
+_exiftool_runtime = importlib.util.module_from_spec(_runtime_spec)
+_runtime_spec.loader.exec_module(_exiftool_runtime)
 
 
 def _read_text(path: Path) -> str:
@@ -124,26 +129,7 @@ def _package_version(distribution: str) -> str | None:
 
 
 def _exiftool_report() -> dict:
-    result = {"available": False, "version": None, "problem": None}
-    executable = shutil.which("exiftool")
-    if not executable:
-        result["problem"] = "not_found"
-        return result
-    try:
-        completed = subprocess.run(
-            [executable, "-config", "", "-ver"], capture_output=True,
-            text=True, encoding="utf-8", errors="replace", timeout=EXIFTOOL_TIMEOUT,
-            check=False, shell=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        result["problem"] = "not_executable_or_timeout"
-        return result
-    version = completed.stdout.strip()
-    if completed.returncode or not re.fullmatch(r"\d+(?:\.\d+){1,2}", version):
-        result["problem"] = "version_check_failed"
-        return result
-    result.update(available=True, version=version)
-    return result
+    return _exiftool_runtime.exiftool_report(timeout=EXIFTOOL_TIMEOUT)
 
 
 def doctor(host: str = "both", home: str | Path | None = None) -> dict:
@@ -185,7 +171,7 @@ def doctor(host: str = "both", home: str | Path | None = None) -> dict:
             "c2pa": {"available": c2pa_version is not None, "version": c2pa_version,
                      "optional": True, "checked_by": "package_metadata"},
         },
-        "images_ready": supported_python and pillow_compatible and exiftool["available"],
+        "images_ready": supported_python and pillow_compatible and exiftool["compatible"],
         "ready": supported_python and any(item["text_ready"] for item in hosts),
         "network_used": False,
     }

@@ -1,0 +1,10 @@
+{
+  "name": "naturale",
+  "version": "0.2.1",
+  "description": "Revisione di testi italiani, profili di voce e strumenti locali per immagini, con controlli e rapporti verificabili.",
+  "author": {
+    "name": "SalvatoreFerro"
+  },
+  "repository": "https://github.com/SalvatoreFerro/naturale",
+  "license": "MIT"
+}

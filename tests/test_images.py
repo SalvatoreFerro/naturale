@@ -103,7 +103,10 @@ class ReportAssertions:
         self.assertIsInstance(report["warnings"], list)
 
 
-@unittest.skipUnless(Image is not None and EXIFTOOL, "Pillow and ExifTool required")
+@unittest.skipUnless(
+    Image is not None and EXIFTOOL and images_module()._exiftool_runtime.exiftool_report()["compatible"],
+    "Pillow and a supported ExifTool are required; older versions are rejected with exiftool_too_old",
+)
 class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
     def setUp(self):
         self.directory = tempfile.TemporaryDirectory()
@@ -362,7 +365,7 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
             if command[-1] == "-":
                 self.assertIsNotNone(kwargs.get("stdin"))
                 self.assertFalse(kwargs["stdin"].closed)
-            else:
+            elif command[-1] != "-ver":
                 self.assertIsNotNone(kwargs.get("cwd"))
                 self.assertEqual(Path(command[-1]).name, command[-1])
                 if "-TagsFromFile" in command:
@@ -632,6 +635,74 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
         self.assertFalse(output.exists())
         self.assertFalse(Path(str(output) + ".report.json").exists())
         self.assertEqual(sorted(self.tmp.iterdir()), [source])
+
+    def gps_only_fixture(self, name):
+        path = self.tmp / name
+        Image.new("RGB", (64, 48), (200, 80, 40)).save(path)
+        completed = subprocess.run([
+            EXIFTOOL, "-config", "", "-overwrite_original",
+            "-GPSLatitude=37.6", "-GPSLatitudeRef=N",
+            "-GPSLongitude=15.0", "-GPSLongitudeRef=E", str(path),
+        ], capture_output=True, text=True, check=False)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        return path
+
+    def assert_gps_only_privacy_preserves_ifd0(self, suffix):
+        source = self.gps_only_fixture("gps-only" + suffix)
+        original_bytes = source.read_bytes()
+        with Image.open(source) as original:
+            expected_ifd0 = {key: value for key, value in original.getexif().items() if key != 34853}
+            pixels = original.tobytes()
+        self.assertTrue(expected_ifd0, "The GPS-only fixture must have technical IFD0 tags")
+        self.assertLessEqual(set(expected_ifd0), {282, 283, 296, 531})
+        output = self.tmp / ("gps-only-privacy" + suffix)
+        report = self.images.clean_image(source, output, profile="privacy")
+        self.assertEqual(source.read_bytes(), original_bytes)
+        self.assertTrue(report["pixel_data_unchanged"])
+        self.assertFalse(self.images._privacy_targets(report["metadata"]["after"]))
+        with Image.open(output) as cleaned:
+            self.assertEqual(dict(cleaned.getexif()), expected_ifd0)
+            self.assertEqual(cleaned.tobytes(), pixels)
+
+    def test_privacy_gps_only_jpeg_preserves_existing_ifd0_tags(self):
+        self.assert_gps_only_privacy_preserves_ifd0(".jpg")
+
+    def test_privacy_gps_only_png_preserves_existing_ifd0_tags(self):
+        self.assert_gps_only_privacy_preserves_ifd0(".png")
+
+    def test_privacy_unrelated_make_or_date_change_still_publishes_nothing(self):
+        for suffix in (".jpg", ".png"):
+            for tag, changed_value in (("IFD0:Make", "CHANGED-CAMERA"),
+                                       ("ExifIFD:DateTimeOriginal", "2027:01:01 00:00:00")):
+                with self.subTest(suffix=suffix, tag=tag):
+                    source = self.gps_only_fixture("unrelated-" + tag.split(":")[-1] + suffix)
+                    completed = subprocess.run([
+                        EXIFTOOL, "-config", "", "-overwrite_original",
+                        "-IFD0:Make=ORIGINAL-CAMERA",
+                        "-ExifIFD:DateTimeOriginal=2026:11:12 12:00:00", str(source),
+                    ], capture_output=True, text=True, check=False)
+                    self.assertEqual(completed.returncode, 0, completed.stderr)
+                    original_bytes = source.read_bytes()
+                    output = self.tmp / ("blocked-" + tag.split(":")[-1] + suffix)
+                    real_exiftool = self.images._exiftool
+
+                    def alter_after_write(*arguments, **kwargs):
+                        result = real_exiftool(*arguments, **kwargs)
+                        if "-overwrite_original" in arguments:
+                            temporary = Path(kwargs.get("cwd") or Path.cwd()) / arguments[-1]
+                            altered = subprocess.run([
+                                EXIFTOOL, "-config", "", "-overwrite_original",
+                                f"-{tag}={changed_value}", str(temporary),
+                            ], capture_output=True, text=True, check=False)
+                            self.assertEqual(altered.returncode, 0, altered.stderr)
+                        return result
+
+                    with patch.object(self.images, "_exiftool", side_effect=alter_after_write):
+                        with self.assertRaises(self.images.ImageError):
+                            self.images.clean_image(source, output, profile="privacy")
+                    self.assertEqual(source.read_bytes(), original_bytes)
+                    self.assertFalse(output.exists())
+                    self.assertFalse(Path(str(output) + ".report.json").exists())
 
     def test_privacy_removes_only_selected_identifiers_and_preserves_rendering(self):
         for suffix in (".png", ".jpg"):

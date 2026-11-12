@@ -2,7 +2,7 @@
 
 Una skill open source in italiano per Claude Code e Codex: revisione di e-mail, messaggi e riassunti, con un modulo locale per ispezionare e rimuovere metadati XMP e contenitori JUMBF dalle immagini.
 
-**Stato: anteprima 0.2.0.** L'efficacia editoriale non è ancora stata misurata con una valutazione umana: lo stato del benchmark è `not_validated`. Le ricerche utilizzate e i relativi limiti sono descritti in [Ricerca](docs/RESEARCH.md).
+**Stato: anteprima 0.2.1, preparata senza tag o release.** L'efficacia editoriale non è ancora stata misurata con una valutazione umana: lo stato del benchmark è `not_validated`. Le ricerche utilizzate e i relativi limiti sono descritti in [Ricerca](docs/RESEARCH.md).
 
 Il modulo testi guida la revisione di chiarezza, ritmo e tono, richiedendo di conservare il significato. Il modulo immagini lavora su una copia e controlla pixel, orientamento, colore e le modifiche ai metadati ammesse dal profilo scelto. **Non rimuove watermark incorporati nei pixel, non rileva SynthID e non garantisce l'assenza dell'etichetta AI su Instagram.**
 
@@ -81,7 +81,7 @@ rimossi dalla disinstallazione della skill.
 
 - Claude Code oppure Codex per usare la skill; il modulo immagini può essere eseguito anche dalla riga di comando.
 - Python 3.11 o successivo per l'installer; per gli script immagini serve anche Pillow `>=11,<13`.
-- Solo per le immagini: [ExifTool](https://exiftool.org/) installato separatamente e disponibile come `exiftool` nel `PATH`.
+- Solo per le immagini: [ExifTool](https://exiftool.org/) **13.60 o successivo**, installato separatamente e disponibile come `exiftool` nel `PATH`.
 - Facoltativo: `c2pa-python` per richiedere la verifica delle credenziali C2PA.
 
 Il modulo immagini supporta JPEG e PNG statici, con limiti di **100 MiB per file** e **40 milioni di pixel**. Non supporta APNG, JPEG con contenitori MPF, immagini animate o altri formati.
@@ -114,10 +114,6 @@ Se l'attivazione dell'ambiente non è disponibile, usa direttamente `.venv/bin/p
 Installa ExifTool con uno dei seguenti metodi:
 
 ```sh
-# Debian / Ubuntu
-sudo apt-get update
-sudo apt-get install libimage-exiftool-perl
-
 # macOS con Homebrew
 brew install exiftool
 ```
@@ -133,7 +129,29 @@ In alternativa, segui le [istruzioni ufficiali di ExifTool](https://exiftool.org
 exiftool -ver
 ```
 
-I gestori di pacchetti possono fornire versioni meno recenti. La CI Linux usa ExifTool 13.63; se la tua versione non gestisce i contenitori JUMBF del file, installa una distribuzione recente dalle fonti ufficiali.
+**Ubuntu 24.04:** il pacchetto apt `libimage-exiftool-perl` fornisce la 12.76,
+che non è supportata per il modulo immagini. La 13.59 riproduce lo stesso errore
+nei PNG firmati; la 13.60 è la prima versione adiacente verificata che include
+la correzione ufficiale e supera la suite. `doctor.py` restituisce
+`exiftool_too_old` e `images_ready: false` sotto questa soglia; anche i comandi
+immagini si fermano prima di elaborare o pubblicare file.
+
+Per usare il sorgente ufficiale 13.63, fissato allo stesso commit della CI,
+su Linux con Git e Perl disponibili:
+
+```sh
+mkdir -p "$HOME/.local/share" "$HOME/.local/bin"
+git clone --no-checkout https://github.com/exiftool/exiftool.git "$HOME/.local/share/naturale-exiftool-13.63"
+git -C "$HOME/.local/share/naturale-exiftool-13.63" checkout --detach 1da714924f67763b6a8a7013dd2aa1983a16f87b
+ln -s "$HOME/.local/share/naturale-exiftool-13.63/exiftool" "$HOME/.local/bin/exiftool"
+export PATH="$HOME/.local/bin:$PATH"
+exiftool -ver
+```
+
+La procedura non usa `sudo` e non sovrascrive directory o link già esistenti.
+Per le sessioni future aggiungi la directory al PATH secondo il tuo ambiente.
+Il requisito minimo è definito una sola volta in
+`skills/naturale/scripts/exiftool_runtime.py`, condiviso da immagini e diagnosi.
 
 Per abilitare la verifica C2PA:
 
@@ -142,6 +160,44 @@ python -m pip install '.[c2pa]'
 ```
 
 L'installazione iniziale delle dipendenze richiede normalmente una connessione; l'elaborazione dei file è locale. La verifica C2PA locale non equivale a un controllo online aggiornato della fiducia o della revoca dei certificati.
+
+## Installazione come plugin Claude Code (opzionale)
+
+Scegli l'installazione manuale oppure il plugin, evitando di caricare due copie
+della stessa skill in Claude Code. L'installazione per Codex rimane quella
+descritta sopra: il plugin è un'alternativa riservata a Claude Code.
+
+In una sessione di **Claude Code 2.1.275 o successivo**:
+
+```text
+/plugin install naturale --marketplace SalvatoreFerro/naturale
+```
+
+Segui il pannello per aggiungere il marketplace e scegliere l'ambito di
+installazione. In alternativa, dalla shell usa i due comandi:
+
+```sh
+claude plugin marketplace add SalvatoreFerro/naturale
+claude plugin install naturale@naturale-marketplace
+```
+
+Il marketplace si chiama `naturale-marketplace`; la skill del plugin si richiama
+come **`/naturale:naturale`**. I comandi di installazione scaricano il pacchetto
+e registrano il plugin nella configurazione di Claude Code. Il pacchetto non
+aggiunge hook, servizi MCP o dipendenze eseguite automaticamente; gli script
+locali conservano il comportamento senza rete descritto in questo README.
+
+Per controllare i manifest da una copia locale della repository:
+
+```sh
+claude plugin validate .
+claude plugin list
+```
+
+`scripts/doctor.py` controlla le cartelle di installazione manuale, non la cache
+dei plugin Claude. Per verificare un'installazione plugin usa `claude plugin list`;
+Pillow, ExifTool e l'eventuale SDK C2PA devono comunque essere presenti per le
+rispettive funzioni immagini.
 
 ## Installazione della skill
 
@@ -333,8 +389,8 @@ immagini. Usa `--host claude` o `--host both` per gli altri casi.
 Gli aggiornamenti lavorano sul checkout locale che hai scelto e controllato:
 
 ```sh
-git fetch --tags origin
-git checkout v0.2.0
+# Seleziona prima un commit verificato nel tuo checkout locale.
+# La preparazione 0.2.1 non crea un tag v0.2.1.
 python scripts/install.py --host codex --update --dry-run
 python scripts/install.py --host codex --update
 ```
@@ -368,7 +424,7 @@ python -m pytest
 python scripts/evaluate.py --validate-cases evals/cases.jsonl
 ```
 
-La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows, con Python 3.11 e 3.12; la configurazione non attesta che siano già passati su tutti questi ambienti. Linux usa il sorgente ufficiale di ExifTool 13.63; macOS e Windows usano rispettivamente Homebrew e Chocolatey. Una configurazione Linux installa anche l'integrazione C2PA facoltativa.
+La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows, con Python 3.11 e 3.12, più Linux con Python 3.13; la configurazione non attesta che siano già passati su tutti questi ambienti. Linux usa il sorgente ufficiale di ExifTool 13.63; macOS e Windows usano rispettivamente Homebrew e Chocolatey. Una configurazione Linux installa anche l'integrazione C2PA facoltativa.
 
 Il [benchmark editoriale](evals/README.md) include 80 casi sintetici e un protocollo di confronto cieco, ora estensibile a nuovi dataset autorizzati. È disponibile un modello sintetico di formato e uno strumento per preparare pacchetti A/B per revisori, con associazioni private separate. Senza voti umani lo stato resta `not_validated`. Nessuno strumento genera automaticamente risultati di efficacia. Consulta le [conclusioni della ricerca](docs/RESEARCH.md) per fonti, scelte adottate e limiti.
 

@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.1 — preparazione, non rilasciata
+
+- Audit testi: calendario italiano, numeri in lettere, scadenze, negazioni e
+  incertezza; normalizzazione di euro e orari, JSON su stdin ed exit `3` per
+  segnali che richiedono revisione. Responsabilità e significato restano
+  soggetti a controllo editoriale.
+- ExifTool minimo 13.60 condiviso fra diagnostica e immagini, verificato sul
+  difetto dei PNG firmati; guida Ubuntu 24.04 per aggiornare la 12.76.
+- Privacy GPS-only JPEG/PNG: conservati i campi tecnici IFD0 già presenti,
+  con blocco invariato su qualsiasi altra modifica EXIF.
+- Avvisi espliciti per nessuna rimozione, testo PNG/commenti JPEG e GPS
+  conservati. Il profilo provenance continua a rimuovere solo XMP/JUMBF.
+- Errori immagini tipizzati senza valori personali nei riepiloghi.
+- Profili utilizzabili attraverso home/base simboliche, con rifiuto dei
+  symlink nel deposito e sui file finali e nessuna sovrascrittura.
+- Action CI aggiornate e fissate per SHA, matrice estesa a Linux/Python 3.13;
+  limite Pillow `<13` conservato.
+- Description della skill ridotta a 189 caratteri e manifest facoltativi
+  plugin/marketplace Claude, validati con Claude Code 2.1.275.
+- Dataset editoriale invariato; nessuna nuova misura della qualità dei modelli.
+
 ## 0.2.0 — anteprima
 
 - Profili di voce locali riutilizzabili, creati solo su richiesta, modificabili

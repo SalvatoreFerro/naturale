@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -14,6 +15,11 @@ import sys
 import tempfile
 import warnings
 
+_runtime_spec = importlib.util.spec_from_file_location(
+    "naturale_image_runtime", Path(__file__).resolve().with_name("exiftool_runtime.py"))
+_exiftool_runtime = importlib.util.module_from_spec(_runtime_spec)
+_runtime_spec.loader.exec_module(_exiftool_runtime)
+
 SCHEMA_VERSION = "1.0"
 MAX_FILE_BYTES = 100 * 1024 * 1024
 MAX_PIXELS = 40_000_000
@@ -21,6 +27,7 @@ TIMEOUT_SECONDS = 60
 SUFFIXES = {"JPEG": {".jpg", ".jpeg"}, "PNG": {".png"}}
 PROFILES = {"provenance", "privacy"}
 MAX_BATCH_FILES = 1000
+RETENTION_WARNINGS = ("nothing_removed", "generation_text_retained", "gps_retained")
 EXIF_PRIVATE_IDS = {0xA430, 0xA431, 0xA435, 0xC62F}
 PRIVATE_NAMES = {"OwnerName", "SerialNumber", "LensSerialNumber", "CameraSerialNumber"}
 EXIF_GROUPS = {"IFD0", "IFD1", "ExifIFD", "InteropIFD"}
@@ -35,6 +42,19 @@ PRIVACY_REMOVE_ARGS = (
 class ImageError(Exception):
     """Errore operativo leggibile, senza interpretazioni sull'origine AI."""
 
+    def __init__(self, message, code="operation_failed"):
+        super().__init__(message)
+        self.code = code
+
+
+def _require_exiftool():
+    report = _exiftool_runtime.exiftool_report()
+    if report["problem"] == "exiftool_too_old":
+        raise ImageError(f"ExifTool troppo vecchio: serve almeno {report['minimum_version']}.",
+                         code="exiftool_too_old")
+    if not report["available"]:
+        raise ImageError("ExifTool non trovato o non verificabile nel PATH.", code="exiftool_missing")
+
 
 def _sha256(path: Path) -> str:
     with path.open("rb") as stream:
@@ -44,7 +64,7 @@ def _sha256(path: Path) -> str:
 def _exiftool(*args: str, cwd: str | Path | None = None, stdin=None) -> str:
     executable = shutil.which("exiftool")
     if not executable:
-        raise ImageError("ExifTool non trovato nel PATH. Installarlo prima di elaborare immagini.")
+        raise ImageError("ExifTool non trovato nel PATH. Installarlo prima di elaborare immagini.", code="exiftool_missing")
     try:
         # Un file .ExifTool_config dell'utente può contenere codice Perl: non caricarlo.
         result = subprocess.run(
@@ -66,13 +86,13 @@ def _metadata(path: Path) -> dict:
         with path.open("rb") as source:
             data = json.loads(_exiftool("-json", "-G1", "-s", "-n", "-struct", "-", stdin=source))
     except (ValueError, TypeError) as exc:
-        raise ImageError("Rapporto ExifTool non leggibile.") from exc
+        raise ImageError("Rapporto ExifTool non leggibile.", code="verification_failed") from exc
     if not isinstance(data, list) or len(data) != 1 or not isinstance(data[0], dict):
-        raise ImageError("Rapporto ExifTool inatteso.")
+        raise ImageError("Rapporto ExifTool inatteso.", code="verification_failed")
     metadata = data[0]
     for key, value in metadata.items():
         if key.split(":")[-1] == "Error":
-            raise ImageError(f"ExifTool non riesce a leggere il file: {value}")
+            raise ImageError(f"ExifTool non riesce a leggere il file: {value}", code="verification_failed")
     # Date/permessi di filesystem del temporaneo non descrivono l'output finale.
     metadata["SourceFile"] = str(path)
     return {key: value for key, value in metadata.items() if not key.startswith("System:")}
@@ -102,6 +122,47 @@ def _privacy_targets(metadata: dict) -> set[str]:
     return targets
 
 
+def _png_has_text(path: Path) -> bool:
+    """Inspect chunk types only: never decode, decompress or expose text values."""
+    size = path.stat().st_size
+    with path.open("rb") as stream:
+        if stream.read(8) != b"\x89PNG\r\n\x1a\n":
+            raise ImageError("Struttura PNG non verificabile.", code="verification_failed")
+        offset = 8
+        while offset < size:
+            header = stream.read(8)
+            if len(header) != 8:
+                raise ImageError("Chunk PNG non verificabile.", code="verification_failed")
+            length, kind = int.from_bytes(header[:4], "big"), header[4:]
+            if length > size - offset - 12:
+                raise ImageError("Lunghezza chunk PNG non verificabile.", code="verification_failed")
+            if kind in {b"tEXt", b"iTXt", b"zTXt"}:
+                return True
+            if kind == b"IEND":
+                return False
+            stream.seek(length + 4, 1)
+            offset += length + 12
+    raise ImageError("Fine PNG non verificabile.", code="verification_failed")
+
+
+def _retained_warning_codes(path: Path, report: dict) -> list[str]:
+    metadata = report["metadata"]
+    result = []
+    if not metadata["removed_groups"] and not metadata.get("removed_tags"):
+        result.append("nothing_removed")
+    if report["output"]["format"] == "PNG":
+        has_text = _png_has_text(path)
+    else:
+        has_text = any(key.split(":")[-1] in {"Comment", "UserComment", "ImageDescription"}
+                       for key in metadata["after"])
+    if has_text:
+        result.append("generation_text_retained")
+    if report["profile"] == "provenance" and any(
+            key.startswith("GPS:") for key in metadata["after"]):
+        result.append("gps_retained")
+    return result
+
+
 def _exif_snapshot(image) -> dict:
     """Confronta valori EXIF, non gli offset che cambiano eliminando un IFD."""
     exif = image.getexif()
@@ -129,7 +190,7 @@ def _jumbf_digest(path: Path, required: bool = False) -> str:
     """Hash dei byte estratti del contenitore, senza decodificarli come testo."""
     executable = shutil.which("exiftool")
     if not executable:
-        raise ImageError("ExifTool non trovato nel PATH.")
+        raise ImageError("ExifTool non trovato nel PATH.", code="exiftool_missing")
     try:
         with path.open("rb") as source:
             result = subprocess.run(
@@ -137,9 +198,9 @@ def _jumbf_digest(path: Path, required: bool = False) -> str:
                 stdin=source, capture_output=True, timeout=TIMEOUT_SECONDS, check=False, shell=False,
             )
     except (OSError, subprocess.TimeoutExpired) as exc:
-        raise ImageError("Estrazione locale JUMBF non completata.") from exc
+        raise ImageError("Estrazione locale JUMBF non completata.", code="verification_failed") from exc
     if result.returncode or (required and not result.stdout):
-        raise ImageError("Contenitore JUMBF non verificabile.")
+        raise ImageError("Contenitore JUMBF non verificabile.", code="verification_failed")
     return hashlib.sha256(result.stdout).hexdigest()
 
 
@@ -147,22 +208,22 @@ def _snapshot(path: Path) -> dict:
     try:
         from PIL import Image, UnidentifiedImageError
     except ImportError as exc:
-        raise ImageError("Pillow non installato. Installare le dipendenze del modulo immagini.") from exc
+        raise ImageError("Pillow non installato. Installare le dipendenze del modulo immagini.", code="pillow_missing") from exc
     try:
         if path.stat().st_size > MAX_FILE_BYTES:
-            raise ImageError("File oltre il limite di 100 MiB.")
+            raise ImageError("File oltre il limite di 100 MiB.", code="file_too_large")
         with warnings.catch_warnings():
             warnings.simplefilter("error", Image.DecompressionBombWarning)
             with Image.open(path) as im:
                 fmt = im.format
                 if fmt not in SUFFIXES:
-                    raise ImageError("Formato non supportato: usare JPEG o PNG statici.")
+                    raise ImageError("Formato non supportato: usare JPEG o PNG statici.", code="unsupported_format")
                 if path.suffix.lower() not in SUFFIXES[fmt]:
-                    raise ImageError("Estensione e formato reale non corrispondono.")
+                    raise ImageError("Estensione e formato reale non corrispondono.", code="extension_mismatch")
                 if im.width * im.height > MAX_PIXELS:
-                    raise ImageError("Immagine oltre il limite di 40 milioni di pixel.")
+                    raise ImageError("Immagine oltre il limite di 40 milioni di pixel.", code="too_many_pixels")
                 if getattr(im, "n_frames", 1) != 1 or "mp" in im.info:
-                    raise ImageError("Immagini animate o multiple non supportate.")
+                    raise ImageError("Immagini animate o multiple non supportate.", code="multiframe_not_supported")
                 im.verify()
             with Image.open(path) as im:
                 im.load()
@@ -178,9 +239,11 @@ def _snapshot(path: Path) -> dict:
                 }
     except ImageError:
         raise
-    except (OSError, ValueError, SyntaxError, UnidentifiedImageError,
-            Image.DecompressionBombError, Image.DecompressionBombWarning) as exc:
-        raise ImageError(f"Immagine non leggibile o non sicura da decodificare: {exc}") from exc
+    except (Image.DecompressionBombError, Image.DecompressionBombWarning) as exc:
+        raise ImageError(f"Immagine oltre il limite sicuro di pixel: {exc}", code="too_many_pixels") from exc
+    except (OSError, ValueError, SyntaxError, UnidentifiedImageError) as exc:
+        raise ImageError(f"Immagine non leggibile o non sicura da decodificare: {exc}",
+                         code="verification_failed") from exc
 
 
 def _public(snapshot: dict) -> dict:
@@ -261,12 +324,13 @@ def _report(operation: str, before: dict, metadata: dict, validate: bool, path: 
 
 def inspect_image(path: str | Path, validate_c2pa: bool = False) -> dict:
     """Rapporto locale: non scrive file né prova a identificare l'origine dai pixel."""
+    _require_exiftool()
     source = _input_path(path)
     before = _snapshot(source)
     metadata = _metadata(source)
     report = _report("inspect", before, metadata, validate_c2pa, source)
     if _sha256(source) != before["sha256"]:
-        raise ImageError("L'input è cambiato durante l'ispezione. Riprovare con un file stabile.")
+        raise ImageError("L'input è cambiato durante l'ispezione. Riprovare con un file stabile.", code="verification_failed")
     return report
 
 
@@ -281,9 +345,11 @@ def _publish_exclusive(temp: Path, destination: Path) -> None:
                 shutil.copyfileobj(source, out)
                 out.flush()
                 os.fsync(out.fileno())
-    except Exception:
+    except Exception as exc:
         if created:
             destination.unlink(missing_ok=True)
+        if isinstance(exc, FileExistsError):
+            raise ImageError("La destinazione esiste già.", code="output_exists") from exc
         raise
 
 
@@ -292,6 +358,7 @@ def clean_image(input_path: str | Path, output_path: str | Path,
     """Applica un profilo su copia, verifica e pubblica immagine e rapporto locale."""
     if profile not in PROFILES:
         raise ImageError("Profilo non supportato: usare provenance o privacy.")
+    _require_exiftool()
     source = _input_path(input_path)
     destination = Path(output_path).expanduser().absolute()
     # Canonicalizza alias del parent (/var su macOS, nomi corti su Windows),
@@ -300,12 +367,12 @@ def clean_image(input_path: str | Path, output_path: str | Path,
     # lexists intercetta anche link simbolici pendenti.
     sidecar = Path(str(destination) + ".report.json")
     if destination.resolve() == source or os.path.lexists(destination) or os.path.lexists(sidecar):
-        raise ImageError("L'output o il rapporto esistono già, oppure coincidono con l'originale.")
+        raise ImageError("L'output o il rapporto esistono già, oppure coincidono con l'originale.", code="output_exists")
     if not destination.parent.is_dir():
         raise ImageError("La directory di destinazione non esiste.")
     before = _snapshot(source)
     if destination.suffix.lower() not in SUFFIXES[before["format"]]:
-        raise ImageError("L'output deve mantenere il formato e un'estensione coerente con l'input.")
+        raise ImageError("L'output deve mantenere il formato e un'estensione coerente con l'input.", code="extension_mismatch")
     metadata_before = _metadata(source)
     report = _report("clean", before, metadata_before, validate_c2pa, source)
     report["profile"] = profile
@@ -326,10 +393,13 @@ def clean_image(input_path: str | Path, output_path: str | Path,
         shutil.copyfile(source, temp)
         remove_args = ("-XMP:all=", "-JUMBF:all=") if profile == "provenance" else PRIVACY_REMOVE_ARGS
         if profile == "privacy":
-            # ExifTool può eliminare un ExifIFD rimasto con soli campi tecnici.
-            # Ricopia soltanto quelli già presenti: mai reintrodurre i tag privati.
+            # Togliendo gli ultimi tag privati ExifTool può eliminare anche
+            # IFD0/ExifIFD rimasti con soli campi tecnici. Ricopia soltanto i
+            # valori già presenti: mai creare default o reintrodurre dati privati.
             technical = {36864: "ExifVersion", 37121: "ComponentsConfiguration", 40960: "FlashpixVersion", 40961: "ColorSpace"}
             retain = [f"-EXIF:{name}" for key, name in technical.items() if key in before["_exif"]["exif"]]
+            ifd0_technical = {282: "XResolution", 283: "YResolution", 296: "ResolutionUnit", 531: "YCbCrPositioning"}
+            retain.extend(f"-IFD0:{name}" for key, name in ifd0_technical.items() if key in before["_exif"]["ifd0"])
             if retain:
                 original = Path(tempdir) / ("original" + destination.suffix.lower())
                 shutil.copyfile(source, original)
@@ -341,21 +411,21 @@ def clean_image(input_path: str | Path, output_path: str | Path,
         metadata_after = _metadata(temp)
         leftovers = _groups(metadata_after) if profile == "provenance" else _privacy_targets(metadata_after)
         if leftovers:
-            raise ImageError(f"Pulizia incompleta: gruppi ancora presenti: {', '.join(sorted(leftovers))}.")
+            raise ImageError(f"Pulizia incompleta: gruppi ancora presenti: {', '.join(sorted(leftovers))}.", code="verification_failed")
         unreadable_warnings = [str(value) for key, value in metadata_after.items() if key.split(":")[-1] == "Warning"]
         if any(profile != "privacy" or not any(term in message.lower() for term in ("c2pa", "jumbf")) for message in unreadable_warnings):
-            raise ImageError("ExifTool segnala dati non leggibili nell'output: pulizia non verificabile.")
+            raise ImageError("ExifTool segnala dati non leggibili nell'output: pulizia non verificabile.", code="verification_failed")
         invariants = ("format", "width", "height", "_pixels", "_mode", "_icc",
                       "_transparency", "_palette", "_color")
         if any(before[key] != after[key] for key in invariants):
-            raise ImageError("La verifica ha rilevato variazioni dei pixel, EXIF o della resa: output non pubblicato.")
+            raise ImageError("La verifica ha rilevato variazioni dei pixel, EXIF o della resa: output non pubblicato.", code="verification_failed")
         expected_exif = before["_exif"] if profile == "provenance" else _exif_without_private(before["_exif"])
         if after["_exif"] != expected_exif:
-            raise ImageError("La verifica ha rilevato modifiche EXIF diverse dalle rimozioni consentite: output non pubblicato.")
+            raise ImageError("La verifica ha rilevato modifiche EXIF diverse dalle rimozioni consentite: output non pubblicato.", code="verification_failed")
         if profile == "privacy" and _jumbf_digest(temp, required=has_jumbf) != jumbf_before:
-            raise ImageError("Il contenitore JUMBF/C2PA è cambiato: output non pubblicato.")
+            raise ImageError("Il contenitore JUMBF/C2PA è cambiato: output non pubblicato.", code="verification_failed")
         if _sha256(source) != before["sha256"]:
-            raise ImageError("L'originale è cambiato durante l'elaborazione: output non pubblicato.")
+            raise ImageError("L'originale è cambiato durante l'elaborazione: output non pubblicato.", code="verification_failed")
         report["output"] = {**_public(after), "path": str(destination)}
         metadata_after["SourceFile"] = str(destination)
         report["metadata"]["after"] = metadata_after
@@ -367,6 +437,7 @@ def clean_image(input_path: str | Path, output_path: str | Path,
             report["c2pa_container_unchanged"] = True if "JUMBF" in _groups(metadata_before) else None
         report["pixel_data_unchanged"] = True
         report["c2pa"]["after"] = _c2pa(temp, metadata_after, validate_c2pa, report["warnings"])
+        report["warnings"].extend(_retained_warning_codes(temp, report))
         temp_report = Path(tempdir) / "report.json"
         temp_report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         image_published = False
@@ -407,6 +478,7 @@ def summarize_report(report: dict) -> dict:
         "warnings": ["invisible_watermark_not_checked", "instagram_label_unknown"],
         "local_warning_count": len(report["warnings"]),
     }
+    result["warnings"].extend(code for code in RETENTION_WARNINGS if code in report["warnings"])
     if "profile" in report:
         result["profile"] = report["profile"]
     if report.get("profile") == "privacy":
@@ -425,8 +497,10 @@ def summarize_report(report: dict) -> dict:
 def _save_report(report: dict, destination: str | Path) -> Path:
     path = Path(destination).expanduser().absolute()
     path = path.parent.resolve() / path.name
-    if not path.parent.is_dir() or os.path.lexists(path):
-        raise ImageError("La directory del rapporto manca o il rapporto esiste già.")
+    if os.path.lexists(path):
+        raise ImageError("Il rapporto esiste già.", code="output_exists")
+    if not path.parent.is_dir():
+        raise ImageError("La directory del rapporto manca.")
     with tempfile.TemporaryDirectory(prefix=".naturale-report-", dir=path.parent) as directory:
         temporary = Path(directory) / "report.json"
         temporary.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -435,13 +509,25 @@ def _save_report(report: dict, destination: str | Path) -> Path:
 
 
 def _safe_error(error: Exception) -> dict:
-    """Non copiare messaggi parser/filepath o metadati nello stdout dell'agente."""
-    detail = str(error).lower()
-    if "exiftool non trovato" in detail:
-        return {"code": "exiftool_missing", "message": "ExifTool non disponibile nel PATH."}
-    if "pillow non installato" in detail:
-        return {"code": "pillow_missing", "message": "Pillow non disponibile nell'interprete Python."}
-    return {"code": "operation_failed", "message": "Operazione non completata; controllare file, formato, dipendenze e collisioni. Nessun dettaglio privato mostrato."}
+    """Codici tipizzati e messaggi statici: nessun valore letto dal file."""
+    minimum = ".".join(map(str, _exiftool_runtime.MIN_EXIFTOOL_VERSION))
+    messages = {
+        "unsupported_format": "Formato non supportato: usare JPEG o PNG statici.",
+        "extension_mismatch": "Estensione e formato non corrispondono.",
+        "file_too_large": "File oltre il limite di dimensione supportato.",
+        "too_many_pixels": "Immagine oltre il limite sicuro di pixel.",
+        "multiframe_not_supported": "Immagini animate o multiple non supportate.",
+        "output_exists": "La destinazione o il rapporto esistono già: nessuna sovrascrittura.",
+        "exiftool_too_old": f"ExifTool non supportato: serve almeno {minimum}.",
+        "verification_failed": "Verifica non superata: output non pubblicato.",
+        "exiftool_missing": "ExifTool non disponibile o non verificabile nel PATH.",
+        "pillow_missing": "Pillow non disponibile nell'interprete Python.",
+        "operation_failed": "Operazione non completata. Nessun dettaglio privato mostrato.",
+    }
+    code = getattr(error, "code", "operation_failed")
+    if code not in messages:
+        code = "operation_failed"
+    return {"code": code, "message": messages[code]}
 
 
 def batch_images(input_directory: str | Path, output_directory: str | Path,
@@ -450,6 +536,7 @@ def batch_images(input_directory: str | Path, output_directory: str | Path,
     """Elabora file indipendenti, senza ricorsione, mantenendo i rapporti su disco."""
     if profile not in PROFILES:
         raise ImageError("Profilo non supportato.")
+    _require_exiftool()
     raw_source = Path(input_directory).expanduser().absolute()
     if raw_source.is_symlink() or not raw_source.is_dir():
         raise ImageError("La directory di input manca o è un collegamento simbolico.")
@@ -484,7 +571,7 @@ def batch_images(input_directory: str | Path, output_directory: str | Path,
             if path.is_symlink():
                 raise ImageError("I collegamenti simbolici non sono accettati nel batch.")
             if os.path.lexists(output) or os.path.lexists(Path(str(output) + ".report.json")):
-                raise ImageError("L'output o il rapporto esistono già.")
+                raise ImageError("L'output o il rapporto esistono già.", code="output_exists")
             if dry_run:
                 report = inspect_image(path, validate_c2pa)
                 metadata = report["metadata"]["before"]

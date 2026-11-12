@@ -1,5 +1,6 @@
 """CLI JSON remains UTF-8 even when a Windows-style pipe encoding is selected."""
 import json
+import importlib.util
 import os
 from pathlib import Path
 import shutil
@@ -9,6 +10,9 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+_runtime_spec = importlib.util.spec_from_file_location("unicode_exiftool_runtime", ROOT / "skills/naturale/scripts/exiftool_runtime.py")
+_runtime = importlib.util.module_from_spec(_runtime_spec)
+_runtime_spec.loader.exec_module(_runtime)
 
 
 class UnicodeCliTests(unittest.TestCase):
@@ -47,7 +51,7 @@ class UnicodeCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2, result.stderr)
         self.assertIn("😀", json.loads(result.stderr)["error"])
 
-    @unittest.skipUnless(shutil.which("exiftool"), "ExifTool required")
+    @unittest.skipUnless(_runtime.exiftool_report()["compatible"], "Supported ExifTool required; exiftool_too_old otherwise")
     def test_image_summary_preserves_unicode_basename(self):
         from PIL import Image
         source = self.base / "foto-😀.png"

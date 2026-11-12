@@ -5,7 +5,9 @@
 Sono supportati JPEG e PNG statici: massimo 100 MiB per file e 40 milioni di
 pixel. Estensione e formato reale devono corrispondere; APNG e immagini multiple
 non sono supportati. Python 3.11+, Pillow ed ExifTool devono essere disponibili
-nell'interprete e nel PATH scelti. Non installare dipendenze automaticamente.
+nell'interprete e nel PATH scelti. ExifTool deve essere almeno 13.60: versioni
+precedenti vengono rifiutate con `exiftool_too_old` prima di leggere o scrivere
+immagini. `scripts/doctor.py` nel repository indica la compatibilità. Non installare dipendenze automaticamente.
 
 Non caricare immagini o anteprime nel modello e non usare browser, strumenti di
 visione o detector esterni per questo percorso. Gli script non eseguono richieste
@@ -67,6 +69,13 @@ Non elimina tutti i dati personali: altri campi XMP/IPTC, descrizioni, persone
 visibili, nomi di file o credenziali possono ancora contenerli. I campi tecnici
 EXIF già presenti vengono conservati; non vengono introdotti nuovi dati personali.
 
+Se il GPS era l'unico contenuto non tecnico dell'EXIF, ExifTool può rimuovere
+anche l'intero blocco. Lo script conserva dalla fonte soltanto gli eventuali
+`XResolution`, `YResolution`, `ResolutionUnit` e `YCbCrPositioning` di IFD0,
+oltre ai campi tecnici ExifIFD già gestiti. Non inventa valori mancanti e non
+ammette altre perdite: qualsiasi ulteriore variazione EXIF continua a bloccare
+la pubblicazione dell'output.
+
 Nel profilo `privacy`, il contenitore JUMBF viene confrontato byte per byte prima
 e dopo e deve restare identico. Le credenziali mantenute possono contenere copie
 o asserzioni di dati personali e riferimenti. Una modifica dei metadati può
@@ -120,6 +129,16 @@ viene applicata implicitamente.
 - `retained_credentials_may_contain_personal_data` ricorda il limite del profilo
   privacy quando rimangono credenziali; `local_report_contains_original_metadata`
   ricorda che il rapporto conserva i dati prima della pulizia.
+- `nothing_removed`: non è stata verificata alcuna rimozione dei gruppi o tag
+  mirati. La copia può essere stata scritta, ma non va presentata come pulita.
+- `generation_text_retained`: restano chunk PNG `tEXt`, `iTXt` o `zTXt`, oppure
+  commenti/descrizioni JPEG. Comprende `parameters`, `prompt`, `workflow`,
+  `Comment`, `Description` e keyword non note. Non prova che il testo sia di
+  origine AI; lo scanner controlla i contenitori senza leggerne o decomprimerne
+  i valori. Il profilo `provenance` continua a rimuovere solo XMP/JUMBF.
+- `gps_retained`: dopo `provenance` restano tag EXIF GPS. Non presentare quella
+  copia come privata o priva di posizione. I codici compaiono anche nel rapporto
+  completo; il riepilogo non espone i valori conservati.
 - `invisible_watermark: not_checked` e `instagram_label: unknown` rimangono sempre
   espliciti. Nessuna rimozione SynthID o previsione delle etichette Meta è verificata.
 
@@ -128,6 +147,24 @@ errore operativo o batch con almeno un file fallito, `2` argomenti non validi.
 Un batch con errori può contenere copie riuscite: riferire i risultati per file.
 I messaggi di errore ordinari non mostrano percorsi o valori letti dal parser;
 `--full-report` autorizza invece dettagli completi che possono essere personali.
+
+Il campo `error.code` nel riepilogo distingue:
+
+| Codice | Significato |
+| --- | --- |
+| `unsupported_format` | Il formato reale non è JPEG o PNG. |
+| `extension_mismatch` | Estensione e formato reale dell'input o dell'output non coincidono. |
+| `file_too_large` | Il file supera il limite di byte. |
+| `too_many_pixels` | Superato il limite di pixel dello script o quello sicuro di Pillow. |
+| `multiframe_not_supported` | Immagine animata o con più fotogrammi. |
+| `output_exists` | Destinazione o rapporto occupati, anche da un symlink. |
+| `exiftool_too_old` | Versione inferiore al minimo supportato. |
+| `verification_failed` | Decodifica, metadati o invarianti non verificabili; output non pubblicato. |
+
+Restano `exiftool_missing`, `pillow_missing` e `operation_failed` per dipendenze
+assenti o altri errori operativi. I messaggi sono statici: non derivano da
+percorsi, valori o testo grezzo restituito dai parser. I dettagli completi degli
+errori sono disponibili solo con `--full-report`.
 
 Le API Python `inspect_image` e `clean_image` continuano a restituire rapporti
 completi per compatibilità; `summarize_report` produce la vista ridotta. Non
