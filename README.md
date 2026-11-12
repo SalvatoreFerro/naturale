@@ -161,6 +161,44 @@ python -m pip install '.[c2pa]'
 
 L'installazione iniziale delle dipendenze richiede normalmente una connessione; l'elaborazione dei file è locale. La verifica C2PA locale non equivale a un controllo online aggiornato della fiducia o della revoca dei certificati.
 
+## Installazione come plugin Claude Code (opzionale)
+
+Scegli l'installazione manuale oppure il plugin, evitando di caricare due copie
+della stessa skill in Claude Code. L'installazione per Codex rimane quella
+descritta sopra: il plugin è un'alternativa riservata a Claude Code.
+
+In una sessione di **Claude Code 2.1.275 o successivo**:
+
+```text
+/plugin install naturale --marketplace SalvatoreFerro/naturale
+```
+
+Segui il pannello per aggiungere il marketplace e scegliere l'ambito di
+installazione. In alternativa, dalla shell usa i due comandi:
+
+```sh
+claude plugin marketplace add SalvatoreFerro/naturale
+claude plugin install naturale@naturale-marketplace
+```
+
+Il marketplace si chiama `naturale-marketplace`; la skill del plugin si richiama
+come **`/naturale:naturale`**. I comandi di installazione scaricano il pacchetto
+e registrano il plugin nella configurazione di Claude Code. Il pacchetto non
+aggiunge hook, servizi MCP o dipendenze eseguite automaticamente; gli script
+locali conservano il comportamento senza rete descritto in questo README.
+
+Per controllare i manifest da una copia locale della repository:
+
+```sh
+claude plugin validate .
+claude plugin list
+```
+
+`scripts/doctor.py` controlla le cartelle di installazione manuale, non la cache
+dei plugin Claude. Per verificare un'installazione plugin usa `claude plugin list`;
+Pillow, ExifTool e l'eventuale SDK C2PA devono comunque essere presenti per le
+rispettive funzioni immagini.
+
 ## Installazione della skill
 
 Il pacchetto da copiare è **l'intera directory** `skills/naturale`, non soltanto `SKILL.md`. Non sovrascrivere una skill già installata con lo stesso nome: prima confrontala o spostala in una copia di sicurezza.

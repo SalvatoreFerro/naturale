@@ -1,0 +1,13 @@
+{
+  "name": "naturale-marketplace",
+  "description": "Distribuzione della skill Naturale per Claude Code.",
+  "owner": {
+    "name": "SalvatoreFerro"
+  },
+  "plugins": [
+    {
+      "name": "naturale",
+      "source": "./"
+    }
+  ]
+}
