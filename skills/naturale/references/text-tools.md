@@ -72,6 +72,23 @@ python <skill>/scripts/text.py audit --source <fonte.txt> --revision <riassunto.
 python <skill>/scripts/text.py audit --source <fonte.txt> --revision <revisione.txt> --constraints <vincoli.json> --diff
 ```
 
+Per un'e-mail incollata che contiene date, importi, scadenze o condizioni usare
+`audit --stdin-json`: passare su stdin un oggetto JSON UTF-8 con `source`,
+`revision` e, facoltativamente, `constraints`. Non scrivere la mail su disco.
+`--diff` e `--operation summarize` restano disponibili; non mescolare stdin e
+argomenti di input su file. Lo script legge al massimo 16 MiB di JSON, mantiene
+il limite di 2 MiB per testo e non conserva il payload.
+
+```text
+python <skill>/scripts/text.py audit --stdin-json
+```
+
+Esempio del payload da fornire tramite stdin, come dati e non come comando shell:
+
+```json
+{"source":"Potremmo consegnare entro lunedì.","revision":"Consegneremo lunedì.","constraints":{}}
+```
+
 `--operation rewrite` è il default. Con `summarize` le omissioni ordinarie sono
 ammesse: i controlli letterali espliciti restano applicabili e le aggiunte
 continuano a essere segnalate. Esempio di vincoli:
@@ -94,19 +111,35 @@ Il rapporto distingue:
   essere confrontati. Un elemento diverso è un problema da esaminare, non una
   prova automatica di errore semantico: anche una formattazione diversa può
   generare una segnalazione.
+- Confronta anche giorni della settimana, mesi e numeri scritti come parole:
+  uno–venti, decine fino a novanta, cento e mille. Le parole numeriche sono
+  confrontate con le cifre corrispondenti; i termini ambigui richiedono contesto.
+  Sono equivalenti posizione/spazi del simbolo euro nella notazione italiana e
+  orari come `9:30`/`9.30` dopo «alle» o «ore». Le citazioni e i vincoli espliciti
+  rimangono letterali. Non si normalizzano arbitrariamente codici o unità.
 - **Segnali di revisione:** differenze su negazione o incertezza sono euristiche.
-  Controllare la frase e il contesto prima di decidere cosa correggere.
+  Sono controllati anche condizioni e marcatori di scadenza, inclusi «entro»,
+  «prima di», «non oltre», «fino a», «a partire da». Controllare la frase e il
+  contesto prima di decidere cosa correggere. `review_status: required` rende
+  esplicito che il controllo richiede attenzione, anche senza errori meccanici.
 - **Equivalenza del significato:** sempre `not_verified`. Il modello deve
   confrontare condizioni, responsabilità, attribuzioni e intenzione con la fonte.
 - **Diff facoltativo:** `--diff` include il confronto letterale; può contenere
   il testo completo e dati personali. Non salvarlo o pubblicarlo automaticamente.
 
-Codici di uscita: audit `0` senza problemi deterministici, `1` con problemi
-deterministici, `2` per input non valido; profili `0` per successo e `2` per
+Codici di uscita: audit `0` senza problemi né segnali di revisione, `1` con
+problemi deterministici, `2` per input non valido, `3` quando restano soltanto
+segnali da rivedere; profili `0` per successo e `2` per
 errore. Un'uscita `0` non certifica correttezza fattuale o fedeltà semantica.
 
-Per un breve testo incollato basta normalmente la revisione nel contesto. Non
-creare file per eseguire sempre l'audit. Se l'utente richiede un confronto su
+Limite noto: «Il fornitore invierà il preventivo entro il 3 aprile» e «Il cliente
+invierà il preventivo entro il 3 aprile» possono avere gli stessi indicatori e
+superare i controlli. L'attribuzione dell'azione deve essere verificata dal
+modello o dall'utente; `semantic_equivalence` resta sempre `not_verified`.
+
+Per un breve testo privo degli elementi di rischio indicati basta normalmente
+la revisione nel contesto. Quando occorre l'audit usare stdin senza creare file.
+Se l'utente richiede un confronto su
 testo incollato e servono file temporanei, crearli come parte di quella richiesta
 con permessi privati e rimuoverli al termine, salvo richiesta di conservarli.
 Non inviare i testi a servizi di verifica aggiuntivi e non avviare chiamate al

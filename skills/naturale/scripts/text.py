@@ -16,6 +16,7 @@ import unicodedata
 
 SCHEMA_VERSION = "1.0"
 MAX_INPUT_BYTES = 2 * 1024 * 1024
+MAX_STDIN_BYTES = 16 * 1024 * 1024
 PROFILE_FIELDS = {
     "schema_version", "name", "register", "conciseness", "preferred_phrases",
     "avoided_phrases", "punctuation", "notes",
@@ -25,16 +26,30 @@ RESERVED_NAMES = {"con", "prn", "aux", "nul", *(f"com{i}" for i in range(1, 10))
                   *(f"lpt{i}" for i in range(1, 10))}
 URL_PATTERN = re.compile(r"https?://[^\s<>\"“”«»]+", re.I)
 NUMBER_PATTERN = re.compile(
-    r"(?<![\w])(?:[€$£][ \t]*)?[+-]?\d+(?:[.,:/-]\d+)*(?:[ \t]*(?:%|€|\$|£))?(?!\d)"
+    r"(?<![\w])(?:(?:[+\-−][^\S\r\n]*)?[€$£][^\S\r\n]*)?(?:[+\-−][^\S\r\n]*)?\d+(?:[.,:/-]\d+)*(?:[^\S\r\n]*(?:%|€|\$|£))?(?!\d)"
 )
 QUOTE_PATTERN = re.compile(r'«([^«»\n]{1,2000})»|“([^“”\n]{1,2000})”|"([^"\n]{1,2000})"')
+TIME_PATTERN = re.compile(r"\b(?:alle|ore)\s+([01]?\d|2[0-3])[:.]([0-5]\d)\b", re.I)
+NUMBER_WORDS = dict(zip(
+    ("uno", "due", "tre", "quattro", "cinque", "sei", "sette", "otto", "nove", "dieci",
+     "undici", "dodici", "tredici", "quattordici", "quindici", "sedici", "diciassette",
+     "diciotto", "diciannove", "venti", "trenta", "quaranta", "cinquanta", "sessanta",
+     "settanta", "ottanta", "novanta", "cento", "mille"),
+    (*range(1, 21), 30, 40, 50, 60, 70, 80, 90, 100, 1000),
+))
+NUMBER_WORD_PATTERN = re.compile(r"\b(?:" + "|".join(NUMBER_WORDS) + r")\b", re.I)
+CALENDAR_PATTERN = re.compile(
+    r"\b(?:luned[ìi]|marted[ìi]|mercoled[ìi]|gioved[ìi]|venerd[ìi]|sabato|domenica|"
+    r"gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre)\b", re.I
+)
 MARKER_PATTERNS = {
-    "negation": re.compile(r"\b(?:non|mai|nessun[oa]?|senza|né)\b", re.I),
+    "negation": re.compile(r"\b(?:non|mai|nessun[oa]?|senza|né|niente|nulla|neanche|nemmeno|neppure)\b", re.I),
     "uncertainty": re.compile(
         r"\b(?:forse|potrebbe|potrebbero|potremmo|potrei|possibile|probabile|"
-        r"ipotizziamo|indicativamente|circa|previsto|prevista)\b", re.I
+        r"ipotizziamo|indicativamente|circa|previsto|prevista|dovrebbe|dovremmo|probabilmente|eventualmente)\b", re.I
     ),
     "condition": re.compile(r"\b(?:se|salvo|purché|qualora|a condizione che|a patto che|solo dopo)\b", re.I),
+    "deadline": re.compile(r"\b(?:entro|prima di|non oltre|fino a|a partire da)\b", re.I),
 }
 
 
@@ -201,7 +216,37 @@ def _urls(text: str) -> list[str]:
 def _numbers(text: str) -> list[str]:
     # Il contenuto degli URL è controllato separatamente, non come numeri nel testo.
     masked = URL_PATTERN.sub(" ", text)
-    return [re.sub(r"\s+", "", match.group()) for match in NUMBER_PATTERN.finditer(masked)]
+    times = []
+    def take_time(match):
+        times.append(f"{int(match[1]):02d}:{match[2]}")
+        return " " * len(match.group())
+    masked = TIME_PATTERN.sub(take_time, masked)
+    numbers = []
+    for match in NUMBER_PATTERN.finditer(masked):
+        value = re.sub(r"\s+", "", match.group()).replace("−", "-")
+        if "€" in value:
+            amount = value.replace("€", "")
+            # La posizione del simbolo è sempre una variazione di forma,
+            # anche quando i separatori numerici restano letterali.
+            value = f"€{amount}"
+            integer, separator, fraction = amount.partition(",")
+            # Solo la notazione italiana non ambigua: gruppi di migliaia,
+            # virgola decimale. Non reinterpretare identificativi generici.
+            if re.fullmatch(r"[+-]?(?:\d+|\d{1,3}(?:\.\d{3})+)", integer) and (
+                    not separator or fraction.isdigit()):
+                integer = integer.replace(".", "")
+                sign = "-" if integer.startswith("-") else ""
+                integer = integer.lstrip("+-").lstrip("0") or "0"
+                fraction = fraction.rstrip("0").ljust(2, "0")
+                value = f"€{sign}{integer},{fraction}"
+        numbers.append(value)
+    numbers.extend(str(NUMBER_WORDS[m.group().casefold()]) for m in NUMBER_WORD_PATTERN.finditer(masked))
+    return numbers + times
+
+
+def _calendar(text: str) -> list[str]:
+    text = URL_PATTERN.sub(" ", unicodedata.normalize("NFC", text))
+    return [m.group().casefold().replace("ì", "i") for m in CALENDAR_PATTERN.finditer(text)]
 
 
 def _quotes(text: str) -> list[str]:
@@ -255,7 +300,7 @@ def audit_text(source: str, revision: str, constraints=None, include_diff: bool 
         if value not in source:
             raise TextError("Un vincolo preserve_exact non compare nella fonte.")
     findings = []
-    for kind, extractor in (("number", _numbers), ("url", _urls), ("quoted_text", _quotes)):
+    for kind, extractor in (("number", _numbers), ("calendar", _calendar), ("url", _urls), ("quoted_text", _quotes)):
         before, after = Counter(extractor(source)), Counter(extractor(revision))
         for value in sorted(before.keys() | after.keys()):
             if before[value] == after[value]:
@@ -274,9 +319,11 @@ def audit_text(source: str, revision: str, constraints=None, include_diff: bool 
         if value in revision:
             findings.append({"kind": "forbidden_text", "change": "added", "value": value})
     review_flags = []
+    marker_source = re.sub(r"\s+", " ", unicodedata.normalize("NFC", source))
+    marker_revision = re.sub(r"\s+", " ", unicodedata.normalize("NFC", revision))
     for category, pattern in MARKER_PATTERNS.items():
-        before = Counter(match.group().casefold() for match in pattern.finditer(unicodedata.normalize("NFC", source)))
-        after = Counter(match.group().casefold() for match in pattern.finditer(unicodedata.normalize("NFC", revision)))
+        before = Counter(match.group().casefold() for match in pattern.finditer(marker_source))
+        after = Counter(match.group().casefold() for match in pattern.finditer(marker_revision))
         if before != after:
             review_flags.append({"category": category, "source_markers": dict(before), "revision_markers": dict(after),
                                  "message": "Indicatori linguistici cambiati: rileggere nel contesto; non è una prova di errore."})
@@ -284,6 +331,7 @@ def audit_text(source: str, revision: str, constraints=None, include_diff: bool 
         "schema_version": SCHEMA_VERSION, "operation": operation,
         "unchanged": source == revision,
         "deterministic_status": "issues_found" if findings else "passed",
+        "review_status": "required" if findings or review_flags else "not_required",
         "semantic_equivalence": "not_verified", "human_review_required": True,
         "findings": findings, "review_flags": review_flags,
         "counts": {"source_characters": len(source), "revision_characters": len(revision)},
@@ -317,16 +365,38 @@ def main(argv=None) -> int:
         if action == "create":
             command.add_argument("--from-json", required=True)
     audit = commands.add_parser("audit", help="Controlli locali: non certifica il significato")
-    audit.add_argument("--source", required=True)
-    audit.add_argument("--revision", required=True)
+    inputs = audit.add_mutually_exclusive_group(required=True)
+    inputs.add_argument("--source")
+    inputs.add_argument("--stdin-json", action="store_true", help="JSON UTF-8 da stdin, senza file temporanei")
+    audit.add_argument("--revision")
     audit.add_argument("--constraints")
     audit.add_argument("--operation", choices=["rewrite", "summarize"], default="rewrite")
     audit.add_argument("--diff", action="store_true")
     args = parser.parse_args(argv)
+    if args.command == "audit":
+        if args.stdin_json and (args.revision is not None or args.constraints is not None):
+            parser.error("--stdin-json non accetta --revision o --constraints su file")
+        if not args.stdin_json and args.revision is None:
+            parser.error("--source richiede --revision")
     try:
         if args.command == "audit":
-            result = audit_files(args.source, args.revision, args.constraints, args.diff, args.operation)
-            status = 1 if result["deterministic_status"] == "issues_found" else 0
+            if args.stdin_json:
+                stream = getattr(sys.stdin, "buffer", sys.stdin)
+                raw = stream.read(MAX_STDIN_BYTES + 1)
+                if isinstance(raw, str):
+                    raw = raw.encode("utf-8")
+                if len(raw) > MAX_STDIN_BYTES:
+                    raise TextError("JSON stdin oltre il limite di 16 MiB.")
+                try:
+                    data = json.loads(raw.decode("utf-8-sig"))
+                except (ValueError, UnicodeError) as error:
+                    raise TextError("JSON UTF-8 da stdin non valido.") from error
+                if not isinstance(data, dict) or not {"source", "revision"} <= data.keys() or data.keys() - {"source", "revision", "constraints"}:
+                    raise TextError("JSON stdin richiede source e revision, con constraints facoltativo.")
+                result = audit_text(data["source"], data["revision"], data.get("constraints"), args.diff, args.operation)
+            else:
+                result = audit_files(args.source, args.revision, args.constraints, args.diff, args.operation)
+            status = 1 if result["findings"] else 3 if result["review_flags"] else 0
         else:
             directory = args.directory
             if args.profile_action == "create":
