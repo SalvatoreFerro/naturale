@@ -8,7 +8,22 @@ file interni, in una delle directory del proprio ambiente:
 
 Su Windows `~` indica la propria directory utente. Non sovrascrivere una skill
 esistente: spostarla prima in una copia di sicurezza. Non serve un plugin o un
-server. La distribuzione è un'anteprima 0.1.0, con licenza MIT.
+server. La distribuzione è un'anteprima 0.2.0, con licenza MIT. Il file `VERSION`
+contiene la versione del pacchetto.
+
+La copia manuale continua a funzionare. Per ricevute, aggiornamenti e ripristino,
+usa invece `scripts/install.py` dalla repository completa; nessun aggiornamento
+viene scaricato o applicato automaticamente.
+
+## Testi e profili
+
+Puoi scegliere intervento minimo, fluidità o ristrutturazione e richiedere un
+confronto delle modifiche. I controlli automatici segnalano differenze, ma non
+certificano l'equivalenza del significato.
+
+I profili di voce sono opzionali e salvati solo su richiesta in
+`~/.naturale/profiles`, fuori dall'installazione. Non contengono automaticamente
+i testi originali. Consulta [strumenti testo e profili](references/text-tools.md).
 
 ## Modulo immagini facoltativo
 
@@ -35,9 +50,11 @@ Se si fa leggere il rapporto a un assistente cloud, i dati del rapporto entrano
 nel suo contesto: per mantenere anche i metadati fuori dal modello, usare solo
 la CLI senza condividere il rapporto.
 
-JPEG/PNG statici soltanto: la pulizia rimuove XMP e contenitori JUMBF/C2PA da una
-copia, conserva EXIF e ICC e verifica i pixel. Non rimuove watermark invisibili
-e non garantisce il risultato delle etichette Instagram. Consulta
+JPEG/PNG statici soltanto: la pulizia predefinita rimuove XMP e contenitori
+JUMBF/C2PA da una copia, conserva EXIF e ICC e verifica i pixel. Il profilo
+`privacy` rimuove invece un insieme mirato di tag personali; `batch` elabora
+cartelle. La CLI mostra un riepilogo sintetico, con dettagli completi su richiesta.
+Non rimuove watermark invisibili e non garantisce il risultato delle etichette Instagram. Consulta
 [la guida immagini](references/images.md) prima dell'uso.
 
 Il repository completo include benchmark, test e fonti. Questa cartella contiene

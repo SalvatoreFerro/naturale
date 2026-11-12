@@ -2,6 +2,7 @@ name: Tests
 
 on:
   push:
+    branches: [main]
   pull_request:
 
 permissions:
@@ -65,7 +66,11 @@ jobs:
           python --version
           exiftool -ver
           python skills/naturale/scripts/images.py --help
+          python skills/naturale/scripts/text.py --help
+          python scripts/doctor.py --help
       - name: Run tests
         run: python -m pytest
       - name: Validate editorial dataset
-        run: python scripts/evaluate.py --validate-cases evals/cases.jsonl
+        run: |
+          python scripts/evaluate.py --validate-cases evals/cases.jsonl --pilot
+          python scripts/evaluate.py --validate-cases evals/real-world-template.jsonl

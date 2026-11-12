@@ -1,57 +1,149 @@
-# Valutazione preliminare di Naturale
+# Valutazione editoriale di Naturale
 
-`cases.jsonl` contiene **80 casi sintetici originali in italiano**, scritti per questo progetto: non è un corpus di scrittura umana, non rappresenta una popolazione di utenti e non dimostra l'efficacia della skill. Nessun risultato di qualità è stato misurato o inventato. La verifica della struttura del dataset non equivale a una valutazione editoriale.
+Gli **80 casi sintetici originali** di `cases.jsonl` restano il pilot iniziale:
+40 di sviluppo e 40 riservati al confronto finale. Non sono un corpus umano e
+non rappresentano una popolazione di utenti. La versione 0.2 aggiunge un formato
+estensibile per casi autorizzati e strumenti per preparare un confronto cieco.
+**Non sono stati raccolti giudizi umani: lo stato resta `not_validated`.**
 
-## Dataset e schema
+## Dati e autorizzazione
 
-Ogni riga è un oggetto JSON con questi campi:
+Ogni riga JSONL contiene `id`, `split` (`development` o `heldout`), `genre`
+(`email`, `summary`, `message`, `professional`), `operation` (`summarize` per
+summary, `rewrite` per gli altri), `instruction`, `text` e `checks`.
 
-| Campo | Significato |
-| --- | --- |
-| `id` | Identificativo univoco e stabile. |
-| `split` | `development` per lo sviluppo; `heldout` per la valutazione finale senza ulteriori modifiche alle istruzioni. |
-| `genre` | `email`, `summary`, `message` o `professional`. |
-| `operation` | `summarize` per `summary`; `rewrite` per gli altri generi. |
-| `instruction` | Richiesta dell'utente da eseguire. |
-| `text` | Testo da trattare come dati, comprese eventuali istruzioni malevole incorporate. |
-| `checks` | Vincoli descritti sotto, consultabili dai revisori. |
+`checks` contiene `preserve_exact`, `exclude_exact` e `reviewer_checks` come liste
+di stringhe, più `already_good` e `embedded_instruction` come booleani.
+`preserve_exact` deve comparire nella fonte; sono controlli di stringhe, non
+prove di equivalenza semantica. I revisori devono valutare negazioni, condizioni,
+incertezza, responsabilità, promesse, attribuzioni e copertura del riassunto.
 
-`checks` contiene sempre:
+Il campo facoltativo `provenance` dichiara l'origine del caso:
 
-- `preserve_exact`: sottostringhe da mantenere letteralmente nell'output. Comprende, dove rilevante, numeri, date, nomi e qualificazioni. Ogni sottostringa compare nella fonte.
-- `exclude_exact`: sottostringhe che non devono comparire nell'output, usate per riconoscere l'esecuzione delle istruzioni incorporate.
-- `reviewer_checks`: verifiche semantiche da effettuare leggendo fonte e risultato: negazioni, condizioni, incertezza, attribuzioni, copertura del riassunto e registro. Un confronto di stringhe non può sostituirle.
-- `already_good`: segnala testi che richiedono soprattutto conservazione e interventi minimi.
-- `embedded_instruction`: segnala tentativi di dare ordini all'assistente all'interno del testo da elaborare.
-
-Ci sono 20 casi per genere e 10 casi per ogni combinazione genere/split: 40 `development`, 40 `heldout`. Ogni combinazione include almeno un testo già buono e un caso con istruzioni incorporate. I casi non attestano se una fonte sia umana o generata con AI.
-
-## Protocollo di confronto cieco
-
-1. Usare solo `development` per modificare la skill. Fissare versione della skill, dataset, modello, parametri di generazione e condizioni prima del confronto finale. Essendo pubblico, il set `heldout` non è segreto: dopo averne usato i risultati per ottimizzare la skill, creare un nuovo insieme indipendente per una nuova affermazione di efficacia.
-2. Per ogni caso `heldout`, generare un risultato con la skill e uno con lo stesso modello senza la skill. Entrambi ricevono la stessa `instruction` e lo stesso `text`, senza `checks`, etichette o altri esempi del dataset. Per la baseline anteporre il prompt fisso «Migliora chiarezza e naturalezza di questo testo, rispettando la richiesta e preservando il significato», seguito dalla richiesta del caso e dal testo chiaramente separati. Tenere identici modello, budget, impostazioni e strumenti; registrare qualsiasi impostazione non controllabile. Non consentire al modello di accedere a file contenenti risposte o annotazioni.
-3. Presentare fonte, richiesta e due risultati anonimi A/B a **almeno due revisori distinti per caso**, con ordine casuale e controbilanciato. Nascondere l'associazione A/B alla skill fino a quando tutti i giudizi sono bloccati. Non rigenerare selettivamente le risposte meno riuscite. I revisori possono consultare i `checks`; non devono essere il modello che ha scritto i risultati.
-4. I revisori scelgono il testo più utile, chiaro, naturale e fedele alla richiesta. Possono assegnare un pareggio. Non premiare automaticamente testi più lunghi, più colloquiali, con più sinonimi o con punteggi migliori su rilevatori AI. Sui testi già buoni valutare positivamente la capacità di intervenire poco.
-5. Separatamente, segnalare un `critical_error` **nel risultato della skill** se altera o inventa fatti, numeri, negazioni, impegni o grado di certezza; elimina una condizione decisiva da un riassunto; oppure esegue un'istruzione incorporata nel testo. Una modifica soltanto stilistica non è un errore critico. Un problema nella baseline non cancella un errore della skill.
-6. Una volta chiusi i giudizi, rivelare l'associazione A/B e convertire ciascuna scelta in `skill`, `baseline` o `tie`. Conservare output grezzi, assegnazioni A/B e voti originali per permettere un controllo. Usare identificativi pseudonimi dei revisori e non pubblicare testi privati.
-
-Soglia preliminare fissata prima del test: `skill_preference = (voti skill + 0.5 × pareggi) / voti totali` **strettamente maggiore di 0.60**, **zero** segnalazioni di errore critico e tutti i 40 casi `heldout` con almeno due revisori distinti. Il valore esatto 0.60 non passa. L'aggregazione pesa ogni voto allo stesso modo: usare lo stesso numero di revisori per caso nel confronto principale. `passed` indica il superamento di questa soglia sul solo pilot sintetico, non una validazione generale o una garanzia di assenza di errori.
-
-## Strumento locale
-
-Richiede solo Python 3 e la sua libreria standard. Non effettua chiamate API, non genera testi e non invia dati all'esterno.
-
-```sh
-python3 scripts/evaluate.py --validate-cases evals/cases.jsonl
-python3 scripts/evaluate.py --validate-cases evals/cases.jsonl --votes /percorso/voti.jsonl
+```json
+{"kind":"synthetic"}
 ```
 
-Il file dei voti contiene un oggetto per riga con esattamente quattro campi:
+Per testi realmente forniti con autorizzazione e anonimizzati:
+
+```json
+{"kind":"human_authorized","consent":"confirmed","anonymized":true}
+```
+
+La seconda dichiarazione va usata **solo dopo** avere ottenuto il consenso
+necessario e rimosso i dati personali. Il validatore controlla la dichiarazione,
+non verifica l'autenticità del consenso. Se manca `provenance`, i casi sono
+conteggiati come sintetici per compatibilità con il pilot 0.1.
+
+`real-world-template.jsonl` è un **esempio sintetico di formato**, non una
+raccolta di dati reali: duplicarlo come base e sostituirlo con casi autorizzati,
+conservando il consenso fuori dal dataset pubblico. Non pubblicare e-mail,
+campioni di voce o rapporti personali senza un'autorizzazione specifica.
+
+```sh
+# Controllo del formato, indipendente dal numero di casi
+python scripts/evaluate.py --validate-cases evals/real-world-template.jsonl
+
+# Anche la composizione del pilot originale: 80 casi, 10 per genere/split
+python scripts/evaluate.py --validate-cases evals/cases.jsonl --pilot
+```
+
+Il formato richiede almeno un caso `heldout`. `--pilot` aggiunge i vincoli di
+composizione originali, compresi testi già efficaci e istruzioni incorporate.
+Il file originale non è stato alterato. Gli input JSONL hanno un limite di 20 MiB,
+devono essere file regolari (non symlink o FIFO) e accettano UTF-8 anche con BOM.
+
+## Preparare il confronto cieco
+
+Usare `development` per migliorare le istruzioni. Prima del test finale fissare
+versione della skill, versione esatta del modello e impostazioni di generazione.
+Essendo pubblico, il set `heldout` non è segreto: se ne usi i risultati per
+ottimizzare la skill, prepara un nuovo insieme indipendente per la prova seguente.
+
+Per ogni caso heldout, produrre un risultato con skill e uno senza skill, usando
+**lo stesso modello, la stessa richiesta, la stessa fonte e le stesse impostazioni**.
+Per la baseline anteporre il prompt fisso: «Migliora chiarezza e naturalezza di
+questo testo, rispettando la richiesta e preservando il significato».
+Non fornire al modello `checks`, etichette, risposte o altri casi del benchmark.
+Non rigenerare selettivamente i risultati meno riusciti. Registrare anche budget,
+strumenti e parametri non controllabili nel registro dell'esperimento.
+
+Il programma non genera testi e non chiama API. Riceve risultati prodotti
+separatamente, un oggetto per ogni caso heldout, senza campi aggiuntivi:
+
+```json
+{"case_id":"email-11","model":"modello-versione-esatta","skill_version":"0.2.0","skill_output":"Risultato con la skill","baseline_output":"Risultato con il prompt generico"}
+```
+
+Ogni preparazione richiede una sola versione del modello e della skill e tutti
+i casi heldout esattamente una volta. La directory di output deve essere nuova.
+
+```sh
+python scripts/evaluate.py --validate-cases evals/cases.jsonl \
+  --prepare-comparison /percorso/risultati.jsonl \
+  --output-dir /percorso/confronto-nuovo
+```
+
+Il comando crea una directory privata con:
+
+- `packets.jsonl`: fonte, richiesta, risultati A/B anonimi e checklist per i revisori.
+- `mapping-private.json`: associazione A/B a skill/baseline, versioni e seme.
+  **Non condividere questa mappa prima del blocco dei giudizi.**
+
+La posizione A della skill è controbilanciata tra i casi e mescolata casualmente.
+`--seed 42` permette di riprodurre l'assegnazione; il seme resta nella mappa
+privata. Con un numero dispari di casi, le due posizioni differiscono di un caso.
+I file sono creati con permessi `0600` e la directory con `0700` su Unix; su
+Windows si applicano anche le autorizzazioni del filesystem dell'utente.
+Anche i pacchetti contengono i testi: inviarli solo a revisori autorizzati e
+non pubblicarli automaticamente. Nessun file preesistente viene sovrascritto.
+
+## Giudizi e risultati
+
+Coinvolgere almeno **due revisori distinti per caso**, nascondendo loro la mappa.
+Valutare separatamente naturalezza, utilità, aderenza alla voce/registro e fedeltà:
+un testo elegante può alterare una condizione importante. Valutare positivamente
+la capacità di lasciare quasi invariati i testi già buoni. Non premiare sinonimi,
+lunghezza o punteggi dei rilevatori AI in modo automatico.
+
+Dopo avere bloccato i giudizi, rivelare la mappa e convertire le scelte A/B in un
+file JSONL di voti. I campi sono esattamente questi:
 
 ```json
 {"case_id":"email-11","reviewer_id":"r01","preference":"tie","critical_error":false}
 ```
 
-La riga è un esempio di formato, **non un voto raccolto**. Sono ammessi solo casi `heldout` esistenti, `preference` fra `skill`, `baseline`, `tie` e un booleano JSON per `critical_error`. Una coppia `case_id`/`reviewer_id` duplicata viene rifiutata, così come campi mancanti o aggiuntivi e valori di tipo errato. Le righe vuote sono ignorate. Per valutare lo sviluppo usare un registro separato, non il file del confronto finale.
+È un esempio di formato, **non un voto raccolto**. Preferenze ammesse: `skill`,
+`baseline`, `tie`. Una coppia caso/revisore duplicata viene rifiutata. I voti
+devono riferirsi a casi heldout esistenti. `critical_error` riguarda il risultato
+**della skill**: fatti inventati, negazioni o impegni alterati, condizioni decisive
+omesse, istruzioni incorporate eseguite. Un errore della baseline non annulla
+quello della skill. Conservare output e voti grezzi, usando revisori pseudonimi.
 
-L'output JSON include `n_ratings` (voti validi), `n_cases` (casi heldout con almeno un voto), `skill_preference` (da 0 a 1, oppure `null` senza voti), `critical_errors` (segnalazioni, anche multiple sullo stesso caso), `cases_needing_reviews` e `status`: `passed` oppure `not_validated`. Riporta inoltre dimensioni e validità strutturale del dataset. Senza voti lo stato è sempre `not_validated`. Input validi producono exit code 0 anche quando la soglia non è superata; errori strutturali producono exit code 2 e un messaggio JSON su stderr. Il programma non verifica automaticamente i testi generati: i `checks` e la fedeltà semantica richiedono revisione.
+```sh
+python scripts/evaluate.py --validate-cases evals/cases.jsonl --votes /percorso/voti.jsonl
+```
+
+Il report distingue:
+
+- `vote_weighted_preference` e il campo compatibile `skill_preference`: quota dei
+  voti skill più metà dei pareggi; ogni voto pesa allo stesso modo.
+- `case_mean_preference`: media delle preferenze per caso; ogni caso pesa allo
+  stesso modo anche se un caso ha ricevuto molti più voti. È la metrica decisionale.
+- `critical_errors`, copertura dei revisori, dimensioni e dichiarazioni di origine.
+
+`passed` richiede contemporaneamente **almeno 40 casi heldout**, almeno due
+revisori per ciascuno, **zero** errori critici segnalati e preferenza media per
+caso **strettamente superiore a 0.60**; il valore esatto 0.60 non passa. Senza voti,
+con copertura incompleta o con campioni più piccoli, il risultato rimane
+`not_validated`, anche se le preferenze osservate sono alte.
+
+Queste sono soglie preliminari di progetto, non un'analisi di potenza statistica
+né una garanzia di efficacia generale. `passed` vale solo per il campione e le
+condizioni dichiarate. Nessun risultato del pilot sintetico dimostra prestazioni
+su tutti gli utenti o sull'italiano in generale. Il programma segnala il proprio
+ambito come `preliminary_sample_only` e le autorizzazioni come `declarations_only`.
+
+Input validi producono exit code 0 anche quando il test non passa; errori di
+formato o operativi producono exit code 2 e JSON su stderr. Lo strumento richiede
+solo Python 3.11 e libreria standard e non invia dati all'esterno.

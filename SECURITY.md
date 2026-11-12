@@ -1,7 +1,7 @@
 # Sicurezza
 
-Naturale è un progetto in anteprima. La versione `0.1.x` è l'unica serie
-attualmente supportata; le correzioni saranno distribuite nel repository.
+Naturale è un progetto in anteprima. La serie corrente è `0.2.x`; le correzioni
+saranno distribuite nel repository. La `0.1.x` resta documentata nel changelog.
 La presenza di test e controlli non garantisce l'assenza di vulnerabilità.
 
 ## Segnalare una vulnerabilità
@@ -41,6 +41,13 @@ il manutentore. Non sono promessi tempi di risposta o un programma di ricompense
 - I rapporti contengono metadati originali e possono includere dati personali.
   Non pubblicarli automaticamente. La pulizia conserva EXIF, incluso eventuale
   GPS, e non costituisce anonimizzazione.
+- La CLI immagini mostra normalmente un riepilogo senza i valori grezzi;
+  `--full-report` e i file completi locali possono invece contenere dati personali.
+  Il profilo `privacy` rimuove solo tag specifici e può lasciare informazioni
+  personali in altri campi o nelle credenziali conservate.
+- Profili di voce e backup restano locali, fuori dalla repository. Condividerli
+  con un assistente cloud ne inserisce il contenuto nel suo contesto. Non allegarli
+  automaticamente a issue o segnalazioni pubbliche.
 - La rimozione XMP/JUMBF non prova l'assenza di watermark invisibili, l'origine
   umana dell'immagine o il comportamento futuro di etichette Instagram.
 
