@@ -10,12 +10,12 @@ eseguiti, non una garanzia universale sul comportamento dei modelli o di Meta.
 | Ambiente | Linux, Python 3.12.14 |
 | Pillow / ExifTool | 12.3.0 / 13.63 |
 | SDK C2PA facoltativo | c2pa-python 0.38.1 |
-| Suite Python completa | 51 test passati, 15 sottocasi passati; nessun test saltato |
+| Suite Python completa | 52 test passati, 15 sottocasi passati; nessun test saltato |
 | Dataset editoriale | 80 casi validi, 40 sviluppo e 40 heldout |
 | Valutazione umana | Non eseguita; `not_validated` |
 | Codex reale | 0.167.0-alpha.4: rilevamento `naturale` riuscito via `skills/list`, skill abilitata, nessun errore |
 | Claude Code | Non installato nell'ambiente; formato e struttura verificati, esecuzione nell'host non verificata |
-| macOS / Windows | CI configurata; non eseguiti in questo ambiente Linux |
+| macOS / Windows | Matrice remota su GitHub Actions con Python 3.11 e 3.12; [esiti delle esecuzioni](https://github.com/SalvatoreFerro/naturale/actions/workflows/ci.yml) |
 | Instagram / SynthID | Nessun test su Instagram, nessuna verifica o rimozione SynthID |
 
 Il controllo Codex usa una copia temporanea nella directory di skill di un
@@ -34,6 +34,8 @@ editoriale della skill.
   nell'adattatore C2PA tramite test del contesto passato al SDK.
 - Collisioni, permessi privati su Unix, file corrotti o non supportati,
   percorsi Unicode, errori di scrittura e assenza di output dopo verifica fallita.
+- Canonicalizzazione della directory di output per alias di filesystem
+  macOS/Windows, conservando il rifiuto dei symlink sul file finale.
 - Contratto Agent Skills e riferimenti locali.
 - Installer locale: anteprima senza scritture, copia per entrambi gli agenti,
   idempotenza, collisioni, rollback, symlink e file non regolari; rilevamento

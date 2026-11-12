@@ -225,6 +225,9 @@ def clean_image(input_path: str | Path, output_path: str | Path,
     """Rimuove XMP/JUMBF su copia, verifica e pubblica immagine e rapporto."""
     source = _input_path(input_path)
     destination = Path(output_path).expanduser().absolute()
+    # Canonicalizza alias del parent (/var su macOS, nomi corti su Windows),
+    # senza seguire un eventuale symlink finale che va rifiutato da lexists.
+    destination = destination.parent.resolve() / destination.name
     # lexists intercetta anche link simbolici pendenti.
     sidecar = Path(str(destination) + ".report.json")
     if destination.resolve() == source or os.path.lexists(destination) or os.path.lexists(sidecar):

@@ -311,6 +311,27 @@ class LocalImageIntegrationTests(ReportAssertions, unittest.TestCase):
                 self.assertFalse(contains_group(report["metadata"]["after"], "xmp"))
                 self.assert_same_image(source, output)
 
+    def test_output_through_parent_alias_reports_canonical_path(self):
+        source = self.fixture("source-with-alias.png", xmp=True)
+        original = source.read_bytes()
+        real_directory = self.tmp / "actual-output"
+        real_directory.mkdir()
+        alias = self.tmp / "output-alias"
+        try:
+            alias.symlink_to(real_directory, target_is_directory=True)
+        except (OSError, NotImplementedError):
+            self.skipTest("Directory symlink creation unavailable")
+        output = alias / "clean.png"
+        report = self.images.clean_image(source, output)
+        self.assert_report(report, "clean", source, output)
+        self.assertEqual(Path(report["output"]["path"]), output.resolve())
+        self.assertEqual(source.read_bytes(), original)
+        self.assertTrue(alias.is_symlink())
+        self.assertTrue((real_directory / "clean.png").is_file())
+        self.assert_same_image(source, output)
+        sidecar = Path(str(output) + ".report.json")
+        self.assertEqual(json.loads(sidecar.read_text(encoding="utf-8")), report)
+
     def test_actual_format_and_extension_must_match(self):
         source = self.fixture("actual.jpg")
         mismatch = self.tmp / "disguised.png"

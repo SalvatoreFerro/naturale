@@ -230,7 +230,7 @@ La CI è configurata per eseguire i test con ExifTool su Linux, macOS e Windows,
 
 Il [benchmark editoriale](evals/README.md) include 80 casi sintetici e un protocollo di confronto cieco. Il comando sopra controlla la struttura del dataset; senza voti umani restituisce `not_validated`. Non genera riscritture e non misura da solo la loro qualità. Consulta le [conclusioni della ricerca](docs/RESEARCH.md) per le fonti e i limiti della prima versione.
 
-Le [verifiche eseguite](docs/VALIDATION.md) riportano ambiente, 51 test passati, rilevamento reale in Codex e controlli ancora da completare.
+Le [verifiche eseguite](docs/VALIDATION.md) riportano ambiente, 52 test passati, rilevamento reale in Codex e controlli ancora da completare.
 
 Per contribuire, apri un issue o una pull request con il comportamento atteso, un esempio minimo e la verifica eseguita. Usa soltanto testi e immagini che puoi condividere; rimuovi dati personali dalle fixture pubbliche. Per le modifiche editoriali includi esempi prima/dopo e controlla che non cambino fatti, negazioni, responsabilità o gradi di certezza.
 
