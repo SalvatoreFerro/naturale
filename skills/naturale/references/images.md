@@ -5,7 +5,9 @@
 Sono supportati JPEG e PNG statici: massimo 100 MiB per file e 40 milioni di
 pixel. Estensione e formato reale devono corrispondere; APNG e immagini multiple
 non sono supportati. Python 3.11+, Pillow ed ExifTool devono essere disponibili
-nell'interprete e nel PATH scelti. Non installare dipendenze automaticamente.
+nell'interprete e nel PATH scelti. ExifTool deve essere almeno 13.60: versioni
+precedenti vengono rifiutate con `exiftool_too_old` prima di leggere o scrivere
+immagini. `scripts/doctor.py` nel repository indica la compatibilità. Non installare dipendenze automaticamente.
 
 Non caricare immagini o anteprime nel modello e non usare browser, strumenti di
 visione o detector esterni per questo percorso. Gli script non eseguono richieste
@@ -145,6 +147,24 @@ errore operativo o batch con almeno un file fallito, `2` argomenti non validi.
 Un batch con errori può contenere copie riuscite: riferire i risultati per file.
 I messaggi di errore ordinari non mostrano percorsi o valori letti dal parser;
 `--full-report` autorizza invece dettagli completi che possono essere personali.
+
+Il campo `error.code` nel riepilogo distingue:
+
+| Codice | Significato |
+| --- | --- |
+| `unsupported_format` | Il formato reale non è JPEG o PNG. |
+| `extension_mismatch` | Estensione e formato reale dell'input o dell'output non coincidono. |
+| `file_too_large` | Il file supera il limite di byte. |
+| `too_many_pixels` | Superato il limite di pixel dello script o quello sicuro di Pillow. |
+| `multiframe_not_supported` | Immagine animata o con più fotogrammi. |
+| `output_exists` | Destinazione o rapporto occupati, anche da un symlink. |
+| `exiftool_too_old` | Versione inferiore al minimo supportato. |
+| `verification_failed` | Decodifica, metadati o invarianti non verificabili; output non pubblicato. |
+
+Restano `exiftool_missing`, `pillow_missing` e `operation_failed` per dipendenze
+assenti o altri errori operativi. I messaggi sono statici: non derivano da
+percorsi, valori o testo grezzo restituito dai parser. I dettagli completi degli
+errori sono disponibili solo con `--full-report`.
 
 Le API Python `inspect_image` e `clean_image` continuano a restituire rapporti
 completi per compatibilità; `summarize_report` produce la vista ridotta. Non
