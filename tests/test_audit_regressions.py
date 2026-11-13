@@ -63,6 +63,32 @@ EMAIL_ERROR_CASES = [
 ]
 
 
+FOUR_POINT_CASES = [
+    ("N1", "Non sono previsti costi né rinnovi.", "Sono previsti costi né rinnovi.", "negation"),
+    ("N2", "Se non è il momento, nessun problema.", "Se è il momento, nessun problema.", "negation"),
+    ("N3", "Il mockup è una simulazione: non è un accordo.",
+     "Il mockup non è una simulazione: non è un accordo.", "negation"),
+    ("N4", "Non firmo né invio nulla.", "Non firmo e invio tutto.", "negation"),
+    ("P1", "Ci sentiamo nei prossimi giorni.", "Ci sentiamo nelle prossime settimane.", "relative_period"),
+    ("R1", "Spero che gli avvisi ti siano stati utili.", "Spero che gli avvisi Le siano stati utili.", "register"),
+    ("R2", "Ho visto la tua proposta, grazie.", "Ho visto la Sua proposta, grazie.", "register"),
+    ("R3", "Grazie per il riscontro. Le anticipo una proposta.",
+     "Grazie per il riscontro. Ti anticipo una proposta.", "register"),
+    ("R4", "Scusami se ti rispondo solo ora: ti scrivo domani.",
+     "Scusami se Le rispondo solo ora: ti scrivo domani.", "register"),
+    ("R5", "Gentile dottore, Le invio la proposta per entrambe le parti.",
+     "Gentile dottore, ti invio la proposta per entrambe le parti.", "register"),
+    ("R6", "Gentile dottoressa, Le scrivo come richiesto dagli esperti.",
+     "Gentile dottoressa, ti scrivo come richiesto dagli esperti.", "register"),
+    ("S1", "Ne parliamo e vediamo anche se ci sono altre idee.",
+     "Ne parliamo e vediamo se ci sono anche altre idee.", None),
+    ("S2", "Nei prossimi giorni ti scrivo.", "Ti scrivo nei prossimi giorni.", None),
+    ("S3", "Le foto sono pronte.", "Ecco le foto.", None),
+    ("S4", "Ciao Marco, ecco il file.", "Ciao Marco, ti mando il file.", None),
+    ("S5", "La riunione è confermata.", "La riunione resta confermata.", None),
+]
+
+
 class AuditVerificationTests(unittest.TestCase):
     def files(self, source, revision):
         with tempfile.TemporaryDirectory() as directory:
@@ -83,6 +109,62 @@ class AuditVerificationTests(unittest.TestCase):
                                 encoding="utf-8", timeout=10)
         self.assertIn(result.returncode, (0, 1, 3), result.stderr)
         return result, json.loads(result.stdout)
+
+    def test_four_remaining_email_audit_points(self):
+        for case, source, revision, category in FOUR_POINT_CASES:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                if category is None:
+                    self.assertEqual(result.returncode, 0, result.stdout)
+                    self.assertEqual(report["findings"], [])
+                    self.assertEqual(report["review_flags"], [])
+                else:
+                    self.assertIn(result.returncode, (1, 3), result.stdout)
+                    flags = [flag for flag in report["review_flags"] if flag["category"] == category]
+                    self.assertTrue(flags, result.stdout)
+                    for flag in flags:
+                        for version, text in (("source", source), ("revision", revision)):
+                            contexts = flag["contexts"][version]
+                            self.assertLessEqual(len(contexts), 2)
+                            for fragment in contexts:
+                                self.assertLessEqual(len(fragment), 60)
+                                self.assertIn(fragment.strip("…"), text)
+
+    def test_four_point_boundary_cases_preserve_expected_signals(self):
+        cases = [
+            ("coordinator_removed", "Né firmo né invio.", "Né firmo e invio.", "negation"),
+            ("mica_removed", "Mica firmo adesso.", "Firmo adesso.", "negation"),
+            ("indirect_question_masking", "Se confermi, verifico anche se il file è completo.",
+             "Verifico se il file è completo.", "condition"),
+            ("distant_governor", "Vediamo il prezzo; firmo anche se sale.",
+             "Vediamo il prezzo; firmo se sale.", "condition"),
+            ("infinitive_governor", "Vorrei capire anche se il file è pronto.",
+             "Vorrei capire se il file è pronto.", None),
+            ("plural_period_order", "Ti scrivo nelle settimane prossime.",
+             "Ti scrivo nelle prossime settimane.", None),
+            ("formal_imperfect", "La avevo contattata ieri.", "Ti avevo contattata ieri.", "register"),
+            ("article_before_photo", "La foto è pronta.", "Ti mando la foto pronta.", None),
+            ("infinitive_enclitic", "Spero di piacerti.", "Spero di piacerLe.", "register"),
+            ("explicit_condition", "Un'eventuale giornata va bene.",
+             "Se ci sarà una giornata va bene.", "condition"),
+            ("irregular_porre", "Vorrei proporti una data.", "Vorrei proporLe una data.", "register"),
+            ("irregular_durre", "Posso tradurti il testo.", "Posso tradurLe il testo.", "register"),
+            ("nominal_governor", "Partiamo dal controllo anche se è complesso.",
+             "Partiamo dal controllo, benché sia complesso.", None),
+            ("opaque_object", "Controllo esempio.it anche se è lento.",
+             "Controllo esempio.it, nonostante sia lento.", None),
+        ]
+        for case, source, revision, category in cases:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                if category is None:
+                    self.assertEqual(result.returncode, 0, result.stdout)
+                    self.assertEqual(report["findings"], [])
+                    self.assertEqual(report["review_flags"], [])
+                else:
+                    self.assertEqual(result.returncode, 3, result.stdout)
+                    self.assertEqual(report["findings"], [])
+                    self.assertTrue(any(flag["category"] == category for flag in report["review_flags"]), result.stdout)
 
     def test_email_tokens_are_bounded_and_protect_their_inner_words_and_digits(self):
         cases = [

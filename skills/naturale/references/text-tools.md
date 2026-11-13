@@ -124,10 +124,11 @@ Il rapporto distingue:
 - **Date relative di un giorno:** confronta espressioni come «oggi», «ieri»,
   «domani» e «dopodomani», riconoscendo forme equivalenti come «in data odierna»
   e «oggi». Non calcola una data assoluta né conosce quando l'autore ha scritto
-  il messaggio. I periodi relativi riconosciuti riguardano settimana, mese e
-  anno e producono invece segnali di revisione (`relative_period`); l'ordine
-  equivalente «la prossima settimana»/«la settimana prossima» non cambia il
-  periodo.
+  il messaggio. I periodi relativi riconosciuti riguardano giorni, settimane,
+  mesi e anni, anche al singolare, e producono segnali di revisione
+  (`relative_period`). «Nei prossimi giorni» e «nelle prossime settimane»
+  restano distinti, così come singolare e plurale; l'ordine equivalente
+  «la prossima settimana»/«la settimana prossima» non cambia il periodo.
 - **Numeri e formati:** riconosce uno–venti, decine fino a novanta, cento e
   mille e confronta le quantità riconosciute con le cifre corrispondenti.
   Esclude gli usi grammaticali riconosciuti di «sei» e «uno» e le formule con
@@ -145,20 +146,39 @@ Il rapporto distingue:
   esprimono la stessa classe condizionale; «salvo»/«a meno che» sono eccezioni
   e «solo se»/«purché»/«a condizione che»/«a patto che» requisiti. «Solo dopo»
   mantiene una classe distinta. Le concessive «anche se», «nonostante»,
-  «sebbene» e «benché» sono escluse dal conteggio delle condizioni. Riconoscere una forma non dimostra che la
-  condizione riguardi ancora l'azione o la persona corretta.
-- **Negazioni e scadenze:** per la negazione si confronta la presenza per
-  frase, evitando di contare «né» coordinativo come una nuova negazione.
+  «sebbene» e «benché» sono escluse. «Anche se» dopo una forma riconosciuta e
+  vicina di vedere, capire, chiedere, sapere, verificare, controllare o valutare
+  conta invece come «se» di una domanda indiretta, anche con alcuni avverbi
+  intermedi. Non si cerca un verbo qualsiasi nell'intera frase: questa resta
+  un'euristica locale, non un'analisi grammaticale. Riconoscere una forma non
+  dimostra che la condizione riguardi ancora l'azione o la persona corretta.
+- **Negazioni e scadenze:** nel testo confrontato si contano globalmente
+  `primary` (P: non, nessun/nessuno/nessuna, mai, niente, nulla, neanche,
+  nemmeno, neppure, mica; anche senza per compatibilità) e `coordinator`
+  (N: né, anche con accento Unicode decomposto). Con Δ = revisione − fonte,
+  si segnala se `(ΔP ≠ 0 e ΔP + ΔN ≠ 0)` oppure `(ΔP = 0 e ΔN < 0)`.
+  Così «e nessun» → «né» e l'aggiunta coordinativa di «né» non bastano a
+  generare un allarme, mentre perdere un «non» accanto a «né» viene segnalato.
+  Compensazioni fra parti diverse del testo possono ancora sfuggire; non si
+  ricostruisce quale azione sia negata. «Non oltre» resta una scadenza.
   Per le scadenze si riconoscono anche preposizioni articolate, per esempio
   «prima della», «prima dell'», «fino al» e «a partire dal», accanto a «entro»,
   «prima di» e «non oltre». Il conteggio non verifica da solo quale azione
   venga negata o quale evento sia legato alla scadenza.
 - **Altri segnali di revisione:** comprende incertezza, periodi relativi e
-  indizi del passaggio tu/Lei (`register`). Per il registro devono esserci
-  indizi riconosciuti in entrambe le versioni: la sola omissione di un pronome
-  non stabilisce un cambio. Si usano «tu/ti/te», forme in `-rti`, «Lei», «Le»
-  seguito da alcuni verbi di allocuzione e forme in `-rLe`; non è un'analisi
-  completa di articoli, pronomi, maiuscole o persona dei verbi.
+  indizi del passaggio tu/Lei (`register`). Se la fonte ha un solo registro
+  riconosciuto, si segnala quando la revisione contiene indizi dell'altro,
+  anche diventando mista. Fonti miste o senza indizi, e revisioni senza
+  indizi, non stabiliscono un cambio. Si riconoscono «tu/ti/te», possessivi
+  informali ed enclitici in -arti/-erti/-irti, escludendo intere parole non
+  clitiche come «parti», «aperti» ed «esperti» senza escludere «piacerti».
+  Restano riconosciuti anche gli irregolari in -porre/-durre, come «proporti».
+  Per il formale si usano «Lei», enclitici in -rLe, «Le/La» maiuscoli davanti
+  a forme verbali candidate di prima persona o ausiliari, e «Suo/Sua/Suoi/Sue»
+  maiuscoli non iniziali. Si conservano gli indizi minuscoli già supportati.
+  Desinenze e un lessico di esclusioni nominali aiutano a distinguere articoli
+  come «Le foto» e «La riunione», ma non sono un'analisi completa: omografi,
+  nomi non riconosciuti, persone citate e allocuzione implicita restano ambigui.
   Le review flag restano richieste di lettura, non prove di errore;
   `review_status: required` rende esplicita la necessità di attenzione.
 - **Dove rileggere:** ogni review flag aggiunge `contexts.source` e

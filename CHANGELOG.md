@@ -2,6 +2,11 @@
 
 ## 0.2.1 — preparazione, non rilasciata
 
+- Audit e-mail: recuperata la sensibilità alle negazioni con conteggi globali
+  di negatori primari e «né»; distinte le domande indirette con «anche se».
+- Periodi relativi plurali e registro tu/Lei ampliati, anche per revisioni
+  miste, possessivi di cortesia e omografi degli enclitici.
+
 - Audit e-mail: condizioni equivalenti e concessive, negazioni coordinate,
   scadenze articolate, date relative, domini, e-mail, codici, segnali di registro
   e frammenti contestuali; ambito esplicito quando si omette la cronologia citata.
