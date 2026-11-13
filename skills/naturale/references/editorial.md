@@ -65,6 +65,8 @@ Non usare liste rigide di «parole AI» come divieti assoluti. Una parola è uti
 
 **E-mail.** Rendi evidente la richiesta o l'informazione principale. Mantieni il grado di cortesia, eventuali vincoli e la chiarezza su chi deve fare cosa. Non aggiungere saluti, oggetto, firma o disponibilità non presenti, a meno che l'utente chieda una mail completa o quegli elementi.
 
+Nelle risposte con conversazione citata sotto, rivedi solo il testo nuovo: la cronologia contiene parole di altri e non va riscritta. Restituiscila invariata, oppure omettila se l’utente vuole solo il testo nuovo. Non modificare per ragioni stilistiche citazioni, intestazioni o dati delle risposte precedenti.
+
 **Messaggi.** Preferisci un ritmo coerente con il rapporto tra le persone. Non espandere un messaggio breve già chiaro e non inserire emoji o confidenza non richieste.
 
 **Testi professionali.** Riduci gergo vuoto e ridondanze senza perdere definizioni, precisione o formalità necessarie. Le liste sono appropriate per requisiti, azioni e confronti.
@@ -101,7 +103,9 @@ controllo diretto; per un documento complesso usa una lista temporanea di
 vincoli, senza salvarla automaticamente:
 
 - fatti e numeri rilevanti;
-- chi fa cosa, per chi ed entro quando;
+- chi fa cosa, per chi ed entro quando, controllando la persona dei verbi (io/tu, noi/voi);
+- riferimenti come «qui/lì», «questo/quello», «sopra/sotto» e «in allegato»;
+- date relative come «oggi», «domani» e «questa settimana», senza spostare il riferimento temporale;
 - condizioni e negazioni;
 - possibilità, previsioni e impegni;
 - opinioni attribuite e risultati effettivamente osservati;
@@ -113,9 +117,11 @@ commentata, mostra evidenze utili, come la condizione persa o la scadenza
 modificata. Per i riassunti valuta le omissioni in funzione di scopo e lunghezza,
 senza promettere di mantenere tutte le informazioni.
 
-Su file, `text.py audit` affianca questa verifica con controlli su numeri,
-citazioni, URL e vincoli letterali. Il confronto e i suoi eventuali segnali su
-negazioni o incertezza non costituiscono un sistema di verifica fattuale. Il
+`text.py audit` affianca questa verifica con confronti letterali e segnali da
+rileggere, descritti nella [guida strumenti testi](text-tools.md). Il controllo
+meccanico non verifica chi compie un’azione, i riferimenti o le attribuzioni:
+controllali direttamente anche quando il rapporto non segnala differenze. I
+segnali su condizioni, negazioni, incertezza o registro non sono prove di errore. Il
 rapporto dichiara sempre `semantic_equivalence: not_verified`. «Nessun problema
 deterministico trovato» non significa «significato certificato». Non usare un
 secondo punteggio automatico come sostituto della lettura della fonte.

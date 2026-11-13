@@ -110,25 +110,95 @@ estranei presenti nel documento.
 
 Il rapporto distingue:
 
-- **Esito deterministico:** numeri, citazioni, URL e vincoli letterali possono
-  essere confrontati. Un elemento diverso è un problema da esaminare, non una
-  prova automatica di errore semantico: anche una formattazione diversa può
-  generare una segnalazione.
-- Confronta anche giorni della settimana, mesi e numeri scritti come parole:
-  uno–venti, decine fino a novanta, cento e mille. Le parole numeriche sono
-  confrontate con le cifre corrispondenti; i termini ambigui richiedono contesto.
+- **Esito deterministico:** confronta numeri, giorni della settimana, mesi,
+  citazioni, URL e vincoli letterali; comprende anche codici alfanumerici ASCII,
+  domini senza schema e indirizzi e-mail. Una variazione di queste stringhe
+  è un elemento da esaminare: non verifica la validità del codice, l'esistenza
+  della casella o il contenuto del sito e non apre collegamenti. I nuovi
+  `kind` sono `identifier`, `domain`, `email` e `relative_day`. I codici
+  conservano le maiuscole; il termine di codifica `Base64`/`base64` è una
+  normalizzazione esplicita. I domini sono confrontati senza distinzione di
+  maiuscole e soltanto per un insieme finito di TLD comuni; non è un elenco
+  universale. Per le e-mail si riconoscono forme ASCII senza virgolette e si
+  normalizza solo il dominio, mantenendo le maiuscole della parte prima di `@`.
+- **Date relative di un giorno:** confronta espressioni come «oggi», «ieri»,
+  «domani» e «dopodomani», riconoscendo forme equivalenti come «in data odierna»
+  e «oggi». Non calcola una data assoluta né conosce quando l'autore ha scritto
+  il messaggio. I periodi relativi riconosciuti riguardano settimana, mese e
+  anno e producono invece segnali di revisione (`relative_period`); l'ordine
+  equivalente «la prossima settimana»/«la settimana prossima» non cambia il
+  periodo.
+- **Numeri e formati:** riconosce uno–venti, decine fino a novanta, cento e
+  mille e confronta le quantità riconosciute con le cifre corrispondenti.
+  Esclude gli usi grammaticali riconosciuti di «sei» e «uno» e le formule con
+  «mille» adiacente a «grazie». Un omografo irrisolto non genera un segnale da
+  solo: può essere appaiato con un numero corrispondente nell'altra versione,
+  senza trasformare una classificazione incerta in una prova di errore.
+  Questa scelta evita falsi allarmi ma può non rilevare la perdita di una
+  quantità priva di indizi sufficienti: il lessico e il contesto restano limitati.
   Sono equivalenti posizione/spazi del simbolo euro nella notazione italiana e
-  orari come `9:30`/`9.30` dopo «alle» o «ore». Le citazioni e i vincoli espliciti
-  rimangono letterali. Non si normalizzano arbitrariamente codici o unità.
-- **Segnali di revisione:** differenze su negazione o incertezza sono euristiche.
-  Sono controllati anche condizioni e marcatori di scadenza, inclusi «entro»,
-  «prima di», «non oltre», «fino a», «a partire da». Controllare la frase e il
-  contesto prima di decidere cosa correggere. `review_status: required` rende
-  esplicito che il controllo richiede attenzione, anche senza errori meccanici.
+  orari come `9:30`/`9.30` negli introduttori orari supportati, fra cui «alle»,
+  «ore», «dalle», «entro le» e «verso le». Citazioni e vincoli espliciti restano
+  letterali; non si normalizzano arbitrariamente codici o unità.
+- **Condizioni:** le forme riconosciute vengono confrontate per classe e
+  numero di occorrenze: «se», «qualora», «nel caso in cui» e «in caso di»
+  esprimono la stessa classe condizionale; «salvo»/«a meno che» sono eccezioni
+  e «solo se»/«purché»/«a condizione che»/«a patto che» requisiti. «Solo dopo»
+  mantiene una classe distinta. Le concessive «anche se», «nonostante»,
+  «sebbene» e «benché» sono escluse dal conteggio delle condizioni. Riconoscere una forma non dimostra che la
+  condizione riguardi ancora l'azione o la persona corretta.
+- **Negazioni e scadenze:** per la negazione si confronta la presenza per
+  frase, evitando di contare «né» coordinativo come una nuova negazione.
+  Per le scadenze si riconoscono anche preposizioni articolate, per esempio
+  «prima della», «prima dell'», «fino al» e «a partire dal», accanto a «entro»,
+  «prima di» e «non oltre». Il conteggio non verifica da solo quale azione
+  venga negata o quale evento sia legato alla scadenza.
+- **Altri segnali di revisione:** comprende incertezza, periodi relativi e
+  indizi del passaggio tu/Lei (`register`). Per il registro devono esserci
+  indizi riconosciuti in entrambe le versioni: la sola omissione di un pronome
+  non stabilisce un cambio. Si usano «tu/ti/te», forme in `-rti`, «Lei», «Le»
+  seguito da alcuni verbi di allocuzione e forme in `-rLe`; non è un'analisi
+  completa di articoli, pronomi, maiuscole o persona dei verbi.
+  Le review flag restano richieste di lettura, non prove di errore;
+  `review_status: required` rende esplicita la necessità di attenzione.
+- **Dove rileggere:** ogni review flag aggiunge `contexts.source` e
+  `contexts.revision`, ciascuno con al massimo due frammenti di 60 caratteri
+  attorno agli indicatori che differiscono. Un elenco vuoto indica che in
+  quella versione non è stato trovato un indicatore corrispondente. I
+  frammenti possono contenere testo personale: non salvarli o pubblicarli
+  automaticamente.
 - **Equivalenza del significato:** sempre `not_verified`. Il modello deve
-  confrontare condizioni, responsabilità, attribuzioni e intenzione con la fonte.
+  confrontare riferimenti («qui/lì», «questo/quello», «sopra/sotto», «in
+  allegato»), date relative, persona dei verbi (io/tu, noi/voi), condizioni,
+  responsabilità e attribuzioni con la fonte. L'audit non certifica questi
+  rapporti semantici.
 - **Diff facoltativo:** `--diff` include il confronto letterale; può contenere
   il testo completo e dati personali. Non salvarlo o pubblicarlo automaticamente.
+
+### Risposte con conversazione citata
+
+Si rivede soltanto il testo nuovo. La cronologia contiene parole di altri:
+restituirla invariata, oppure ometterla se l'utente vuole solo il testo nuovo.
+
+Se la fonte contiene una cronologia riconosciuta e la revisione la omette,
+l'audit esclude quella parte della fonte dai confronti ordinari. Il confine
+richiede un'intestazione di risposta italiana o inglese, separata dal testo
+nuovo da una riga vuota, con cifre e un indirizzo e-mail; tutte le righe
+successive devono essere introdotte da `>`, oppure essere vuote.
+
+Il rapporto lo dichiara in `comparison_scope`: `name` è `new_message` oppure
+`full_text`, `source_history_excluded` indica l'esclusione della fonte e
+`revision_history_excluded` resta `false`. Un'esclusione non equivale a un
+controllo superato su tutto il contenuto della fonte. Se entrambe le versioni
+mantengono la cronologia, viene confrontata: cambiare un importo citato deve
+essere segnalato. Una cronologia aggiunta soltanto nella revisione non viene
+ignorata. I vincoli espliciti `preserve_exact` e `forbid` continuano ad
+applicarsi ai testi completi, anche alla parte citata.
+
+Il riconoscimento è prudente e non copre ogni client, inoltro, firma o
+intestazione personalizzata. Senza un confine riconosciuto l'audit confronta
+anche quella parte: non presume che un testo difficile da classificare possa
+essere ignorato. Non modificare la cronologia per eliminare una segnalazione.
 
 Codici di uscita: audit `0` senza problemi né segnali di revisione, `1` con
 problemi deterministici, `2` per input non valido, `3` quando restano soltanto
