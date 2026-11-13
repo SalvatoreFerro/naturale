@@ -76,7 +76,7 @@ DEADLINE_PATTERN = re.compile(
     r"(?P<from>a\s+partire\s+(?:(?:da|dal|dallo|dalla|dai|dagli|dalle)\b|dall['’])))", re.I)
 
 MARKER_PATTERNS = {
-    "negation": re.compile(r"\b(?:non|mai|nessun[oa]?|senza|n(?:é|e\u0301)|niente|nulla|neanche|nemmeno|neppure)(?!\w)", re.I),
+    "negation": re.compile(r"\b(?:non|mai|nessun[oa]?|senza|n(?:é|e\u0301)|niente|nulla|neanche|nemmeno|neppure|mica)(?!\w)", re.I),
     "uncertainty": re.compile(
         r"\b(?:forse|potrebbe|potrebbero|potremmo|potrei|possibile|probabile|"
         r"ipotizziamo|indicativamente|circa|previsto|prevista|dovrebbe|dovremmo|probabilmente|eventualmente)\b", re.I
@@ -110,9 +110,9 @@ FACT_DAY_PATTERN = re.compile(
     r"\b(?:in\s+data\s+odierna|quest['’]oggi|l['’]altro\s*ieri|avantieri|"
     r"ieri\s+l['’]altro|domani\s+l['’]altro|dopodomani|domani|ieri|oggi)\b", re.I)
 FACT_PERIOD_PATTERN = re.compile(
-    r"\b(?:(?P<before>questa|questo|corrente|presente|prossima|prossimo|scorsa|scorso)\s+"
-    r"(?P<unit_after>settimana|mese|anno)|(?P<unit_before>settimana|mese|anno)\s+"
-    r"(?P<after>corrente|presente|prossima|prossimo|scorsa|scorso)|quest['’]anno)\b", re.I)
+    r"\b(?:(?P<before>quest[aoei]|corrent[ei]|present[ei]|prossim[aoie]|scors[aoie])\s+"
+    r"(?P<unit_after>giorn[oi]|settiman[ae]|mes[ei]|ann[oi])|(?P<unit_before>giorn[oi]|settiman[ae]|mes[ei]|ann[oi])\s+"
+    r"(?P<after>corrent[ei]|present[ei]|prossim[aoie]|scors[aoie])|quest['’]anno)\b", re.I)
 
 
 def _trim_fact_url(value):
@@ -188,14 +188,103 @@ def _relative_period_records(text):
 
 
 
-INFORMAL_PATTERN = re.compile(r"\b(?:tu|ti|te)\b|\b[a-zàèéìòù]+rti\b", re.I)
-FORMAL_PATTERN = re.compile(
-    r"\bLei\b|\b[Ll]e\s+(?:scrivo|invio|mando|comunico|confermo|chiedo|allego|"
-    r"ringrazio|segnalo|ricordo|auguro|rispondo)\b|\b[a-zàèéìòù]+rLe\b")
+REGISTER_WORD = r"[^\W\d_]+"
+INFORMAL_DIRECT_PATTERN = re.compile(r"\b(?:tu|ti|te|tuo|tua|tuoi|tue)\b", re.I)
+INFORMAL_ENCLITIC_PATTERN = re.compile(
+    r"\b(?:[^\W\d_]+(?:arti|erti|irti)|[^\W\d_]*(?:por|dur)ti)\b", re.I)
+# Whole forms, not suffixes: piacerti/conoscerti remain real infinitive clitics.
+NON_ENCLITICS = {
+    "arti", "parti", "quarti", "scarti", "comparti", "scomparti", "reparti", "riparti",
+    "erti", "certi", "incerti", "aperti", "riaperti", "semiaperti", "esperti", "inesperti",
+    "coperti", "scoperti", "ricoperti", "riscoperti", "offerti", "sofferti", "deserti",
+    "referti", "reperti", "inserti", "allerti", "liberti", "irti",
+    "porti", "apporti", "rapporti", "importi", "supporti", "trasporti",
+}
+FORMAL_OBJECT_PATTERN = re.compile(
+    r"\b(?:Le|La)\s+(?:(?:non|già|anche)\s+)?(?P<verb>" + REGISTER_WORD + r")\b")
+FORMAL_DIRECT_PATTERN = re.compile(
+    r"\bLei\b|\b[^\W\d_]+rLe\b|"
+    r"\ble\s+(?:scrivo|invio|mando|comunico|confermo|chiedo|allego|ringrazio|segnalo|ricordo|auguro|rispondo)\b")
+FORMAL_POSSESSIVE_PATTERN = re.compile(r"\b(?:Suo|Sua|Suoi|Sue)\b")
+# Invariant/feminine nominal heads cannot be identified from the ending -o.
+ARTICLE_HEADS_O = {"foto", "auto", "moto", "radio", "mano", "dinamo", "flebo", "eco", "video", "audio", "pallavolo"}
+FORMAL_AUXILIARIES = {
+    "sia", "siano", "è", "era", "erano", "fosse", "fossero", "sarà", "saranno",
+    "ha", "hanno", "abbia", "abbiano", "aveva", "avevano", "avrà", "avranno",
+    "sta", "stanno", "stia", "stiano",
+}
+
+
+def _first_person_candidate(word):
+    lower = word.casefold()
+    return lower not in ARTICLE_HEADS_O and (
+        lower.endswith(("o", "ò", "rei")) or lower in FORMAL_AUXILIARIES
+    )
+
+
+def _sentence_initial(text, position):
+    previous = position - 1
+    while previous >= 0 and text[previous] in " \t\r\"'«“([":
+        previous -= 1
+    return previous < 0 or text[previous] in ".!?\n"
+
+
+def _register_events(text):
+    events = [("informal", *m.span()) for m in INFORMAL_DIRECT_PATTERN.finditer(text)]
+    for match in INFORMAL_ENCLITIC_PATTERN.finditer(text):
+        if match.group().casefold() not in NON_ENCLITICS:
+            events.append(("informal", *match.span()))
+    events.extend(("formal", *m.span()) for m in FORMAL_DIRECT_PATTERN.finditer(text))
+    for match in FORMAL_OBJECT_PATTERN.finditer(text):
+        if _first_person_candidate(match["verb"]):
+            following = WORD_AFTER.match(text, match.end())
+            if following and following[1].casefold() in {"è", "sono", "era", "erano", "sarà", "saranno", "sembra", "sembrano", "resta", "restano"}:
+                continue
+            events.append(("formal", *match.span()))
+    for match in FORMAL_POSSESSIVE_PATTERN.finditer(text):
+        if not _sentence_initial(text, match.start()):
+            events.append(("formal", *match.span()))
+    return events
+
+
+# A nearby interrogative governor distinguishes "vediamo anche se" from a
+# concessive. Forms are grammatical cues, not a parser of indirect questions.
+QUERY_GOVERNOR_PATTERN = re.compile(
+    r"\b(?P<verb>(?:ved|chied)(?:ere|o|i|e|iamo|ete|ono|evo|evi|eva|evamo|evate|evano|endo|rò|rai|rà|remo|rete|ranno|rei|erò|eremo|erei)|"
+    r"cap(?:ire|isco|isci|isce|iamo|ite|iscono|ivo|iva|ivamo|ivano|endo|irò|iremo|irei)|"
+    r"(?:verific|controll|valut)(?:are|o|i|a|hi|hiamo|iamo|ate|ano|ando|ato|ata|avo|ava|avamo|avano|herò|heremo|herei|erò|eremo|erei)|"
+    r"sapere|so|sai|sa|sappiamo|sapete|sanno|sapevo|sapeva|sapevamo|sapendo|saprò|sapremo|saprei|visto|chiesto|saputo|capito)"
+    r"(?:\s+(?:bene|meglio|prima|poi|ora|adesso|insieme|comunque)){0,2}\s*$", re.I)
+
+
+def _indirect_question(text: str, start: int, masked: str) -> bool:
+    begin = max(0, start - 160)
+    # Masked identifiers are objects/barriers, not whitespace linking a verb
+    # to a following concessive. Keep offsets without inspecting their value.
+    left = "".join(raw if raw == visible else "\ufffc"
+                   for raw, visible in zip(text[begin:start], masked[begin:start]))
+    governor = QUERY_GOVERNOR_PATTERN.search(left)
+    if not governor:
+        return False
+    preceding = WORD_BEFORE.search(left[:governor.start()])
+    previous = preceding[1].casefold() if preceding else ""
+    word = governor["verb"].casefold()
+    # Nominal uses of the same spelling do not govern a question.
+    masculine_heads = {"il", "un", "questo", "quel", "dal", "del", "al", "nel", "sul", "col",
+                       "mio", "tuo", "suo", "nostro", "vostro", "loro"}
+    if word in {"controllo", "sapere"} and previous in masculine_heads:
+        return False
+    if word == "controllo" and previous == "senza":
+        return False
+    if word in {"verifica", "valuta"} and previous in {"la", "una", "questa", "quella", "dalla", "della", "alla", "nella", "sulla", "senza",
+                                                       "mia", "tua", "sua", "nostra", "vostra", "loro"}:
+        return False
+    return True
+
+
 HISTORY_HEADER_PATTERN = re.compile(
     r"(?im)^[ \t]*(?:Il\s+giorno\s+[^\r\n]+\bha\s+scritto:|"
     r"On\s+[^\r\n]+\bwrote:)[ \t]*\r?$")
-SENTENCE_END_PATTERN = re.compile(r"[.!?;]+(?=\s|$)|\n+")
 
 
 def _history_boundary(text: str) -> int | None:
@@ -226,28 +315,25 @@ def _review_events(text: str) -> dict[str, list[tuple[str, int, int]]]:
     masked = _mask_identifiers(text)
     events = {category: [] for category in ("negation", "uncertainty", "condition", "deadline", "register", "relative_period")}
     for match in CONDITION_PATTERN.finditer(masked):
-        if match.lastgroup != "concessive":
-            events["condition"].append((match.lastgroup, *match.span()))
+        category = match.lastgroup
+        if re.fullmatch(r"anche\s+se", match.group(), re.I) and _indirect_question(text, match.start(), masked):
+            category = "conditional"
+        if category != "concessive":
+            events["condition"].append((category, *match.span()))
     for match in DEADLINE_PATTERN.finditer(masked):
         events["deadline"].append((match.lastgroup, *match.span()))
     for match in MARKER_PATTERNS["uncertainty"].finditer(masked):
         events["uncertainty"].append((match.group().casefold(), *match.span()))
-    # One negative-presence event per sentence, including coordinating né.
+    # Count primary negators and coordinating né throughout the compared text.
     # "non oltre" belongs to the deadline class rather than negation.
     negated = list(masked)
     for match in re.finditer(r"\bnon\s+oltre\b", masked, re.I):
         negated[match.start():match.end()] = " " * len(match.group())
     negated = "".join(negated)
-    begin = 0
-    for end in [match.end() for match in SENTENCE_END_PATTERN.finditer(masked)] + [len(masked)]:
-        match = MARKER_PATTERNS["negation"].search(negated, begin, end)
-        if match:
-            events["negation"].append(("negative", *match.span()))
-        begin = end
-    for match in INFORMAL_PATTERN.finditer(masked):
-        events["register"].append(("informal", *match.span()))
-    for match in FORMAL_PATTERN.finditer(masked):
-        events["register"].append(("formal", *match.span()))
+    for match in MARKER_PATTERNS["negation"].finditer(negated):
+        category = "coordinator" if unicodedata.normalize("NFC", match.group()).casefold() == "né" else "primary"
+        events["negation"].append((category, *match.span()))
+    events["register"].extend(_register_events(masked))
     for record in _relative_period_records(text):
         events["relative_period"].append((record["value"], record["start"], record["end"]))
     return events
@@ -274,9 +360,15 @@ def _review_flags(source: str, revision: str) -> list[dict]:
         before = Counter(event[0] for event in before_events[category])
         after = Counter(event[0] for event in after_events[category])
         if category == "register":
-            # Omitted pronouns alone do not establish a switch of address.
+            # A pure source may become mixed; an already mixed/unknown source
+            # does not establish which address the revision should preserve.
             before, after = Counter(set(before)), Counter(set(after))
-            if len(before) != 1 or len(after) != 1:
+            if len(before) != 1 or not (after.keys() - before.keys()):
+                continue
+        if category == "negation":
+            dp = after["primary"] - before["primary"]
+            dn = after["coordinator"] - before["coordinator"]
+            if not ((dp != 0 and dp + dn != 0) or (dp == 0 and dn < 0)):
                 continue
         if before == after:
             continue
