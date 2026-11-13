@@ -2,6 +2,11 @@
 
 ## 0.2.1 — preparazione, non rilasciata
 
+- Audit e-mail: condizioni equivalenti e concessive, negazioni coordinate,
+  scadenze articolate, date relative, domini, e-mail, codici, segnali di registro
+  e frammenti contestuali; ambito esplicito quando si omette la cronologia citata.
+- Istruzioni editoriali: verifica di riferimenti, date relative e persona dei
+  verbi; conversazioni citate conservate invariate oppure omesse su richiesta.
 - Audit: ridotti i falsi allarmi sugli omografi numerici e sugli orari equivalenti, conservando i controlli sulle quantità.
 - Audit testi: calendario italiano, numeri in lettere, scadenze, negazioni e
   incertezza; normalizzazione di euro e orari, JSON su stdin ed exit `3` per

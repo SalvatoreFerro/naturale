@@ -14,6 +14,55 @@ audit = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(audit)
 
 
+# Invented correspondence only; no messages from the private mail evaluation.
+EMAIL_SAFE_CASES = [
+    ("A1", "Ti richiamo qualora servisse.", "Ti richiamo se servisse."),
+    ("A2", "Se confermi, procedo.", "Nel caso in cui confermi, procedo."),
+    ("A3", "Ti mando il file nel caso in cui ti serva.", "Se ti serve, ti mando il file."),
+    ("A4", "In caso di ritardo avvisami.", "Se c'è un ritardo, avvisami."),
+    ("A5", "Passo da te, anche se arrivo tardi.", "Passo da te, nonostante arrivi tardi."),
+    ("A6", 'Mi avete indicato come “dottore” anche se sono ancora studente.',
+     'Mi avete indicato come “dottore”: sono ancora studente.'),
+    ("A7", "Prima di procedere con l'invio ricontrollo tutto.", "Prima dell'invio ricontrollo tutto."),
+    ("A8", "Nessun costo di attivazione e nessun rinnovo automatico.",
+     "Nessun costo di attivazione né rinnovo automatico."),
+    ("A9", "Non sono dati definitivi o ufficiali.", "Non sono dati definitivi né ufficiali."),
+    ("A10", "Cerchiamo un sponsor principale.", "Cerchiamo uno sponsor principale."),
+    ("A11", "Sei tra i primi utenti.", "Rientri tra i primi utenti."),
+    ("A12", "Se sei in zona uno di questi giorni, chiamami.",
+     "Se uno di questi giorni sei in zona, chiamami."),
+    ("A13", "Grazie mille per l'aiuto.", "Grazie davvero per l'aiuto."),
+    ("A14", "Ci vediamo dalle 19:30 alle 20:15.", "Ci vediamo dalle 19.30 alle 20.15."),
+    ("A15", "Ho inviato la domanda in data odierna.", "Ho inviato la domanda oggi."),
+    ("A16", "Trovi tutto su Esempio.it.", "Trovi tutto su esempio.it."),
+    ("A17", "Ci sentiamo dieci minuti.", "Ci sentiamo 10 minuti."),
+    ("A18", "Le condizioni sono queste.", "Le condizioni sono le seguenti."),
+    ("A19", "Marta mi ha risposto, la ringrazio. Ti scrivo per due cose.",
+     "Marta mi ha risposto e la ringrazio. Ti scrivo per due cose."),
+    ("A20", "Il file è in Base64.", "Il file è in base64."),
+    ("A21", "Ci sentiamo la prossima settimana.", "Ci sentiamo la settimana prossima."),
+]
+EMAIL_ERROR_CASES = [
+    ("B1", "Il volo AB1234 parte alle 7.", "Il volo AB1243 parte alle 7.", "finding", "identifier"),
+    ("B2", "Il poster S05-7 è pronto.", "Il poster S06-7 è pronto.", "finding", "identifier"),
+    ("B3", "Stampa in formato A0.", "Stampa in formato A1.", "finding", "identifier"),
+    ("B4", "Te l'ho scritto oggi.", "Te l'ho scritto ieri.", "finding", "relative_day"),
+    ("B5", "Ne parliamo domani.", "Ne parliamo dopodomani.", "finding", "relative_day"),
+    ("B6", "Ci sentiamo questa settimana.", "Ci sentiamo la prossima settimana.", "review", "relative_period"),
+    ("B7", "Le condizioni sono su esempio.it.", "Le condizioni sono su esempio.com.", "finding", "domain"),
+    ("B8", "Scrivi a info@esempio.it.", "Scrivi a inf@esempio.it.", "finding", "email"),
+    ("B9", "Prima della firma riceverai la bozza.", "Dopo la firma riceverai la bozza.", "review", "deadline"),
+    ("B10", "Ti mando il link nel caso in cui vada bene anche a te.",
+     "Quando va bene anche a te, ti mando il link.", "review", "condition"),
+    ("B11", "Se approvate partiamo lunedì; in caso di rinvio vi avviso.",
+     "Partiamo lunedì; se c'è un rinvio vi avviso.", "review", "condition"),
+    ("B12", "Ti scrivo per confermarti l'orario.", "Le scrivo per confermarLe l'orario.", "review", "register"),
+    ("B13", "Gentile dottoressa, Le invio il file.", "Gentile dottoressa, ti invio il file.", "review", "register"),
+    ("B14", "Firmo anche se il prezzo sale.", "Firmo se il prezzo sale.", "review", "condition"),
+    ("B15", "Servono sei foto.", "Servono cinque foto.", "finding", "number"),
+]
+
+
 class AuditVerificationTests(unittest.TestCase):
     def files(self, source, revision):
         with tempfile.TemporaryDirectory() as directory:
@@ -24,6 +73,153 @@ class AuditVerificationTests(unittest.TestCase):
             result = subprocess.run([sys.executable, str(SCRIPT), "audit", "--source", str(s),
                                      "--revision", str(r)], capture_output=True, encoding="utf-8", timeout=10)
             return result, json.loads(result.stdout)
+
+    def stdin(self, source, revision, constraints=None):
+        payload = {"source": source, "revision": revision}
+        if constraints is not None:
+            payload["constraints"] = constraints
+        result = subprocess.run([sys.executable, str(SCRIPT), "audit", "--stdin-json"],
+                                input=json.dumps(payload), capture_output=True,
+                                encoding="utf-8", timeout=10)
+        self.assertIn(result.returncode, (0, 1, 3), result.stderr)
+        return result, json.loads(result.stdout)
+
+    def test_email_tokens_are_bounded_and_protect_their_inner_words_and_digits(self):
+        cases = [
+            ("long_non_address", "+" * 50_000, "+" * 50_000, 0),
+            ("address_tokens", "Scrivi a domani12+note@esempio.it.",
+             "Scrivi a ieri13+note@esempio.it.", 1),
+        ]
+        for case, source, revision, expected in cases:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                self.assertEqual(result.returncode, expected)
+                if expected:
+                    self.assertEqual({item["kind"] for item in report["findings"]}, {"email"})
+                else:
+                    self.assertEqual(report["findings"], [])
+                    self.assertEqual(report["review_flags"], [])
+
+    def test_email_safe_rewrites_are_silent(self):
+        for case, source, revision in EMAIL_SAFE_CASES:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                self.assertEqual(result.returncode, 0, result.stdout)
+                self.assertEqual(report["findings"], [])
+                self.assertEqual(report["review_flags"], [])
+                self.assertEqual(report["review_status"], "not_required")
+
+    def test_email_visible_errors_keep_the_expected_signal(self):
+        for case, source, revision, signal, category in EMAIL_ERROR_CASES:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                self.assertIn(result.returncode, (1, 3), result.stdout)
+                if signal == "finding":
+                    self.assertEqual(result.returncode, 1)
+                    self.assertTrue(any(item["kind"] == category for item in report["findings"]), result.stdout)
+                else:
+                    self.assertTrue(any(flag["category"] == category for flag in report["review_flags"]), result.stdout)
+
+    def test_quoted_conversation_scope_and_preservation(self):
+        current = "Va bene, confermo giovedì alle 10:00."
+        revised = "Perfetto, confermo giovedì alle 10:00."
+        italian = "Il giorno mar 3 nov 2026 alle ore 09:12 Nilo Falenzi <nilo@esempio.it> ha scritto:"
+        english = "On Tue, 3 Nov 2026 at 09:12, Nilo Falenzi <nilo@esempio.it> wrote:"
+        quoted = "> Possiamo fare giovedì alle 10:00?\n> Il preventivo è di 300 €."
+        for case, header, keep_history in (("C1", italian, False), ("C2", italian, True), ("C3", english, False)):
+            with self.subTest(case=case):
+                source = current + "\n\n" + header + "\n" + quoted
+                revision = revised
+                if keep_history:
+                    revision += "\n\n" + header + "\n" + quoted.replace("300 €", "350 €")
+                result, report = self.stdin(source, revision)
+                self.assertEqual(report["counts"], {"source_characters": len(source), "revision_characters": len(revision)})
+                if case == "C1":
+                    self.assertIn("300 €", audit.audit_text(source, revision, include_diff=True)["diff"])
+                if keep_history:
+                    self.assertEqual(result.returncode, 1, result.stdout)
+                    self.assertTrue(any(item["kind"] == "number" for item in report["findings"]))
+                    self.assertFalse(report["comparison_scope"]["source_history_excluded"])
+                    self.assertFalse(report["comparison_scope"]["revision_history_excluded"])
+                else:
+                    self.assertEqual(result.returncode, 0, result.stdout)
+                    self.assertEqual(report["findings"], [])
+                    self.assertEqual(report["review_flags"], [])
+                    self.assertTrue(report["comparison_scope"]["source_history_excluded"])
+                    self.assertFalse(report["comparison_scope"]["revision_history_excluded"])
+
+    def test_history_exclusion_does_not_hide_unquoted_or_newly_added_content(self):
+        current = "Confermo."
+        history = "\n\nIl giorno mar 3 nov 2026 alle ore 09:12 Nilo Falenzi <nilo@esempio.it> ha scritto:\n> Totale 300 €."
+        cases = [
+            ("mixed_tail", current + history + "\n\nNuova nota: budget 500 €.", current),
+            ("newly_added_history", current, current + history),
+        ]
+        for case, source, revision in cases:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertTrue(any(item["kind"] == "number" for item in report["findings"]))
+                self.assertFalse(report["comparison_scope"]["source_history_excluded"])
+                self.assertFalse(report["comparison_scope"]["revision_history_excluded"])
+
+    def test_review_contexts_are_short_bounded_and_locate_condition(self):
+        for case, source, revision, signal, _ in EMAIL_ERROR_CASES:
+            if signal != "review":
+                continue
+            with self.subTest(case="D-" + case):
+                _, report = self.stdin(source, revision)
+                self.assertTrue(report["review_flags"])
+                for flag in report["review_flags"]:
+                    contexts = flag["contexts"]
+                    self.assertEqual(set(contexts), {"source", "revision"})
+                    self.assertTrue(contexts["source"] or contexts["revision"])
+                    for version, fragments in contexts.items():
+                        self.assertIsInstance(fragments, list)
+                        self.assertLessEqual(len(fragments), 2)
+                        for fragment in fragments:
+                            self.assertIsInstance(fragment, str)
+                            self.assertLessEqual(len(fragment), 60)
+                            excerpt = fragment.strip("…")
+                            self.assertTrue(excerpt)
+                            self.assertIn(excerpt, source if version == "source" else revision)
+                if case == "B10":
+                    flag = next(flag for flag in report["review_flags"] if flag["category"] == "condition")
+                    self.assertTrue(any("nel caso in cui" in fragment.casefold() for fragment in flag["contexts"]["source"]))
+
+    def test_history_scope_keeps_explicit_constraints_and_unmarked_text(self):
+        current = "Confermo giovedì alle 10:00."
+        history = "Il giorno mar 3 nov 2026 alle ore 09:12 Nilo Falenzi <nilo@esempio.it> ha scritto:\n> Totale 300 €."
+        cases = [
+            ("explicit_constraint", current + "\n\n" + history, {"preserve_exact": ["300 €"]}, "required_text"),
+            ("unmarked_text", current + "\n\nPromemoria non citato: totale 300 €.", None, "number"),
+        ]
+        for case, source, constraints, kind in cases:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, current, constraints)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertTrue(any(item["kind"] == kind for item in report["findings"]), result.stdout)
+
+    def test_marker_classes_register_and_unicode_keep_expected_signals(self):
+        cases = [
+            ("third_person", "Lei mi ha risposto. Ti scrivo per due cose.",
+             "La dottoressa mi ha risposto. Ti scrivo per due cose.", None),
+            ("condition_nfc_nfd", "Purché confermi, procedo.", "Purche\u0301 confermi, procedo.", None),
+            ("negation_nfc_nfd", "Né confermo né annullo.", "Ne\u0301 confermo ne\u0301 annullo.", None),
+            ("condition_nfd_removed", "Purche\u0301 confermi, procedo.", "Procedo.", "condition"),
+            ("exception_equivalence", "Partiamo salvo pioggia.", "Partiamo a meno che piova.", None),
+            ("requirement_equivalence", "Partiamo solo se confermi.", "Partiamo a condizione che confermi.", None),
+        ]
+        for case, source, revision, category in cases:
+            with self.subTest(case=case):
+                result, report = self.stdin(source, revision)
+                if category is None:
+                    self.assertEqual(result.returncode, 0, result.stdout)
+                    self.assertEqual(report["findings"], [])
+                    self.assertEqual(report["review_flags"], [])
+                else:
+                    self.assertEqual(result.returncode, 3, result.stdout)
+                    self.assertTrue(any(flag["category"] == category for flag in report["review_flags"]))
 
     def test_contextual_number_words_and_equivalent_times(self):
         cases = [
