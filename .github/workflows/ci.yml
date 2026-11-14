@@ -77,3 +77,6 @@ jobs:
         run: |
           python scripts/evaluate.py --validate-cases evals/cases.jsonl --pilot
           python scripts/evaluate.py --validate-cases evals/real-world-template.jsonl
+          python scripts/evaluate.py --validate-cases evals/editorial-structure.jsonl
+          python scripts/evaluate.py --validate-cases evals/italian-language.jsonl
+          python scripts/evaluate.py --validate-cases evals/fluency-fidelity.jsonl

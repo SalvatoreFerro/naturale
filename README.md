@@ -251,6 +251,12 @@ Puoi fornire destinatario, tono, lunghezza o esempi del tuo stile. La qualità v
 
 ### Intensità e voce personale
 
+La revisione comprende sintassi, punteggiatura e ortografia, adattate al
+registro richiesto. La [guida italiana](skills/naturale/references/italian.md)
+documenta le scelte con riferimenti a Crusca e Treccani: distingue errori da
+correggere, varianti ammesse e interventi stilistici. L'audit locale non è un
+correttore grammaticale: questi controlli sono svolti dal modello dell'host.
+
 ```text
 Usa Naturale con intervento minimo: correggi solo ciò che serve e mantieni il mio tono.
 ```
@@ -260,9 +266,17 @@ Usa Naturale in modalità strutturale: riordina questa e-mail per renderla chiar
 senza cambiare condizioni, impegni o grado di certezza. Mostrami anche le modifiche.
 ```
 
-La modalità predefinita è **fluidità**, con intervento conservativo. Una modalità
-più intensa non autorizza l'aggiunta di fatti o promesse. Il riassunto rimane
-un'operazione distinta e deve essere richiesto esplicitamente.
+La modalità predefinita è **fluidità**: conserva il contenuto, ma può ricomporre
+frasi e capoversi che rendono artificiosa la lettura. Richieste come «umanizza»
+o «togli l'effetto template» consentono anche una revisione strutturale quando
+serve. I vincoli espliciti, come «solo punteggiatura», restano prioritari.
+Una modalità più intensa non autorizza l'aggiunta di fatti, esperienze personali
+o promesse. Il riassunto rimane un'operazione distinta da richiedere esplicitamente.
+
+```text
+Usa Naturale: questo post suona artificioso. Rivedi struttura e ritmo dove serve,
+conservando informazioni, voce e liste utili. Mostrami anche cosa hai cambiato.
+```
 
 Puoi chiedere all'agente di ricavare un profilo da alcuni tuoi esempi, mostrandoti
 le caratteristiche individuate. Il profilo viene salvato solo se lo chiedi;

@@ -1,4 +1,4 @@
-# Ricerca e scelte della versione 0.2.0
+# Ricerca e riferimenti editoriali
 
 Naturale usa ricerche esistenti per scegliere **cosa controllare e come misurarlo**.
 Non ha riprodotto gli esperimenti dei paper né misurato una percentuale di
@@ -6,7 +6,26 @@ miglioramento sui propri utenti. I riferimenti seguenti sono stati verificati
 nelle rispettive fonti primarie; i risultati pubblicati nei loro contesti non
 sono risultati della skill italiana.
 
-## Quattro basi scientifiche
+## Lingua italiana: aggiornamento del 13 novembre 2026
+
+La [guida linguistica della skill](../skills/naturale/references/italian.md)
+raccoglie i riferimenti consultati di Accademia della Crusca e Treccani,
+con autore e data quando disponibili. Ogni indicazione rimanda alla fonte
+pertinente: punteggiatura, registro, ordine delle parole, allocutivi, gerundio,
+modi e tempi, reggenze e ortografia. Gli esempi sono originali; non è stato
+copiato un manuale né attribuita alle fonti una validazione di Naturale.
+
+Il progetto distingue errori correggibili, varianti compatibili col registro,
+scelte editoriali e ambiguità da conservare o chiarire. Questa distinzione è
+una scelta di implementazione, così come le tre fasce operative di registro;
+non viene presentata come una classificazione prescritta dagli autori citati.
+
+I 12 casi sintetici di `evals/italian-language.jsonl` affiancano il pilot e il
+set sulla struttura. Verificare il loro formato non misura la qualità delle
+riscritture. Le prove con agenti servono alla revisione delle istruzioni, non
+sono giudizi umani né un confronto controllato di efficacia.
+
+## Quattro basi scientifiche della versione 0.2.0
 
 | Fonte primaria | Risultato utile al progetto | Adozione in Naturale e limite |
 | --- | --- | --- |

@@ -1,0 +1,1309 @@
+{
+  "date": "2026-11-14",
+  "status": "not_validated",
+  "purpose": "Development comparison, not a human or heldout evaluation",
+  "generation": {
+    "contexts": "independent agents with inherited host configuration",
+    "exact_model_version": "not_recorded",
+    "sampling_parameters": "not_controlled",
+    "replicates_per_version": 1,
+    "tools": "snapshot skill references and local text audit"
+  },
+  "snapshots": {
+    "previous": {
+      "manifest_sha256": "b91ccbe3233802b67f57284e640f99a785210a5bbd9a518250c5fb28f2ba164f",
+      "files": {
+        "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+        "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+        "references\\editorial.md": "6b4f07b5ab9b229164f50f8ffe3c9f4231bc3cfef9431ee7cbe2f62b235e23d8",
+        "references\\examples.md": "5f718b5d2c701a2d18824527011d92ba00299a44ccc202302da394f1d504dd8b",
+        "references\\images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+        "references\\italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+        "references\\text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+        "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+        "scripts\\exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+        "scripts\\images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+        "scripts\\text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+        "SKILL.md": "c02509c2fd495f3c62827971a223bd0be30b949c0bc576de9439bb44bb060fd5",
+        "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+        "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+      }
+    },
+    "first_candidate": {
+      "manifest_sha256": "d7f5e818abee098e6575a2e597eb7992c93d3d4bdfea31e720ce5ef3f6b7f5f1",
+      "files": {
+        "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+        "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+        "references\\editorial.md": "9c51dfbe24080bedee93bedd139206fb5f8184ddff5d5a093d9552bc3ce31636",
+        "references\\examples.md": "c454010876732d4a52c1b4b05313d9b99e6a15bc48ed5858c2e43622f60fa323",
+        "references\\images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+        "references\\italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+        "references\\text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+        "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+        "scripts\\exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+        "scripts\\images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+        "scripts\\text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+        "SKILL.md": "f04e382fa30c59855c5bb3012e54bee924ff828dc75c752d27013ee3a1261c9a",
+        "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+        "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+      }
+    },
+    "final": {
+      "manifest_sha256": "68363c0e01a24a120e37079b55d4a9e9e4af29fbfa78970d735ba72060c8cd09",
+      "files": {
+        "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+        "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+        "references\\editorial.md": "a8926d3b6817b6b7cd98a3005e4e0e10d76c24a5598b6b97e114ef043b47122a",
+        "references\\examples.md": "22f2f260a7cf8887a3183c3c0af3746a6171bd4fa96361bf45bdd7ac819c1002",
+        "references\\images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+        "references\\italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+        "references\\text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+        "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+        "scripts\\exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+        "scripts\\images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+        "scripts\\text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+        "SKILL.md": "f04e382fa30c59855c5bb3012e54bee924ff828dc75c752d27013ee3a1261c9a",
+        "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+        "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+      }
+    }
+  },
+  "skill_diffs": {
+    "previous_to_first": "--- baseline/references\\editorial.md\n+++ candidate/references\\editorial.md\n@@ -45,6 +45,9 @@\n | Scadenza | «Entro venerdì» diventa «venerdì» o «la prossima settimana». |\n | Causalità | Due eventi vicini diventano uno la causa dell'altro. |\n | Attribuzione | L'opinione di una persona viene presentata come fatto accertato. |\n+| Ambito | «Alcuni» diventa «tutti» o «se fai X»; «solo dopo» perde il vincolo. |\n+| Prospettiva | Una stima generale diventa «ci metto»; il vantaggio per «te» diventa un'esperienza dell'«io». |\n+| Stato dell'azione | «Già», «ancora», «di nuovo» spariscono e cambiano ciò che è accaduto o resta da fare. |\n | Tono e intenzione | Una proposta diventa un ordine o una richiesta diventa un'accusa. |\n \n Conserva esattamente citazioni testuali, URL, codice e identificativi, salvo istruzioni specifiche. Non cambiare numeri, unità, importi, date o nomi per ragioni estetiche. Non correggere una presunta inesattezza fattuale senza dirlo; se rilevante per il compito, segnalala separatamente e con misura.\n@@ -71,6 +74,43 @@\n \n Non usare liste rigide di «parole AI» come divieti assoluti. Una parola è utile o superflua nel suo contesto; non dimostra come sia stato scritto il testo. Perplessità, varietà lessicale e punteggi dei rilevatori non sostituiscono la revisione editoriale.\n \n+## Scorrevolezza senza perdere significato\n+\n+La riscrittura conserva tutte le informazioni distinte, le relazioni e\n+l'intenzione comunicativa; può esprimerle una volta sola e con una sintassi\n+diversa. Questo permette di alleggerire senza trasformare l'operazione in\n+un riassunto. Una frase non è ridondante se aggiunge una riserva, una diversa\n+attribuzione, un contrasto o un'enfasi richiesta.\n+\n+- Fai avanzare il discorso: se un periodo annuncia ciò che il successivo\n+  dice già, incorpora l'informazione utile e togli l'annuncio superfluo.\n+  Non sostituirlo con un nuovo raccordo generico.\n+- Usa il verbo concreto della fonte e parole comuni adatte al destinatario.\n+  Anche una mail formale può arrivare subito alla richiesta: preserva il\n+  grado di cortesia, senza conservare ogni formula introduttiva.\n+- Unisci frasi quando condividono davvero argomento e relazione; separa\n+  richieste diverse quando facilita la risposta. Non allungare tutto per\n+  evitare lo staccato. Un collegamento può essere affidato al contesto:\n+  non aggiungere «quindi», «per questo» o «ma» se cambia il rapporto logico.\n+- Togli una ripetizione solo se il suo contenuto resta rintracciabile nella\n+  revisione. Se per ricostruirlo il lettore deve aggiungere una premessa,\n+  ripristinalo. La semplice somiglianza fra due frasi non basta.\n+- Mantieni le piccole parole che delimitano un'affermazione: «quasi», «solo»,\n+  «anche», «almeno», «ancora» possono essere decisive. Possono essere\n+  riformulate, ma la loro funzione deve restare legata alla stessa azione.\n+\n+Controlla nei due sensi: ogni affermazione della revisione deve avere un\n+appoggio nella fonte o nel contesto dato; ogni informazione distinta della\n+fonte deve essere ancora espressa. Confronta anche cosa il lettore è invitato\n+a fare: una domanda esplorativa non deve diventare un ordine o una promessa.\n+Non è una dimostrazione automatica di equivalenza, ma una rilettura mirata.\n+\n+Se un taglio perde significato, recupera il dettaglio nel punto più naturale,\n+senza tornare automaticamente a tutta la perifrasi originale. Se due\n+formulazioni conservano le stesse sfumature, scegli quella che richiede meno\n+passaggi al lettore, anche lasciando una frase breve. Fermati quando i difetti\n+osservati sono risolti: non produrre varianti o controlli ripetuti per routine.\n+\n ## Struttura e ritmo prima dei sinonimi\n \n Quando un testo suona costruito, cerca il problema nell'insieme prima di\n--- baseline/references\\examples.md\n+++ candidate/references\\examples.md\n@@ -254,6 +254,57 @@\n > Quando arriva, decidiamo.\n \n La cadenza resta: il vincolo esplicito esclude la riorganizzazione.\n+\n+## Alleggerire conservando le sfumature\n+\n+### Mail formale: arrivare alla richiesta senza trasformarla in un ordine\n+\n+**Richiesta:** «Renda questa mail più scorrevole, mantenendo tono e significato.»\n+\n+**Fonte:**\n+\n+> Buongiorno, Le scrivo per chiederLe se può confermare di aver ricevuto la bozza. Vorrei inoltre precisare che Le chiedo soltanto una conferma di ricezione, non l'approvazione del contenuto. Per quanto riguarda la versione definitiva, potremo inviarla solo dopo il riscontro del tecnico. Grazie.\n+\n+**Risultato:**\n+\n+> Buongiorno, può confermare di aver ricevuto la bozza? Le chiedo soltanto una conferma di ricezione, non l'approvazione del contenuto. Potremo inviare la versione definitiva solo dopo il riscontro del tecnico. Grazie.\n+\n+Scompaiono gli annunci della richiesta e della precisazione. Restano la\n+domanda cortese, il limite della conferma e il vincolo sul riscontro.\n+«Confermi la bozza e Le invieremo la versione definitiva» cambierebbe sia\n+l'azione richiesta sia l'impegno.\n+\n+### Messaggio informale: togliere un doppione, tenere l'alternativa\n+\n+**Richiesta:** «Rendilo più scorrevole, senza cambiare quello che dico.»\n+\n+**Fonte:**\n+\n+> Ciao, per me va bene vederci stasera oppure domani. Sono libero in entrambe le sere. Se ti è comodo, posso passare io da te, ma non prima delle otto.\n+\n+**Risultato:**\n+\n+> Ciao, per me va bene vederci stasera o domani. Se ti è comodo, posso passare io da te, ma non prima delle otto.\n+\n+La disponibilità in entrambe le sere è già espressa dall'alternativa.\n+Restano la condizione legata al destinatario, la possibilità e il limite\n+orario. «Passo domani alle otto» inventerebbe un accordo.\n+\n+### Post: conservare chi è coinvolto e a chi appartiene l'esperienza\n+\n+**Richiesta:** «Togli le ripetizioni e rendilo più fluido.»\n+\n+**Fonte:**\n+\n+> Alcuni lettori saltano le note. Le note restano quindi non lette da una parte dei lettori. Io le metto accanto al passaggio a cui si riferiscono. Per chi legge, questo evita di cercarle in fondo alla pagina. Il controllo dell'impaginazione richiede pochi minuti.\n+\n+**Risultato:**\n+\n+> Alcuni lettori saltano le note. Io le metto accanto al passaggio a cui si riferiscono, così chi legge non deve cercarle in fondo alla pagina. Il controllo dell'impaginazione richiede pochi minuti.\n+\n+Si elimina la ripetizione, senza trasformare «alcuni lettori» in «i lettori»\n+o «se leggi». «Mi bastano pochi minuti e non perdo più nessuna nota» sarebbe\n+più personale ma introdurrebbe un'esperienza e un risultato non dichiarati.\n \n ## Italiano formale e informale: stessa informazione, scelte diverse\n \n--- baseline/SKILL.md\n+++ candidate/SKILL.md\n@@ -22,9 +22,9 @@\n ## Percorso editoriale\n \n 1. **Individua operazione e intensità.** Riscrivi per impostazione predefinita; riassumi soltanto su richiesta esplicita. L'intensità predefinita è **fluidità**, conservativa sul contenuto ma libera di sciogliere frasi e capoversi artificiosi. «Correggi appena» richiede **minima**; «umanizza», «suona da AI» o «togli l'effetto template» autorizzano anche un intervento **strutturale** dove serve, senza dover chiedere di riorganizzare. I vincoli espliciti su parole e formato prevalgono. Per questi casi consulta anche gli [esempi di struttura e ritmo](references/examples.md#struttura-e-ritmo). Non chiedere una scelta già evidente nella richiesta.\n-2. **Fissa i vincoli della fonte.** Per una mail semplice basta un controllo diretto. Per testi complessi individua separatamente fatti, numeri, negazioni, condizioni, attribuzioni, responsabilità, promesse e incertezze. Questa lista temporanea serve al confronto, senza diventare un archivio personale. Mantieni citazioni, URL, codice e identificativi salvo richiesta di modificarli.\n+2. **Fissa i vincoli della fonte.** Per una mail semplice basta un controllo diretto. Per testi complessi individua fatti e relazioni da conservare: chi agisce, a chi si rivolge, quantità, tempi, negazioni, condizioni, attribuzioni, promesse e incertezze. Controlla anche l'ambito di parole come «alcuni», «solo», «già», «ancora», «almeno»: possono cambiare l'affermazione pur lasciando invariati nomi e numeri. Questa lista temporanea serve al confronto, senza diventare un archivio personale. Mantieni citazioni, URL, codice e identificativi salvo richiesta di modificarli.\n 3. **Applica voce e obiettivo.** Usa destinatario, tono e lunghezza richiesti. Se l'utente indica un profilo salvato, leggilo con `text.py profiles show`; non cercare altri profili. La richiesta attuale e la fedeltà alla fonte prevalgono sulle preferenze stilistiche. In assenza di indicazioni conserva registro, lingua, tu/Lei e formato utili.\n-4. **Rivedi dal testo alle frasi.** Prima osserva apertura, progressione, capoversi e chiusura: individua cosa rende questo testo artificioso, se qualcosa lo rende tale. Intervieni su quel difetto secondo l'intensità scelta, poi sul lessico. Non limitarti a cambiare sinonimi lasciando intatto uno schema che ostacola la lettura. Conserva liste, termini tecnici, enfasi voluta e ripetizioni funzionali. Non aggiungere incisi, domande o dettagli per raggiungere una quota di modifiche. Un testo già efficace può restare invariato.\n+4. **Rendi il testo scorrevole.** Osserva apertura, progressione, capoversi e chiusura, poi lavora sulle frasi. Ricomponi ciò che appartiene allo stesso pensiero, togli i passaggi che ripetono informazioni già espresse e preferisci formulazioni dirette compatibili con il registro. Conservare il contenuto non richiede di conservarne ogni ripetizione. Segui i criteri di [scorrevolezza e fedeltà](references/editorial.md#scorrevolezza-senza-perdere-significato): restano protette le sfumature che aggiungono informazione o intenzione. Conserva liste, termini tecnici ed enfasi utili. Un testo già efficace può restare invariato; non introdurre sinonimi, connettivi o dettagli solo per mostrare un intervento.\n 5. **Confronta fonte e risultato.** Controlla vincoli, tono e intenzione; nei riassunti anche omissioni, decisioni e riserve. Verifica esplicitamente i riferimenti («qui/lì», «questo/quello», «sopra/sotto», «in allegato»), le date relative («oggi», «domani», «questa settimana») e la persona dei verbi: chi fa cosa, distinguendo io/tu e noi/voi. Se la mail contiene date, importi, scadenze o condizioni, usa `text.py audit --stdin-json` passando fonte, revisione e vincoli come JSON su stdin, senza scrivere file. Per file già esistenti resta disponibile `audit --source ... --revision ...`. Tratta l'exit `1` come differenze da esaminare e `3` come revisione richiesta; non restituire un esito rassicurante ignorando i segnali. Verifica comunque responsabilità e attribuzioni: uno scambio «fornitore»/«cliente» può sfuggire. L'equivalenza del significato resta non verificata automaticamente. Correggi le alterazioni osservate o chiedi soltanto la scelta indispensabile.\n 6. **Restituisci il risultato richiesto.** Default: soltanto il testo pronto all'uso. Se richiesti, aggiungi confronto delle modifiche, motivazioni osservabili e punti da confermare; non inventare punteggi di naturalezza o certezza. Su file usa destinazione e formato richiesti e conserva l'originale.\n \n",
+    "first_to_final": "--- candidate/references\\editorial.md\n+++ candidate2/references\\editorial.md\n@@ -95,6 +95,11 @@\n - Togli una ripetizione solo se il suo contenuto resta rintracciabile nella\n   revisione. Se per ricostruirlo il lettore deve aggiungere una premessa,\n   ripristinalo. La semplice somiglianza fra due frasi non basta.\n+- Mantieni esplicite le limitazioni esplicite: «alcuni» da solo non basta a\n+  conservare «alcuni, non tutti», perché la lettura non esaustiva può restare\n+  soltanto suggerita. Puoi incorporare «non tutti» nello stesso periodo,\n+  senza mantenerne per forza la frase isolata. Lo stesso vale per riserve\n+  come «non è una garanzia» o «è solo una stima»: non affidarle al tono.\n - Mantieni le piccole parole che delimitano un'affermazione: «quasi», «solo»,\n   «anche», «almeno», «ancora» possono essere decisive. Possono essere\n   riformulate, ma la loro funzione deve restare legata alla stessa azione.\n--- candidate/references\\examples.md\n+++ candidate2/references\\examples.md\n@@ -305,6 +305,12 @@\n Si elimina la ripetizione, senza trasformare «alcuni lettori» in «i lettori»\n o «se leggi». «Mi bastano pochi minuti e non perdo più nessuna nota» sarebbe\n più personale ma introdurrebbe un'esperienza e un risultato non dichiarati.\n+\n+**Precisazione esplicita da non perdere:** «Alcuni lettori saltano le note.\n+Non tutti.» può diventare «Alcuni lettori, non tutti, saltano le note».\n+Tagliare semplicemente «non tutti» affiderebbe al lettore un limite che\n+l'autore aveva scelto di esplicitare. Si può ricomporre il ritmo senza\n+sacrificare quel limite.\n \n ## Italiano formale e informale: stessa informazione, scelte diverse\n \n"
+  },
+  "inputs": [
+    {
+      "id": "fluency-dev-01",
+      "instruction": "Renda questa e-mail più scorrevole, mantenendo il significato e il tono formale.",
+      "text": "Gentile dottoressa Moretti, con la presente desidero comunicarLe che, nel caso in cui ricevessimo la Sua approvazione entro il 18 giugno, potremmo procedere all'invio dei campioni entro il 24 giugno. Ci tengo a precisare che l'importo massimo previsto è di 1.800 euro e che tale importo non comprende il trasporto. Per quanto riguarda invece la data di consegna, al momento non siamo ancora in grado di confermarla. Le chiederei pertanto di farci sapere se intende approvare il preventivo. Grazie."
+    },
+    {
+      "id": "fluency-dev-02",
+      "instruction": "Renda più fluida questa risposta al cliente, conservandone contenuto e cortesia.",
+      "text": "Gentile signor Riva, Le scrivo in merito alla Sua richiesta per precisare che posso occuparmi soltanto della verifica dei dati anagrafici. La decisione sull'accettazione della domanda resta invece di competenza della responsabile del servizio, alla quale ho già inoltrato la documentazione. Come indicato nell'avviso, «La verifica non equivale all'accettazione della domanda». Se dovessero mancare dei dati, sarà mia cura contattarLa per chiederLe di integrarli. Per il momento non è necessario che ci invii nuovamente gli allegati."
+    },
+    {
+      "id": "fluency-dev-03",
+      "instruction": "Rendi più scorrevole questo messaggio, mantenendo il tono informale e quello che voglio dire.",
+      "text": "Ciao Leo, ti scrivo per dirti che io questa settimana riesco a passare da te mercoledì oppure giovedì, ma non tutti e due i giorni. Mercoledì per me sarebbe un po' più comodo perché esco prima dal lavoro. Se però a te va meglio giovedì, per me va bene anche quello. Quello che ti chiedo è di farmelo sapere entro domani, così riesco a organizzarmi."
+    },
+    {
+      "id": "fluency-dev-04",
+      "instruction": "Sistema questo messaggio per farlo scorrere meglio, senza cambiare significato o tono.",
+      "text": "Guarda, ti volevo dire che con la valigia ho quasi finito, ma non ho ancora deciso se portare anche la giacca. Il fatto è che non so se domani sera farà freddo. A te chiedo solo se riesci a dare un'occhiata alle previsioni, perché io adesso sto finendo di sistemare casa. Se non riesci, le controllo io dopo, non c'è problema."
+    },
+    {
+      "id": "fluency-dev-05",
+      "instruction": "Riscrivi questo post in modo più scorrevole, mantenendo contenuto e tono.",
+      "text": "Alcuni gruppi di lavoro raccolgono i commenti su uno stesso documento in chat diverse. Non tutti, ma succede. Si apre una chat. Si cerca un messaggio. Si passa a un'altra chat. Alla fine si rischia di perdere una correzione.\n\nNel nostro gruppo usiamo un'unica pagina per le osservazioni. La maggior parte dei colleghi scrive lì; due persone preferiscono ancora mandarmi una mail. Io copio anche quei commenti nella pagina, indicando chi li ha scritti.\n\nIl punto è avere le osservazioni nello stesso posto. Così chi rivede il documento può leggerle senza ricostruire ogni conversazione. Non abbiamo misurato quanto tempo si risparmia."
+    },
+    {
+      "id": "fluency-dev-06",
+      "instruction": "Rendi questo post più fluido e naturale, conservando tutte le informazioni.",
+      "text": "Prima di una riunione, preparare un ordine del giorno richiede circa dieci minuti. È una stima, non un tempo valido per ogni riunione.\n\nIo inserisco gli argomenti da discutere e, per ciascuno, indico chi lo presenterà. Chi partecipa può aggiungere una nota almeno un giorno prima dell'incontro.\n\nGli argomenti sono visibili in anticipo. Le note sono visibili in anticipo. Tutti possono leggerle prima di arrivare.\n\nDa quando abbiamo adottato questa abitudine, le nostre riunioni durano meno. Nello stesso periodo abbiamo anche ridotto il numero degli invitati, quindi non sappiamo quale dei due cambiamenti abbia inciso di più."
+    },
+    {
+      "id": "fluency-dev-07",
+      "instruction": "Renda questa e-mail più scorrevole, se necessario, mantenendo il tono formale.",
+      "text": "Buongiorno, Le invio il prospetto aggiornato. Potrebbe verificare soltanto i dati della Sua sede entro venerdì? Le altre sedi riceveranno una richiesta separata. Grazie."
+    },
+    {
+      "id": "fluency-dev-08",
+      "instruction": "Rendi più naturale questo messaggio, intervenendo dove serve.",
+      "text": "Io ci sono dalle sette in poi. Se per te è tardi, vediamoci un altro giorno: non voglio farti aspettare. Il posto sceglilo tu."
+    }
+  ],
+  "checks": {
+    "fluency-dev-01": {
+      "preserve_exact": [
+        "18 giugno",
+        "24 giugno",
+        "1.800 euro"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "L'approvazione deve arrivare entro il 18 giugno perché resti possibile inviare i campioni entro il 24 giugno; la possibilità non diventa un impegno.",
+        "Il limite di 1.800 euro resta massimo ed esclude il trasporto.",
+        "Invio e consegna restano distinti: la data di consegna non è ancora confermabile.",
+        "La domanda di approvazione resta una richiesta cortese al destinatario, non un'approvazione già acquisita.",
+        "Le formule introduttive possono essere ridotte e i rapporti fra le informazioni resi più diretti, senza rendere il testo telegrafico o informale."
+      ],
+      "already_good": false,
+      "embedded_instruction": false
+    },
+    "fluency-dev-02": {
+      "preserve_exact": [
+        "«La verifica non equivale all'accettazione della domanda»"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "L'autore può verificare soltanto i dati anagrafici; la decisione resta alla responsabile del servizio.",
+        "La documentazione è già stata inoltrata: non diventa un'azione futura.",
+        "La citazione resta letterale e non viene reinterpretata come accettazione o rifiuto della domanda.",
+        "Il contatto per integrare i dati resta condizionato alla loro mancanza; non viene promesso un contatto in ogni caso.",
+        "Il nuovo invio degli allegati rimane non necessario per il momento, senza diventare vietato.",
+        "La revisione alleggerisce formule e perifrasi mantenendo una risposta formale riconoscibile."
+      ],
+      "already_good": false,
+      "embedded_instruction": false
+    },
+    "fluency-dev-03": {
+      "preserve_exact": [
+        "Leo",
+        "mercoledì",
+        "giovedì",
+        "domani"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "Resta possibile una visita mercoledì oppure giovedì, non in entrambi i giorni.",
+        "Mercoledì è una preferenza dell'autore dovuta all'uscita anticipata dal lavoro, non una necessità né la preferenza di Leo.",
+        "Giovedì resta accettabile se è più comodo per il destinatario.",
+        "La risposta è richiesta entro domani, senza anticipare o posticipare la scadenza.",
+        "La revisione toglie raccordi ripetitivi senza irrigidire la voce o aggiungere confidenza."
+      ],
+      "already_good": false,
+      "embedded_instruction": false
+    },
+    "fluency-dev-04": {
+      "preserve_exact": [
+        "domani"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "La valigia è quasi pronta, non completamente pronta; la giacca è ancora una scelta aperta.",
+        "Il dubbio riguarda il freddo di domani sera, non quello di oggi o del viaggio intero.",
+        "Si chiede soltanto un controllo delle previsioni; non si delega al destinatario la decisione sulla giacca.",
+        "Se il destinatario non può, l'autore controllerà dopo; non si trasforma l'alternativa in una seconda verifica obbligatoria.",
+        "La scorrevolezza può migliorare riducendo introduzioni e spiegazioni ripetitive; restano il tono informale e la disponibilità già espressa."
+      ],
+      "already_good": false,
+      "embedded_instruction": false
+    },
+    "fluency-dev-05": {
+      "preserve_exact": [
+        "due"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "L'abitudine delle chat diverse riguarda alcuni gruppi, esplicitamente non tutti; il rischio di perdere correzioni non diventa una perdita certa.",
+        "Nella pagina scrive la maggior parte dei colleghi, non tutti, e restano le due persone che preferiscono la mail.",
+        "L'autore copia nella pagina quei commenti e ne indica gli autori; la responsabilità non passa ai colleghi che scrivono le mail.",
+        "Resta il vantaggio di leggere le osservazioni senza ricostruire le conversazioni e l'assenza di misure sul tempo risparmiato.",
+        "La revisione può ricomporre la sequenza frammentata e la conclusione ridondante, senza introdurre altri vantaggi o una morale."
+      ],
+      "already_good": false,
+      "embedded_instruction": false
+    },
+    "fluency-dev-06": {
+      "preserve_exact": [
+        "dieci",
+        "un giorno"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "I circa dieci minuti restano una stima generale, non una durata precisa misurata dall'autore né valida per ogni riunione.",
+        "L'autore inserisce argomenti e presentatori; i partecipanti possono aggiungere una nota almeno un giorno prima, non necessariamente il giorno prima.",
+        "Argomenti e note restano consultabili in anticipo da tutti i partecipanti.",
+        "La minore durata delle riunioni è osservata dopo due cambiamenti concomitanti; non viene attribuita con certezza all'ordine del giorno.",
+        "La revisione può unire le informazioni ripetute sulla consultazione anticipata senza perdere la distinzione fra argomenti e note."
+      ],
+      "already_good": false,
+      "embedded_instruction": false
+    },
+    "fluency-dev-07": {
+      "preserve_exact": [
+        "venerdì"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "La verifica richiesta riguarda soltanto la sede del destinatario e deve avvenire entro venerdì.",
+        "Le altre sedi riceveranno una richiesta separata, senza delegarne il contatto al destinatario.",
+        "Mantiene richiesta cortese, Lei e riferimento al prospetto aggiornato.",
+        "Il testo è già diretto: sono accettabili nessuna modifica o piccoli interventi, senza aggiungere formule o tagliare il limite della verifica."
+      ],
+      "already_good": true,
+      "embedded_instruction": false
+    },
+    "fluency-dev-08": {
+      "preserve_exact": [
+        "sette"
+      ],
+      "exclude_exact": [],
+      "reviewer_checks": [
+        "La disponibilità dell'autore parte dalle sette e non indica un appuntamento già fissato per quell'ora.",
+        "Vedersi un altro giorno resta un'alternativa se l'orario è tardi per il destinatario.",
+        "Resta la motivazione di non far aspettare il destinatario; non diventa una promessa di arrivare prima.",
+        "La scelta del posto resta al destinatario.",
+        "Il messaggio già scorrevole può restare invariato; non aggiungere un saluto, slang o una spiegazione."
+      ],
+      "already_good": true,
+      "embedded_instruction": false
+    }
+  },
+  "outputs": {
+    "previous": {
+      "fluency-dev-01": "Gentile dottoressa Moretti, se ricevessimo la Sua approvazione entro il 18 giugno, potremmo inviare i campioni entro il 24 giugno. L'importo massimo previsto è di 1.800 euro e non comprende il trasporto. Al momento non siamo ancora in grado di confermare la data di consegna. Le chiederei di farci sapere se intende approvare il preventivo. Grazie.",
+      "fluency-dev-02": "Gentile signor Riva, in merito alla Sua richiesta, Le preciso che posso occuparmi soltanto della verifica dei dati anagrafici. La decisione sull'accettazione della domanda spetta alla responsabile del servizio, alla quale ho già inoltrato la documentazione. Come indicato nell'avviso, «La verifica non equivale all'accettazione della domanda». Se dovessero mancare dei dati, La contatterò per chiederLe di integrarli. Per il momento non è necessario che ci invii nuovamente gli allegati.",
+      "fluency-dev-03": "Ciao Leo, questa settimana riesco a passare da te mercoledì oppure giovedì, ma non tutti e due i giorni. Mercoledì per me sarebbe un po' più comodo perché esco prima dal lavoro, ma se a te va meglio giovedì, va bene anche quello. Ti chiedo di farmelo sapere entro domani, così riesco a organizzarmi.",
+      "fluency-dev-04": "Guarda, ho quasi finito con la valigia, ma non ho ancora deciso se portare anche la giacca: non so se domani sera farà freddo. Ti chiedo solo se riesci a dare un'occhiata alle previsioni, perché io adesso sto finendo di sistemare casa. Se non riesci, le controllo io dopo, non c'è problema.",
+      "fluency-dev-05": "Alcuni gruppi di lavoro, anche se non tutti, raccolgono i commenti su uno stesso documento in chat diverse. Si apre una chat per cercare un messaggio, poi si passa a un'altra, con il rischio di perdere una correzione.\n\nNel nostro gruppo usiamo un'unica pagina per le osservazioni. La maggior parte dei colleghi scrive lì; due persone preferiscono ancora mandarmi una mail. Io copio anche quei commenti nella pagina, indicando chi li ha scritti.\n\nAvere le osservazioni nello stesso posto permette a chi rivede il documento di leggerle senza ricostruire ogni conversazione. Non abbiamo misurato quanto tempo si risparmia.",
+      "fluency-dev-06": "Preparare un ordine del giorno prima di una riunione richiede circa dieci minuti: è una stima, non un tempo valido per ogni riunione.\n\nIo inserisco gli argomenti da discutere, indicando per ciascuno chi lo presenterà. Chi partecipa può aggiungere una nota almeno un giorno prima dell'incontro. Gli argomenti e le note sono visibili in anticipo, così tutti possono leggerli prima di arrivare.\n\nDa quando abbiamo adottato questa abitudine, le nostre riunioni durano meno. Nello stesso periodo abbiamo anche ridotto il numero degli invitati, quindi non sappiamo quale dei due cambiamenti abbia inciso di più.",
+      "fluency-dev-07": "Buongiorno, Le invio il prospetto aggiornato. Potrebbe verificare soltanto i dati della Sua sede entro venerdì? Le altre sedi riceveranno una richiesta separata. Grazie.",
+      "fluency-dev-08": "Io ci sono dalle sette in poi. Se per te è tardi, vediamoci un altro giorno: non voglio farti aspettare. Il posto sceglilo tu."
+    },
+    "first_candidate": {
+      "fluency-dev-01": "Gentile dottoressa Moretti, se ricevessimo la Sua approvazione entro il 18 giugno, potremmo inviare i campioni entro il 24 giugno. L'importo massimo previsto è di 1.800 euro e non comprende il trasporto. Al momento non siamo ancora in grado di confermare la data di consegna. Potrebbe farci sapere se intende approvare il preventivo? Grazie.",
+      "fluency-dev-02": "Gentile signor Riva, in merito alla Sua richiesta, posso occuparmi soltanto della verifica dei dati anagrafici. La decisione sull'accettazione della domanda spetta invece alla responsabile del servizio, alla quale ho già inoltrato la documentazione. Come indicato nell'avviso, «La verifica non equivale all'accettazione della domanda». Se dovessero mancare dei dati, La contatterò per chiederLe di integrarli. Per il momento non è necessario che ci invii nuovamente gli allegati.",
+      "fluency-dev-03": "Ciao Leo, questa settimana riesco a passare da te mercoledì oppure giovedì, ma non tutti e due i giorni. Mercoledì mi sarebbe un po' più comodo perché esco prima dal lavoro, ma se per te è meglio giovedì va bene anche quello. Ti chiedo di farmelo sapere entro domani, così riesco a organizzarmi.",
+      "fluency-dev-04": "Guarda, ho quasi finito con la valigia, ma non ho ancora deciso se portare anche la giacca perché non so se domani sera farà freddo. Ti chiedo solo se riesci a dare un'occhiata alle previsioni: io adesso sto finendo di sistemare casa. Se non riesci, le controllo io dopo, non c'è problema.",
+      "fluency-dev-05": "Alcuni gruppi di lavoro raccolgono i commenti su uno stesso documento in chat diverse. Per ritrovarli si apre una chat, si cerca un messaggio e si passa a un'altra, rischiando di perdere una correzione.\n\nNel nostro gruppo usiamo un'unica pagina per le osservazioni. La maggior parte dei colleghi scrive lì; due persone preferiscono ancora mandarmi una mail e io copio anche quei commenti nella pagina, indicando chi li ha scritti.\n\nAvere tutte le osservazioni nello stesso posto permette a chi rivede il documento di leggerle senza ricostruire ogni conversazione. Non abbiamo misurato quanto tempo si risparmia.",
+      "fluency-dev-06": "Preparare un ordine del giorno prima di una riunione richiede circa dieci minuti: è una stima, non un tempo valido per ogni incontro.\n\nIo elenco gli argomenti da discutere e indico chi presenterà ciascuno. Chi partecipa può aggiungere una nota almeno un giorno prima dell'incontro. Argomenti e note sono visibili in anticipo, così tutti possono leggerli prima di arrivare.\n\nDa quando abbiamo adottato questa abitudine, le nostre riunioni durano meno. Nello stesso periodo abbiamo anche ridotto il numero degli invitati, quindi non sappiamo quale dei due cambiamenti abbia inciso di più.",
+      "fluency-dev-07": "Buongiorno, Le invio il prospetto aggiornato. Potrebbe verificare soltanto i dati della Sua sede entro venerdì? Le altre sedi riceveranno una richiesta separata. Grazie.",
+      "fluency-dev-08": "Io ci sono dalle sette in poi. Se per te è tardi, vediamoci un altro giorno: non voglio farti aspettare. Il posto sceglilo tu."
+    },
+    "final": {
+      "fluency-dev-01": "Gentile dottoressa Moretti, se ricevessimo la Sua approvazione entro il 18 giugno, potremmo inviare i campioni entro il 24 giugno. L'importo massimo previsto è di 1.800 euro e non comprende il trasporto. Non siamo ancora in grado di confermare la data di consegna. Le chiederei di farci sapere se intende approvare il preventivo. Grazie.",
+      "fluency-dev-02": "Gentile signor Riva, in merito alla Sua richiesta, posso occuparmi soltanto della verifica dei dati anagrafici. La decisione sull'accettazione della domanda spetta alla responsabile del servizio, alla quale ho già inoltrato la documentazione. Come indicato nell'avviso, «La verifica non equivale all'accettazione della domanda». Se dovessero mancare dei dati, La contatterò per chiederLe di integrarli. Per il momento non è necessario che ci invii nuovamente gli allegati.",
+      "fluency-dev-03": "Ciao Leo, questa settimana riesco a passare da te mercoledì o giovedì, ma non tutti e due i giorni. Mercoledì per me sarebbe un po' più comodo perché esco prima dal lavoro, ma se a te va meglio giovedì, va bene anche quello. Fammi sapere entro domani, così riesco a organizzarmi.",
+      "fluency-dev-04": "Guarda, con la valigia ho quasi finito, ma non ho ancora deciso se portare anche la giacca: non so se domani sera farà freddo. Ti chiedo solo se riesci a dare un'occhiata alle previsioni, perché adesso sto finendo di sistemare casa. Se non riesci, le controllo io dopo, non c'è problema.",
+      "fluency-dev-05": "Alcuni gruppi di lavoro, non tutti, raccolgono i commenti su uno stesso documento in chat diverse. Si apre una chat, si cerca un messaggio, poi si passa a un'altra e alla fine si rischia di perdere una correzione.\n\nNel nostro gruppo usiamo un'unica pagina per le osservazioni. La maggior parte dei colleghi scrive lì; due persone preferiscono ancora mandarmi una mail. Io copio anche quei commenti nella pagina, indicando chi li ha scritti.\n\nAvere le osservazioni nello stesso posto permette a chi rivede il documento di leggerle senza ricostruire ogni conversazione. Non abbiamo misurato quanto tempo si risparmia.",
+      "fluency-dev-06": "Preparare un ordine del giorno prima di una riunione richiede circa dieci minuti: è una stima, non un tempo valido per ogni riunione.\n\nIo inserisco gli argomenti da discutere e, per ciascuno, indico chi lo presenterà. Chi partecipa può aggiungere una nota almeno un giorno prima dell'incontro. Gli argomenti e le note sono visibili in anticipo e tutti possono leggerli prima di arrivare.\n\nDa quando abbiamo adottato questa abitudine, le nostre riunioni durano meno. Nello stesso periodo abbiamo anche ridotto il numero degli invitati, quindi non sappiamo quale dei due cambiamenti abbia inciso di più.",
+      "fluency-dev-07": "Buongiorno, Le invio il prospetto aggiornato. Potrebbe verificare soltanto i dati della Sua sede entro venerdì? Le altre sedi riceveranno una richiesta separata. Grazie.",
+      "fluency-dev-08": "Io ci sono dalle sette in poi. Se per te è tardi, vediamoci un altro giorno: non voglio farti aspettare. Il posto sceglilo tu."
+    }
+  },
+  "rounds": [
+    {
+      "candidate": "first_candidate",
+      "mapping": {
+        "fluency-dev-01": {
+          "A": "previous",
+          "B": "candidate"
+        },
+        "fluency-dev-02": {
+          "A": "candidate",
+          "B": "previous"
+        },
+        "fluency-dev-03": {
+          "A": "candidate",
+          "B": "previous"
+        },
+        "fluency-dev-04": {
+          "A": "previous",
+          "B": "candidate"
+        },
+        "fluency-dev-05": {
+          "A": "candidate",
+          "B": "previous"
+        },
+        "fluency-dev-06": {
+          "A": "previous",
+          "B": "candidate"
+        },
+        "fluency-dev-07": {
+          "A": "previous",
+          "B": "candidate"
+        },
+        "fluency-dev-08": {
+          "A": "candidate",
+          "B": "previous"
+        }
+      },
+      "reviewer_kind": "agent",
+      "reviews": [
+        {
+          "id": "fluency-dev-01",
+          "preferred": "tie",
+          "reason": "Entrambe eliminano le introduzioni pesanti mantenendo un registro formale e leggibile. La domanda finale di B è più diretta, mentre il condizionale di A conserva la formulazione personale della fonte: sono due richieste cortesi equivalenti, senza un vantaggio netto di scorrevolezza. Restano la condizione dell'approvazione entro il 18 giugno, la sola possibilità di invio entro il 24, il massimo di 1.800 euro escluso il trasporto e l'impossibilità attuale di confermare la consegna.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-02",
+          "preferred": "tie",
+          "reason": "Le differenze tra «Le preciso» in B e «invece» in A non producono un vantaggio editoriale sostanziale: entrambe risultano formali e scorrevoli. Sono conservati il limite della verifica ai soli dati anagrafici, la competenza della responsabile, l'inoltro già avvenuto, la citazione letterale, il contatto subordinato a dati mancanti e la non necessità temporanea di reinviare gli allegati.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-03",
+          "preferred": "tie",
+          "reason": "Entrambe ricompongono bene le ripetizioni della fonte mantenendo una voce informale. «Mi sarebbe» e «per me sarebbe», come «per te è meglio» e «a te va meglio», sono alternative naturali senza differenze sostanziali. Restano una sola visita fra i due giorni, la preferenza dell'autore per mercoledì motivata dall'uscita anticipata, la disponibilità per giovedì secondo la preferenza di Leo e la risposta entro domani.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-04",
+          "preferred": "tie",
+          "reason": "Le due versioni distribuiscono diversamente i due punti e il nesso causale, ma rendono comprensibili gli stessi rapporti: l'incertezza sul freddo motiva il dubbio sulla giacca e il lavoro in casa motiva la richiesta di controllare le previsioni. Entrambe mantengono la valigia quasi pronta, il riferimento a domani sera, la richiesta limitata al controllo e l'alternativa dell'autore se il destinatario non può. Il ritmo e il tono informale sono comparabili.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-05",
+          "preferred": "B",
+          "reason": "B conserva esplicitamente «non tutti» e rende più continua la sequenza delle chat senza perdere il tono concreto della fonte. A scorre altrettanto bene, ma lascia soltanto «alcuni»: la lettura di un sottoinsieme non universale rimane plausibile nell'uso comune, però l'esclusione esplicita della fonte non è più garantita. Questa differenza di fedeltà giustifica la preferenza per B. Entrambe mantengono la maggioranza dei colleghi, le due persone che usano la mail, la responsabilità dell'autore nel copiare e attribuire i commenti e l'assenza di misurazioni del risparmio di tempo.",
+          "issues_A": [
+            "Omette la precisazione esplicita «Non tutti». «Alcuni» può suggerirla pragmaticamente, ma da solo non esclude inequivocabilmente che la pratica riguardi tutti i gruppi: è una perdita della qualificazione, non un'affermazione esplicita contraria."
+          ],
+          "issues_B": [],
+          "selected_version": "previous"
+        },
+        {
+          "id": "fluency-dev-06",
+          "preferred": "tie",
+          "reason": "Entrambe uniscono con naturalezza le informazioni ripetute sulla visibilità e conservano la stima dei dieci minuti, la possibilità di aggiungere una nota almeno un giorno prima e l'incertezza sull'effetto relativo dei due cambiamenti. A ha un riferimento più agevole in «per ciascuno chi lo presenterà»; B evita la ripetizione di «riunione» usando «incontro», che nel contesto mantiene lo stesso referente. Sono differenze stilistiche piccole e compensate, senza una violazione di significato o una superiorità netta complessiva.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-07",
+          "preferred": "tie",
+          "reason": "A e B sono identiche alla fonte, già chiara e scorrevole. Conservano il tono formale, la richiesta cortese di verificare soltanto i dati della propria sede entro venerdì e la richiesta separata destinata alle altre sedi. L'assenza di interventi è coerente con «se necessario».",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-08",
+          "preferred": "tie",
+          "reason": "A e B sono identiche alla fonte, già naturale. Restano la disponibilità dalle sette in poi, l'alternativa di un altro giorno condizionata alla comodità del destinatario, il desiderio di non farlo aspettare e la scelta del posto affidata a lui. Non occorrono modifiche per soddisfare la richiesta.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        }
+      ],
+      "counts": {
+        "tie": 7,
+        "previous": 1
+      }
+    },
+    {
+      "candidate": "final",
+      "mapping": {
+        "fluency-dev-01": {
+          "A": "previous",
+          "B": "final"
+        },
+        "fluency-dev-02": {
+          "A": "previous",
+          "B": "final"
+        },
+        "fluency-dev-03": {
+          "A": "previous",
+          "B": "final"
+        },
+        "fluency-dev-04": {
+          "A": "final",
+          "B": "previous"
+        },
+        "fluency-dev-05": {
+          "A": "previous",
+          "B": "final"
+        },
+        "fluency-dev-06": {
+          "A": "final",
+          "B": "previous"
+        },
+        "fluency-dev-07": {
+          "A": "final",
+          "B": "previous"
+        },
+        "fluency-dev-08": {
+          "A": "final",
+          "B": "previous"
+        }
+      },
+      "reviewer_kind": "agent",
+      "reviews": [
+        {
+          "id": "fluency-dev-01",
+          "preferred": "tie",
+          "reason": "Entrambe le versioni alleggeriscono le formule iniziali mantenendo registro formale, condizione sull'approvazione, possibilità di invio, importo massimo e trasporto escluso. La sola omissione di «Al momento» in B non cambia l'incertezza temporanea sulla consegna, già espressa da «non siamo ancora in grado». La differenza di scorrevolezza è minima.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-02",
+          "preferred": "tie",
+          "reason": "Entrambe conservano ambito della verifica, competenza della responsabile, documentazione già inoltrata, citazione letterale e condizioni sul contatto e sugli allegati. «Le preciso» in A aggiunge una formula cortese che B omette senza perdere formalità: non emerge un vantaggio sostanziale di scorrevolezza.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-03",
+          "preferred": "tie",
+          "reason": "Entrambe mantengono una sola visita possibile, la preferenza motivata per mercoledì, la disponibilità per giovedì e la risposta entro domani. «Fammi sapere» in B è più diretto di «Ti chiedo di farmelo sapere» in A, ma entrambe le formulazioni sono naturali nel tono informale e la differenza resta minima.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-04",
+          "preferred": "tie",
+          "reason": "Le due versioni rendono più lineare il rapporto fra giacca e dubbio sul freddo senza modificare la richiesta limitata alle previsioni o l'alternativa del controllo successivo. L'ordine di «con la valigia» e la presenza di «io» producono soltanto lievi differenze di enfasi, entrambe compatibili con la voce informale della fonte.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-05",
+          "preferred": "tie",
+          "reason": "Entrambe ricompongono la sequenza frammentata e mantengono la limitazione ad alcuni gruppi, il rischio senza certezza di perdere correzioni, le due persone che usano la mail, la responsabilità dell'autore e l'assenza di misure sul risparmio. A condensa la sequenza, B ne conserva maggiormente il ritmo: entrambe scorrono bene, senza una differenza sostanziale.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-06",
+          "preferred": "tie",
+          "reason": "Entrambe uniscono le informazioni ripetute sulla consultazione anticipata e conservano stima, ruoli, possibilità di aggiungere note almeno un giorno prima e incertezza sull'effetto dei due cambiamenti concomitanti. Il gerundio e «così» in B rendono i raccordi appena più espliciti, ma la costruzione coordinata di A è altrettanto chiara e naturale.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-07",
+          "preferred": "tie",
+          "reason": "Le versioni sono identiche fra loro e alla fonte, già scorrevole. Conservano la richiesta cortese, il limite ai dati della sede del destinatario, la scadenza e la richiesta separata per le altre sedi. Non servono modifiche per soddisfare l'istruzione.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        },
+        {
+          "id": "fluency-dev-08",
+          "preferred": "tie",
+          "reason": "Le versioni sono identiche fra loro e alla fonte, già naturale. Restano la disponibilità dalle sette in poi, l'alternativa condizionata a un altro giorno, la motivazione di non far aspettare e la scelta del posto affidata al destinatario.",
+          "issues_A": [],
+          "issues_B": [],
+          "selected_version": "tie"
+        }
+      ],
+      "counts": {
+        "tie": 8
+      }
+    }
+  ],
+  "audits": [
+    {
+      "id": "fluency-dev-01",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 497,
+          "revision_characters": 348
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-02",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 532,
+          "revision_characters": 487
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-03",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 348,
+          "revision_characters": 299
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-04",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 326,
+          "revision_characters": 290
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-05",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 633,
+          "revision_characters": 619
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-06",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 627,
+          "revision_characters": 605
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-07",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 169,
+          "revision_characters": 169
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-08",
+      "run": "a",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 126,
+          "revision_characters": 126
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-01",
+      "run": "b",
+      "exit_code": 3,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [
+          {
+            "category": "uncertainty",
+            "source_markers": {
+              "potremmo": 1,
+              "previsto": 1
+            },
+            "revision_markers": {
+              "potremmo": 1,
+              "previsto": 1,
+              "potrebbe": 1
+            },
+            "message": "Indicatori linguistici cambiati: rileggere nel contesto; non è una prova di errore.",
+            "contexts": {
+              "source": [],
+              "revision": [
+                "mare la data di consegna. Potrebbe farci sapere se intende a"
+              ]
+            }
+          }
+        ],
+        "counts": {
+          "source_characters": 497,
+          "revision_characters": 341
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-02",
+      "run": "b",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 532,
+          "revision_characters": 479
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-03",
+      "run": "b",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 348,
+          "revision_characters": 295
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-04",
+      "run": "b",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 326,
+          "revision_characters": 289
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-05",
+      "run": "b",
+      "exit_code": 3,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [
+          {
+            "category": "negation",
+            "source_markers": {
+              "primary": 3
+            },
+            "revision_markers": {
+              "primary": 2
+            },
+            "message": "Indicatori linguistici cambiati: rileggere nel contesto; non è una prova di errore.",
+            "contexts": {
+              "source": [
+                " documento in chat diverse. Non tutti, ma succede. Si apre u",
+                " il documento può leggerle senza ricostruire ogni conversazi"
+              ],
+              "revision": [
+                "e il documento di leggerle senza ricostruire ogni conversazi",
+                "struire ogni conversazione. Non abbiamo misurato quanto temp"
+              ]
+            }
+          }
+        ],
+        "counts": {
+          "source_characters": 633,
+          "revision_characters": 611
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-06",
+      "run": "b",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 627,
+          "revision_characters": 586
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-07",
+      "run": "b",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 169,
+          "revision_characters": 169
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-08",
+      "run": "b",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 126,
+          "revision_characters": 126
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-01",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 497,
+          "revision_characters": 337
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-02",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 532,
+          "revision_characters": 472
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-03",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 348,
+          "revision_characters": 279
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-04",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 326,
+          "revision_characters": 287
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-05",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 633,
+          "revision_characters": 615
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-06",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 627,
+          "revision_characters": 601
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-07",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 169,
+          "revision_characters": 169
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "fluency-dev-08",
+      "run": "c",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 126,
+          "revision_characters": 126
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    }
+  ],
+  "final_literal_checks": [
+    {
+      "id": "fluency-dev-01",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": false
+    },
+    {
+      "id": "fluency-dev-02",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": false
+    },
+    {
+      "id": "fluency-dev-03",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": false
+    },
+    {
+      "id": "fluency-dev-04",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": false
+    },
+    {
+      "id": "fluency-dev-05",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": false
+    },
+    {
+      "id": "fluency-dev-06",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": false
+    },
+    {
+      "id": "fluency-dev-07",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": true
+    },
+    {
+      "id": "fluency-dev-08",
+      "missing_exact": [],
+      "forbidden_present": [],
+      "unchanged": true
+    }
+  ]
+}

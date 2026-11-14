@@ -1,5 +1,34 @@
 # Changelog
 
+## In lavorazione
+
+- Scorrevolezza dei periodi: riferimenti meno ripetitivi, ellissi degli
+  elenchi chiarite quando il contesto lo consente e pause fra azioni diverse.
+  Esempio operativo con condizioni, responsabilità e scadenza conservate.
+- Scorrevolezza: eliminazione dei doppioni a parità di informazioni, raccordi
+  più diretti e controllo della fedeltà in entrambe le direzioni. Esplicitati
+  ambito dei quantificatori, stato delle azioni e prospettiva io/tu;
+  le limitazioni esplicite restano esplicite anche quando si ricompone il ritmo.
+- Esempi su mail formali, messaggi informali e post; set separato di 12 casi
+  sintetici per confrontare scorrevolezza e conservazione delle sfumature.
+- Rapporto di sviluppo su 8 casi con output e giudizi degli agenti conservati:
+  corretta una regressione; scorrevolezza finale comparabile alla versione
+  precedente, senza nuova validazione umana dichiarata.
+
+- Guida italiana documentata su sintassi, punteggiatura, ortografia e registri
+  formali/informali, con fonti Crusca e Treccani; distinzione fra errori,
+  varianti, scelte editoriali e ambiguità, senza normalizzazione automatica.
+- Esempi di adattamento del registro e sintassi; 12 casi sintetici diagnostici
+  aggiuntivi, validati nel formato anche dalla CI.
+
+- Revisione editoriale: diagnosi di struttura e ritmo prima del lessico;
+  richieste come «umanizza» consentono di riorganizzare dove serve, con
+  precedenza ai vincoli espliciti e alla conservazione del significato.
+- Esempi di post, voce già efficace, contrasti informativi e intervento minimo;
+  nessuna autobiografia o dettaglio aggiunti per simulare spontaneità.
+- Set diagnostico separato con 8 casi sintetici per struttura e fedeltà;
+  pilot originale invariato, nessuna nuova valutazione umana dichiarata.
+
 ## 0.2.1 — preparazione, non rilasciata
 
 - Audit e-mail: recuperata la sensibilità alle negazioni con conteggi globali

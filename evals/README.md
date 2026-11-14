@@ -147,3 +147,78 @@ ambito come `preliminary_sample_only` e le autorizzazioni come `declarations_onl
 Input validi producono exit code 0 anche quando il test non passa; errori di
 formato o operativi producono exit code 2 e JSON su stderr. Lo strumento richiede
 solo Python 3.11 e libreria standard e non invia dati all'esterno.
+
+## Diagnostica della struttura editoriale
+
+`editorial-structure.jsonl` aggiunge **8 casi sintetici originali**, 4 di sviluppo
+e 4 heldout, per osservare ritmo, formule di raccordo, struttura dei paragrafi e
+rischio di revisione eccessiva. Include liste utili, voce colloquiale già efficace,
+interventi minimi, registro formale, attribuzioni e citazioni da preservare. È un
+piccolo set diagnostico separato dal pilot: non è un corpus umano né una
+validazione della qualità della skill.
+
+```sh
+python scripts/evaluate.py --validate-cases evals/editorial-structure.jsonl
+```
+
+Le checklist richiedono un giudizio sul testo completo: non prescrivono parole
+vietate, quote di modifiche o punteggi dei rilevatori. Per un confronto usare le
+stesse condizioni e il procedimento cieco descritti sopra, valutando insieme
+naturalezza e fedeltà. Con soli 4 casi heldout il risultato resta
+`not_validated`, anche raccogliendo voti favorevoli. Se i casi heldout vengono
+letti per tarare le istruzioni o se ne usano i risultati per modificarle, non
+costituiscono più una prova indipendente: occorre un nuovo insieme per la
+valutazione successiva.
+
+## Diagnostica della lingua italiana
+
+`italian-language.jsonl` contiene **12 casi sintetici originali**, 8 di sviluppo
+e 4 heldout, su sintassi, punteggiatura, ortografia e registri. Le checklist
+distinguono gli errori da correggere dalle costruzioni ammissibili da conservare
+e richiedono di controllare anche soggetti, riferimenti, modalità e significato.
+Citazioni e URL protetti non devono essere uniformati al testo corrente.
+
+```sh
+python scripts/evaluate.py --validate-cases evals/italian-language.jsonl
+```
+
+È un set diagnostico aggiuntivo, non un corpus umano né una prova di miglioramento
+della skill. Non sono stati raccolti giudizi umani: il risultato resta
+`not_validated`. Usare i casi development per la taratura; riservare gli heldout
+al confronto successivo nelle condizioni descritte sopra. Leggerli per definire
+le istruzioni o correggere la skill sulla base dei loro risultati ne elimina
+l'indipendenza e richiede un nuovo insieme per la valutazione seguente. Quattro
+casi heldout non raggiungono comunque la soglia minima del protocollo.
+
+## Scorrevolezza e fedeltà a confronto
+
+`fluency-fidelity.jsonl` contiene 12 casi sintetici originali: 8 development
+e 4 heldout. Copre mail formali, messaggi informali e post, con attenzione a
+condizioni, alternative, quantificatori, prospettiva e formule di cortesia.
+Include testi già efficaci che possono restare invariati.
+
+```sh
+python scripts/evaluate.py --validate-cases evals/fluency-fidelity.jsonl
+```
+
+Per le prove di sviluppo si possono confrontare due copie fissate della
+skill sugli stessi input, nascondendo la provenienza al revisore. Distinguere
+la preferenza per una lettura più scorrevole dal riscontro di aggiunte o
+omissioni: un testo più breve non è automaticamente migliore. Registrare
+anche pareggi, regressioni e differenze non risolte.
+
+Una revisione svolta da agenti non è una raccolta di giudizi umani e non va
+inserita nel file dei voti umani del protocollo. Le prove development non
+costituiscono validazione indipendente; conservare i casi heldout per una
+prova successiva. Lo stato resta `not_validated`.
+
+La [prova di sviluppo del 14 novembre 2026](reports/2026-11-14-fluency.md)
+conserva otto confronti su mail, messaggi e post: una regressione nel primo
+aggiornamento, la correzione e otto pareggi nella revisione finale. Fonti,
+riscritture, giudizi degli agenti e impronte degli snapshot sono allegati al
+rapporto. Non dimostra una superiorità generale né rispetto a `/humanizer`.
+
+La [prova successiva su sei testi nuovi](reports/2026-11-14-fresh-registers.md)
+confronta originali e riscritture di tre mail formali e tre messaggi informali,
+senza modificare la skill durante il test. Riporta separatamente i giudizi
+degli agenti su scorrevolezza e significato, inclusi i due testi invariati.
