@@ -13,7 +13,7 @@ dependencies = ["Pillow>=11,<13"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8,<10", "build>=1,<2"]
-c2pa = ["c2pa-python>=0.38.1,<0.39"]
+c2pa = ["c2pa-python>=0.38.1,<0.40"]
 
 [tool.setuptools]
 packages = []
