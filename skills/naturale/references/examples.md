@@ -331,6 +331,105 @@ richiesta di verifica, che resta una domanda sulla possibilità di Marta,
 non un impegno assunto da lei. Sono scelte per questi attriti, non un
 obbligo di sostituire ogni nome con un pronome o spezzare tutte le istruzioni.
 
+### Elenchi con funzioni diverse
+
+**Richiesta:** «Rendi questo elenco più naturale mantenendo il significato.»
+
+**Fonte:**
+
+> Nel messaggio al fornitore elenco cosa deve evitare: imballaggi di plastica, limite di peso e fascia di consegna. Il peso non deve superare i cinque chili e la consegna deve avvenire al mattino.
+
+**Risultato:**
+
+> Al fornitore chiedo per iscritto di evitare gli imballaggi di plastica, non superare i cinque chili e consegnare al mattino.
+
+Le tre voci richiedono azioni diverse, già chiarite dal contesto. Il divieto
+riguarda gli imballaggi; il peso è un limite da rispettare e il mattino è
+la fascia di consegna. La riscrittura conserva il destinatario, la modalità
+scritta e tutti i vincoli, senza attribuire «evitare» a ogni elemento.
+
+**Controesempio ambiguo:**
+
+> Nel messaggio al fornitore scrivo: peso, consegna.
+
+Si può conservare la formulazione neutra o coordinare le etichette:
+«Nel messaggio al fornitore scrivo: peso e consegna». La fonte non chiarisce
+se si tratti di informazioni, domande o istruzioni: «do indicazioni» sceglierebbe
+una funzione. Non si possono inventare un peso massimo, una data o un obbligo.
+
+Se la fonte dice invece «Da escludere: colori, finiture», l'esclusione resta:
+«I colori e le finiture da escludere». «Indicazioni su colori e finiture»
+perderebbe il vincolo, pur lasciando intatti i nomi. Non scegliere quali
+colori o finiture escludere se la fonte non lo dice.
+
+Anche una voce come «senza firma» può restare tale se non è chiaro se descriva
+un documento o vieti al destinatario di firmarlo. «Non firmare» sceglierebbe
+un attore e un obbligo che l'etichetta da sola non stabilisce.
+
+**Un raccordo corretto può appesantire il tono:** «Alla redazione scrivo chi
+intervistare e quali domande fare» è già diretto. Espanderlo in «Organizzo la
+comunicazione alla redazione in due sezioni» aggiunge una descrizione del metodo
+e perde il contenuto se le sezioni non vengono specificate. Per introdurre un
+elenco basta raccordare le informazioni, senza raccontare come lo si costruisce.
+Una frase come «Il controllo prevede due passaggi da eseguire nell'ordine
+indicato» descrive invece una procedura reale: metodo e ordine vanno conservati.
+
+**Una richiesta fra informazioni e materiali:**
+
+> Nella mail alla tipografia scrivo tre cose:
+> 1. Il numero di copie.
+> 2. Il file da stampare, che allego.
+> 3. Che mi dicano quando sarà pronto il lavoro.
+
+**Una revisione possibile:**
+
+> Scrivo una mail alla tipografia per:
+> 1. Indicare il numero di copie.
+> 2. Allegare il file da stampare.
+> 3. Chiedere quando sarà pronto il lavoro.
+
+L'introduzione conserva la comunicazione scritta e le tre voci restano
+riconoscibili. I verbi esplicitano ciò che la fonte già dice, senza aggiungere
+un metodo. La richiesta non rimane una subordinata isolata e non viene
+trasformata in una nominalizzazione per uniformarla agli altri elementi.
+
+### Ricomporre l'enfasi senza indebolirla
+
+**Richiesta:** «Rendi il testo più scorrevole mantenendo il significato.»
+
+**Fonte:**
+
+> Prima di inviare il listino controllo i prezzi. Tutti. Mi servono pochi minuti in più. In cambio evito correzioni dopo l'invio.
+
+**Risultato:**
+
+> Prima di inviare il listino controllo tutti i prezzi. Mi servono pochi minuti in più, ma evito correzioni dopo l'invio.
+
+Restano il controllo universale, il tempo aggiuntivo e il beneficio. «Tutti»
+mantiene la sua forza dentro il periodo; il rapporto fra costo e beneficio
+non richiede due frasi separate. La voce non coincide con ogni punto della
+fonte. Un vincolo esplicito a mantenere quel ritmo cambierebbe l'intervento.
+
+**Controesempio già efficace:**
+
+> Controlla gli importi e correggi eventuali errori. Solo dopo invia il riepilogo.
+
+La pausa distingue la verifica dall'invio e mette in evidenza l'ordine delle
+azioni. Può restare: scorrevolezza non significa trasformare tutto in un
+periodo unico.
+
+### Vincoli negativi e controesempi
+
+Un vincolo riguarda l'effetto della modifica, non una parola proibita.
+Questi esempi sintetici mostrano anche quando lasciare il testo com'è.
+
+| Fonte | Modifica da scartare | Scelta utile |
+| --- | --- | --- |
+| «Se mi mandi l'elenco, controllo i nomi.» | «In presenza di un elenco trasmesso, procedo alla verifica dei nominativi.»: aggiunge distanza e astrazione. | Conservare la frase diretta se il registro richiesto è quello della fonte. |
+| «Il rimborso è pari alla spesa documentata.» | «Il rimborso dipende dalla spesa documentata.»: perde la relazione di uguaglianza. | Conservare «è pari a» o un'equivalenza altrettanto precisa. |
+| «Il pacco è arrivato, quindi puoi passare a ritirarlo.» | Eliminare «quindi» soltanto perché compare fra i presunti tic dei testi AI. | Il connettivo esprime un nesso utile e può restare. |
+| «Quella mail, la mando io domani.» | «Invierò la comunicazione domani.»: uniforma il registro e riduce l'enfasi su chi agisce. | Conservare la ripresa colloquiale se compatibile con la richiesta. |
+
 ## Italiano formale e informale: stessa informazione, scelte diverse
 
 Questi esempi sintetici applicano la [guida linguistica e le sue fonti](italian.md).

@@ -1,0 +1,427 @@
+{
+  "date": "2026-11-15",
+  "status": "not_validated",
+  "method": {
+    "purpose": "Compare contextual negative constraints with the previously installed skill",
+    "case_author": "independent agent without skill or previous cases",
+    "generation": "one independent agent context per frozen skill snapshot; same inputs without checklists",
+    "replicates_per_case": 1,
+    "reviewer": "separate agent; balanced anonymous A/B; source and checklist visible",
+    "human_ratings": 0,
+    "exact_model_version": "not_recorded",
+    "sampling_parameters": "not_controlled"
+  },
+  "cases": [
+    {
+      "id": "proporzionalita_tavole",
+      "genre": "post professionale",
+      "instruction": "Rendi più scorrevole il post, preservando significato e tono.",
+      "source": "Nel nostro modello, a parità di complessità, il tempo di revisione cresce in proporzione diretta al numero di tavole: raddoppiare le tavole significa raddoppiare le ore previste. È una relazione utile ai fini della pianificazione, fermo restando che non descrive i progetti con molte eccezioni. Su questo punto occorre fare chiarezza, per evitare aspettative errate.",
+      "checklist": [
+        "Mantenere la proporzionalità diretta, senza ridurla a una generica crescita.",
+        "Conservare la condizione della pari complessità.",
+        "Conservare l'esclusione dei progetti con molte eccezioni.",
+        "Mantenere il tono professionale e lo scopo di evitare aspettative errate."
+      ],
+      "already_good": false
+    },
+    {
+      "id": "mail_preventivo_condizioni",
+      "genre": "mail formale",
+      "instruction": "Rendi più scorrevole la mail, preservando significato e tono.",
+      "source": "Gentile architetta, con la presente sono a richiederle un preventivo aggiornato per il rilievo dei due locali. Le chiedo di includere la restituzione dei disegni e di indicare separatamente le spese di trasferta. Potremo valutare l'incarico solo se il lavoro sarà concluso entro il 18 dicembre e il costo complessivo non supererà 1.200 euro.",
+      "checklist": [
+        "Richiedere un preventivo aggiornato per il rilievo di due locali.",
+        "Includere la restituzione dei disegni e separare le spese di trasferta.",
+        "Mantenere entrambe le condizioni: conclusione entro il 18 dicembre e costo massimo di 1.200 euro.",
+        "La possibilità di valutare l'incarico non equivale alla conferma dell'incarico.",
+        "Mantenere il registro formale senza aggiungere scuse o promesse."
+      ],
+      "already_good": false
+    },
+    {
+      "id": "messaggio_giro_mercato",
+      "genre": "messaggio informale",
+      "instruction": "Rivedi il messaggio, se serve, preservando significato e tono.",
+      "source": "Il giro al mercato, quello lo farei sabato mattina, perché venerdì esco tardi e rischiamo di trovare tutto chiuso. Per il pranzo invece decidiamo lì: se c'è posto ci fermiamo da Luca, altrimenti prendiamo qualcosa e torniamo a casa.",
+      "checklist": [
+        "Conservare la proposta di andare al mercato sabato mattina.",
+        "Mantenere il rapporto causale tra l'uscita tarda del venerdì e il rischio di trovare tutto chiuso.",
+        "Preservare la ripresa parlata «Il giro al mercato, quello» e il tono informale.",
+        "La decisione sul pranzo viene presa sul posto e dipende dalla disponibilità da Luca."
+      ],
+      "already_good": true
+    },
+    {
+      "id": "spiegazione_prenotazione",
+      "genre": "breve spiegazione",
+      "instruction": "Rivedi la spiegazione, se serve, preservando significato e tono.",
+      "source": "Se arrivi entro le nove, la prenotazione resta valida anche senza conferma telefonica. Dopo le nove, invece, il tavolo può essere assegnato ad altri. Una telefonata ci aiuta a organizzarci, ma non prolunga il tempo per cui teniamo libero il tavolo.",
+      "checklist": [
+        "Conservare la validità della prenotazione a condizione che l'arrivo avvenga entro le nove.",
+        "Entro le nove la conferma telefonica non è necessaria.",
+        "Dopo le nove il tavolo può essere riassegnato, ma la riassegnazione non è certa.",
+        "Mantenere il contrasto tra l'utilità organizzativa della telefonata e la sua inefficacia nel prolungare la prenotazione."
+      ],
+      "already_good": true
+    }
+  ],
+  "outputs-before": [
+    {
+      "id": "proporzionalita_tavole",
+      "text": "Nel nostro modello, a parità di complessità, il tempo di revisione cresce in proporzione diretta al numero di tavole: raddoppiare le tavole significa raddoppiare le ore previste. È una relazione utile per la pianificazione, ma non descrive i progetti con molte eccezioni. Questo punto va chiarito per evitare aspettative errate."
+    },
+    {
+      "id": "mail_preventivo_condizioni",
+      "text": "Gentile architetta,\nLe chiedo un preventivo aggiornato per il rilievo dei due locali, comprensivo della restituzione dei disegni e con le spese di trasferta indicate separatamente. Potremo valutare l'incarico solo se il lavoro sarà concluso entro il 18 dicembre e il costo complessivo non supererà 1.200 euro."
+    },
+    {
+      "id": "messaggio_giro_mercato",
+      "text": "Il giro al mercato, quello lo farei sabato mattina, perché venerdì esco tardi e rischiamo di trovare tutto chiuso. Per il pranzo invece decidiamo lì: se c'è posto ci fermiamo da Luca, altrimenti prendiamo qualcosa e torniamo a casa."
+    },
+    {
+      "id": "spiegazione_prenotazione",
+      "text": "Se arrivi entro le nove, la prenotazione resta valida anche senza conferma telefonica. Dopo le nove, invece, il tavolo può essere assegnato ad altri. Una telefonata ci aiuta a organizzarci, ma non prolunga il tempo per cui teniamo libero il tavolo."
+    }
+  ],
+  "outputs-after": [
+    {
+      "id": "proporzionalita_tavole",
+      "text": "Nel nostro modello, a parità di complessità, il tempo di revisione cresce in proporzione diretta al numero di tavole: raddoppiare le tavole significa raddoppiare le ore previste. È una relazione utile per la pianificazione, ma non descrive i progetti con molte eccezioni. Occorre chiarire questo punto per evitare aspettative errate."
+    },
+    {
+      "id": "mail_preventivo_condizioni",
+      "text": "Gentile architetta,\nLe chiedo un preventivo aggiornato per il rilievo dei due locali, che includa la restituzione dei disegni e indichi separatamente le spese di trasferta.\n\nPotremo valutare l'incarico solo se il lavoro sarà concluso entro il 18 dicembre e il costo complessivo non supererà 1.200 euro."
+    },
+    {
+      "id": "messaggio_giro_mercato",
+      "text": "Il giro al mercato, quello lo farei sabato mattina, perché venerdì esco tardi e rischiamo di trovare tutto chiuso. Per il pranzo invece decidiamo lì: se c'è posto ci fermiamo da Luca, altrimenti prendiamo qualcosa e torniamo a casa."
+    },
+    {
+      "id": "spiegazione_prenotazione",
+      "text": "Se arrivi entro le nove, la prenotazione resta valida anche senza conferma telefonica. Dopo le nove, invece, il tavolo può essere assegnato ad altri. Una telefonata ci aiuta a organizzarci, ma non prolunga il tempo per cui teniamo libero il tavolo."
+    }
+  ],
+  "review": [
+    {
+      "id": "proporzionalita_tavole",
+      "preferred": "tie",
+      "reason": "Scorrevolezza: entrambe alleggeriscono il testo in modo equivalente; la diversa formulazione dell'ultima frase non determina un vantaggio sostanziale. Fedeltà: entrambe conservano proporzionalità diretta, pari complessità, esclusione dei progetti con molte eccezioni, necessità di chiarimento e tono professionale.",
+      "issues_A": [],
+      "issues_B": []
+    },
+    {
+      "id": "mail_preventivo_condizioni",
+      "preferred": "tie",
+      "reason": "Scorrevolezza: entrambe rendono più diretta la richiesta mantenendo un registro formale; il paragrafo separato di A e la costruzione nominale di B producono differenze minime. Fedeltà: entrambe preservano oggetto e contenuti del preventivo, le due condizioni necessarie e il carattere di sola valutazione dell'incarico, senza trasformarlo in una conferma.",
+      "issues_A": [],
+      "issues_B": []
+    },
+    {
+      "id": "messaggio_giro_mercato",
+      "preferred": "tie",
+      "reason": "Scorrevolezza: i testi sono identici alla fonte e tra loro; la ripresa parlata è coerente con la voce informale e la richiesta non impone modifiche. Fedeltà: entrambi mantengono la proposta per sabato, il motivo legato al venerdì, il rischio anziché la certezza di trovare chiuso e la scelta del pranzo sul posto subordinata alla disponibilità da Luca.",
+      "issues_A": [],
+      "issues_B": []
+    },
+    {
+      "id": "spiegazione_prenotazione",
+      "preferred": "tie",
+      "reason": "Scorrevolezza: i testi sono identici alla fonte e tra loro; la spiegazione è già chiara e non richiede interventi. Fedeltà: entrambi conservano la condizione di arrivo entro le nove, l'assenza di obbligo di conferma telefonica, la possibilità e non certezza di riassegnazione dopo le nove e il limite della telefonata, utile per organizzarsi ma inefficace nel prolungare la prenotazione.",
+      "issues_A": [],
+      "issues_B": []
+    }
+  ],
+  "mapping": {
+    "proporzionalita_tavole": {
+      "A": "before",
+      "B": "after"
+    },
+    "mail_preventivo_condizioni": {
+      "A": "after",
+      "B": "before"
+    },
+    "messaggio_giro_mercato": {
+      "A": "after",
+      "B": "before"
+    },
+    "spiegazione_prenotazione": {
+      "A": "before",
+      "B": "after"
+    }
+  },
+  "audits": [
+    {
+      "id": "proporzionalita_tavole",
+      "version": "before",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 366,
+          "revision_characters": 328
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "proporzionalita_tavole",
+      "version": "after",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 366,
+          "revision_characters": 333
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "mail_preventivo_condizioni",
+      "version": "before",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 341,
+          "revision_characters": 309
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "mail_preventivo_condizioni",
+      "version": "after",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 341,
+          "revision_characters": 302
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "messaggio_giro_mercato",
+      "version": "before",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 232,
+          "revision_characters": 232
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "messaggio_giro_mercato",
+      "version": "after",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 232,
+          "revision_characters": 232
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "spiegazione_prenotazione",
+      "version": "before",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 248,
+          "revision_characters": 248
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    {
+      "id": "spiegazione_prenotazione",
+      "version": "after",
+      "exit_code": 0,
+      "report": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": true,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 248,
+          "revision_characters": 248
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    }
+  ],
+  "baseline-hashes": {
+    "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+    "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+    "references/editorial.md": "5bb3ca0a052014a98c1c0a248f109afaaa759c36631a45236124c1dd2886323f",
+    "references/examples.md": "27b6a97aabc1345476c302a7787c5a97e5e5b4eeff6fb0e13be86a9a242a27cb",
+    "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+    "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+    "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+    "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+    "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+    "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+    "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+    "SKILL.md": "f04e382fa30c59855c5bb3012e54bee924ff828dc75c752d27013ee3a1261c9a",
+    "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+    "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+  },
+  "candidate-hashes": {
+    "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+    "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+    "references/editorial.md": "75b2a77283800c41da9fa0f0ab1f67c4b413cc7c725e472fcfa69335f98397b1",
+    "references/examples.md": "318c1a5351c3fc4635429dc5af68a8fc770c463f92374c0051bf10b75ec69457",
+    "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+    "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+    "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+    "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+    "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+    "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+    "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+    "SKILL.md": "f04e382fa30c59855c5bb3012e54bee924ff828dc75c752d27013ee3a1261c9a",
+    "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+    "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+  }
+}

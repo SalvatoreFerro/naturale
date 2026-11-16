@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-15",
+  "status": "not_validated",
+  "method": {
+    "kind": "synthetic_regression_checks",
+    "case_origin": "written_for_this_change",
+    "generator": "fresh agent using frozen skill",
+    "manual_review": "primary agent",
+    "human_reviews": 0,
+    "exact_model_version": "not_recorded",
+    "sampling_parameters": "not_controlled",
+    "no_post_generation_edits": true
+  },
+  "snapshots": {
+    "before-hashes": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "references/editorial.md": "75b2a77283800c41da9fa0f0ab1f67c4b413cc7c725e472fcfa69335f98397b1",
+      "references/examples.md": "318c1a5351c3fc4635429dc5af68a8fc770c463f92374c0051bf10b75ec69457",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+      "SKILL.md": "f04e382fa30c59855c5bb3012e54bee924ff828dc75c752d27013ee3a1261c9a",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+    },
+    "candidate-hashes": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "references/editorial.md": "cf197a353baae331bf1af7492987c93afbe97463f3fe510c3efbcfa24550e14b",
+      "references/examples.md": "5e6c1b14fa1df9468ec92955c96f55d633704ec5c384b4116c20506b314748e3",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+      "SKILL.md": "925c08a81265837dc6612018ec7bf8532fcc012ffbd18f33675ee0990bb62422",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+    }
+  },
+  "cases": [
+    {
+      "id": "ritmo_esplicito",
+      "instruction": "Correggi eventuali errori, mantenendo esattamente ritmo e punteggiatura.",
+      "source": "Aspetta. Ho trovato una differenza. Ti mando il confronto tra poco.",
+      "revision": "Aspetta. Ho trovato una differenza. Ti mando il confronto tra poco.",
+      "assessment": "Invariato: rispettato il vincolo esplicito sulla cadenza."
+    },
+    {
+      "id": "passaggi_condizionati",
+      "instruction": "Rendi le istruzioni più scorrevoli, se serve, senza cambiare le condizioni.",
+      "source": "Confronta il numero del documento con quello della richiesta. Se non coincidono, interrompi l'invio e avvisami. Prima di riprendere, aspetta il mio via libera.",
+      "revision": "Confronta il numero del documento con quello della richiesta. Se non coincidono, interrompi l'invio e avvisami. Prima di riprendere, aspetta il mio via libera.",
+      "assessment": "Invariato: le pause separano confronto, interruzione condizionata e autorizzazione alla ripresa."
+    },
+    {
+      "id": "stima_riserva",
+      "instruction": "Rendi questo testo più scorrevole, mantenendo tutte le informazioni.",
+      "source": "Il controllo richiede circa tre minuti. Non è un tempo garantito. La durata può aumentare con documenti lunghi.",
+      "revision": "Il controllo richiede circa tre minuti, ma il tempo non è garantito e può aumentare con documenti lunghi.",
+      "assessment": "Ricomposto il periodo mantenendo durata approssimativa, assenza di garanzia e possibile aumento per documenti lunghi."
+    }
+  ]
+}

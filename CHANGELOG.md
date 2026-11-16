@@ -2,6 +2,26 @@
 
 ## In lavorazione
 
+- Ambito e vincoli negli elenchi: le etichette poco specifiche conservano
+  divieti e obblighi dell'introduzione; la neutralità riguarda soltanto ciò
+  che la fonte lascia indeterminato. Anticipate le precisazioni comuni agli
+  esempi e raccordate le richieste all'intero elenco, senza nominalizzazioni
+  forzate o nuove spiegazioni del metodo.
+- Introduzioni degli elenchi: il raccordo viene controllato anche nel tono,
+  evitando spiegazioni aggiunte su come l'autore organizza il messaggio.
+  La rilettura finale risolve perifrasi ed echi creati dalla riscrittura stessa;
+  restano protetti metodi autentici, ordine delle azioni e modalità scritta.
+- Elenchi: separate azioni, esclusioni e parametri quando richiedono verbi
+  diversi; conservate modalità di comunicazione e relazioni esplicite,
+  senza inventare soglie, attribuire divieti ambigui o uniformare artificialmente
+  tutte le voci. Controllato il raccordo fra introduzione e singoli punti.
+- Ritmo: distinta la funzione dell'enfasi dalla punteggiatura che la esprime;
+  frammenti e passaggi dello stesso pensiero possono essere ricomposti,
+  conservando quantificatori, forza della tesi e pause operative utili.
+- Vincoli negativi contestuali: consolidate le istruzioni su astrazione,
+  raccordi, voce e ritmo; protetti anche tipo di relazione e forza della tesi.
+  Aggiunti controesempi per evitare eliminazioni automatiche di connettivi,
+  termini precisi e costruzioni colloquiali corrette.
 - Scorrevolezza dei periodi: riferimenti meno ripetitivi, ellissi degli
   elenchi chiarite quando il contesto lo consente e pause fra azioni diverse.
   Esempio operativo con condizioni, responsabilità e scadenza conservate.

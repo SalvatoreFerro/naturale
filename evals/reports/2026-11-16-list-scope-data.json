@@ -1,0 +1,148 @@
+{
+  "date": "2026-11-16",
+  "status": "not_validated",
+  "method": {
+    "kind": "targeted_development_trial",
+    "generations_per_input_per_snapshot": 1,
+    "rounds": 3,
+    "generator": "fresh contexts; first post and controls generated separately, later rounds in one context each",
+    "review": "primary agent plus separate reviewer, post variants labelled A/B",
+    "human_reviews": 0,
+    "no_post_generation_edits": true,
+    "exact_model_version": "not_recorded",
+    "sampling_parameters": "not_controlled",
+    "baseline_generation": false
+  },
+  "snapshot_roles": {
+    "before": "hash-only installed baseline",
+    "candidate": "scope, qualifiers and explicit request verbs",
+    "final": "whole-list linkage; reviewer found suspended introduction and an interpretation in neutral labels",
+    "release": "complete introductions and preservation of unspecified communicative function; installed version"
+  },
+  "snapshots": {
+    "before": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "abf20cdde4f97071fcfe8f370fd41ed0edb09399dcf73ebc514ae9c8d6bd6396",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "60518f1a383da0feccf534c38fea975de4efa6dd4175a52ea26662cd5727f56a",
+      "references/examples.md": "2c03a1d947717e1ff90735a498d28d621081fc5e3e2d13694661d5d37d4b176a",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    },
+    "candidate": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "abf20cdde4f97071fcfe8f370fd41ed0edb09399dcf73ebc514ae9c8d6bd6396",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "75e75826ddac9534dce3fa077e0cb8b669b8afd38e2a410440189ddd1678c6c7",
+      "references/examples.md": "044491268a2c7b62b482fd2a18bf0509fe27ad0695780b3996fbb9efe9f72364",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    },
+    "final": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "abf20cdde4f97071fcfe8f370fd41ed0edb09399dcf73ebc514ae9c8d6bd6396",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "3ad428882d359eeb5bfee59ee04af7cb5e39edd0a962cbe0c0c27c970106f53b",
+      "references/examples.md": "c554c259f600c4f5ec32559f84e25bb4bfc372c6df706845a706737a8e1fa836",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    },
+    "release": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "abf20cdde4f97071fcfe8f370fd41ed0edb09399dcf73ebc514ae9c8d6bd6396",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "e5801bf4781abca03608fc383cb5f831e2b11fd19015222a34435ff5a3d4425a",
+      "references/examples.md": "a87e1cecdf9773aff59891620f8adce83bf594d18062b2634dd604722139cd06",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    }
+  },
+  "cases": [
+    {
+      "id": "esclusioni",
+      "instruction": "Rendi il testo più naturale e scorrevole, senza cambiarne il significato o risolverne le ambiguità.",
+      "source": "Nel messaggio al grafico scrivo cosa escludere: caratteri, effetti, dimensioni.",
+      "outputs": {
+        "candidate": "Nel messaggio al grafico indico cosa escludere: caratteri, effetti e dimensioni.",
+        "final": "Nel messaggio al grafico indico i caratteri, gli effetti e le dimensioni da escludere.",
+        "release": "Nel messaggio al grafico indico quali caratteri, effetti e dimensioni escludere."
+      },
+      "assessment": "L'esclusione resta esplicita in tutti i passaggi; la versione finale non inventa caratteri, effetti o dimensioni specifici."
+    },
+    {
+      "id": "qualificatore",
+      "instruction": "Rendi il testo più naturale e scorrevole, senza cambiarne il significato o risolverne le ambiguità.",
+      "source": "Per il catalogo invio i testi: schede dei prodotti, didascalie, note. Tutti già approvati.",
+      "outputs": {
+        "candidate": "Per il catalogo invio i testi, tutti già approvati: schede dei prodotti, didascalie e note.",
+        "final": "Per il catalogo invio i testi, tutti già approvati: schede dei prodotti, didascalie e note.",
+        "release": "Per il catalogo invio i testi, tutti già approvati: schede dei prodotti, didascalie e note."
+      },
+      "assessment": "La precisazione precede gli esempi e continua a riguardare tutti i testi. Stesso risultato nei tre passaggi."
+    },
+    {
+      "id": "richiesta",
+      "instruction": "Rendi il testo più naturale e scorrevole, senza cambiarne il significato o risolverne le ambiguità.",
+      "source": "Nella mail al centro sportivo scrivo tre cose: il corso che mi interessa, i giorni in cui sono libero, che mi dicano se c'è ancora posto.",
+      "outputs": {
+        "candidate": "Nella mail al centro sportivo indico il corso che mi interessa e i giorni in cui sono libero e chiedo di farmi sapere se c'è ancora posto.",
+        "final": "Nella mail al centro sportivo indico il corso che mi interessa e i giorni in cui sono libero, e chiedo che mi dicano se c'è ancora posto.",
+        "release": "Nella mail al centro sportivo indico il corso che mi interessa e i giorni in cui sono libero, e chiedo che mi dicano se c'è ancora posto."
+      },
+      "assessment": "La richiesta di risposta diventa esplicita senza cambiare disponibilità, corso o domanda sul posto. Nel primo passaggio la doppia congiunzione lasciava un attrito. Il conteggio non è più dichiarato, ma i tre contenuti restano distinti."
+    },
+    {
+      "id": "parametri_neutri",
+      "instruction": "Rendi il testo più naturale e scorrevole, senza cambiarne il significato o risolverne le ambiguità.",
+      "source": "Nel messaggio al grafico scrivo: caratteri, effetti, dimensioni.",
+      "outputs": {
+        "candidate": "Nel messaggio al grafico scrivo: caratteri, effetti e dimensioni.",
+        "final": "Nel messaggio al grafico do indicazioni su caratteri, effetti e dimensioni.",
+        "release": "Nel messaggio al grafico scrivo: caratteri, effetti e dimensioni."
+      },
+      "assessment": "Nel secondo passaggio 'do indicazioni' attribuiva una funzione non dichiarata. L'esempio nella guida che autorizzava questa trasformazione è stato corretto. Nel terzo resta soltanto la coordinazione delle etichette."
+    }
+  ],
+  "post_observations": {
+    "source_and_output": "in conversation, not stored in this report",
+    "point_2": "whole-material qualifier precedes examples",
+    "point_5": "explicit request verb; all five items express actions",
+    "length": "original avoidance relation retained; no added length instruction or threshold",
+    "remaining_style": "repeated recipient pronoun in introduction and some items",
+    "manual_edits": 0,
+    "general_superiority_over_humanizer": "not_established"
+  },
+  "checks": {
+    "skill_contract": "6 passed, 4 subtests passed; entrypoint and tested contract unchanged across these snapshots",
+    "generic_validator": "rejects pre-existing compatibility key; frontmatter unchanged",
+    "semantic_equivalence": "not_verified_automatically"
+  }
+}

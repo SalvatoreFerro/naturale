@@ -222,3 +222,29 @@ La [prova successiva su sei testi nuovi](reports/2026-11-14-fresh-registers.md)
 confronta originali e riscritture di tre mail formali e tre messaggi informali,
 senza modificare la skill durante il test. Riporta separatamente i giudizi
 degli agenti su scorrevolezza e significato, inclusi i due testi invariati.
+
+La [prova sui vincoli negativi del 15 novembre](reports/2026-11-15-negative-constraints.md)
+confronta due snapshot su quattro nuovi casi sintetici: quattro pareggi e
+nessuna regressione rilevata dal revisore agente. Non dimostra un guadagno
+di scorrevolezza o una validazione generale dei vincoli negativi.
+
+I [controlli sulla continuità del ritmo](reports/2026-11-15-rhythm.md)
+verificano su tre nuovi testi sintetici la ricomposizione di una stima con
+riserva e la conservazione di cadenze richieste e pause operative utili.
+Sono controlli di regressione con agenti, non una misura generale di qualità.
+
+La [prova sugli elenchi](reports/2026-11-15-lists.md) conserva tre passaggi
+sugli stessi tre casi sintetici. Documenta anche l'attribuzione indebita di
+un divieto nel primo tentativo e la revisione delle istruzioni. Sono prove
+di sviluppo, senza giudizi umani né confronto controllato con la skill precedente.
+
+La [prova sulle introduzioni degli elenchi](reports/2026-11-15-list-introductions.md)
+verifica la successiva correzione del tono procedurale e degli echi introdotti
+dalla riscrittura. Conserva tre nuovi controlli, incluso un metodo reale e
+un testo già efficace; gli output non hanno ricevuto ritocchi esterni.
+
+La [prova su ambito e vincoli del 16 novembre](reports/2026-11-16-list-scope.md)
+conserva tre passaggi su quattro controlli sintetici: qualificatori comuni,
+richieste nell'elenco ed etichette con o senza un divieto esplicito. Include
+gli attriti osservati e la revisione delle istruzioni; nessun output è stato
+ritoccato dopo la generazione. È una prova di sviluppo, non una validazione.

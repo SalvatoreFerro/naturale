@@ -1,0 +1,161 @@
+{
+  "date": "2026-11-15",
+  "status": "not_validated",
+  "method": {
+    "kind": "synthetic_development_checks",
+    "case_origin": "written_for_this_change",
+    "generator": "fresh agent context for each snapshot; three controls in the same context",
+    "source_reused_across_rounds": true,
+    "manual_review": "primary agent and separate agent reviewers",
+    "human_reviews": 0,
+    "exact_model_version": "not_recorded",
+    "sampling_parameters": "not_controlled",
+    "no_post_generation_edits": true,
+    "baseline_rewrite_run": false
+  },
+  "rounds": {
+    "before": "Hash-only baseline, no generation in this trial.",
+    "candidate": "Distinguish exclusions, actions and parameters; first outputs revealed assignment of an ambiguous prohibition.",
+    "final": "Preserve ambiguous actors and unspecified communication organization; post review still found a list linkage issue.",
+    "release": "Also reread introduction with each item; same inputs rerun once. Final installed snapshot."
+  },
+  "snapshots": {
+    "before": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "references/editorial.md": "cf197a353baae331bf1af7492987c93afbe97463f3fe510c3efbcfa24550e14b",
+      "references/examples.md": "5e6c1b14fa1df9468ec92955c96f55d633704ec5c384b4116c20506b314748e3",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+      "SKILL.md": "925c08a81265837dc6612018ec7bf8532fcc012ffbd18f33675ee0990bb62422",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+    },
+    "candidate": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "references/editorial.md": "4a3cec589e245d08f138966cfe8710ba95ddd1ef3a7d72404233361ff53bfee3",
+      "references/examples.md": "8c57a90c39133b066cb8163dd6ff6cc88773dcad0c4ea8ac06184b2900976530",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+      "SKILL.md": "687b83d5764f6d311e312a3152a882ed95cbee18af78dbc165b27b7e30db1a8a",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+    },
+    "final": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "references/editorial.md": "18919f52d49c772f0be22ecb22bb3169d862fdd5dc18e631e18c3b4e2c81ffc6",
+      "references/examples.md": "4755be008caad966bbba21003a95f62afa93d643d88795dd4a88faea64bbf22f",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d",
+      "SKILL.md": "687b83d5764f6d311e312a3152a882ed95cbee18af78dbc165b27b7e30db1a8a",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310"
+    },
+    "release": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "687b83d5764f6d311e312a3152a882ed95cbee18af78dbc165b27b7e30db1a8a",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "131802feec187ba4ef30d7887dca897c714ed429b1cf0d871ffabb2dedeb3fc5",
+      "references/examples.md": "4755be008caad966bbba21003a95f62afa93d643d88795dd4a88faea64bbf22f",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    }
+  },
+  "cases": [
+    {
+      "id": "brief_podcast",
+      "instruction": "Rendi il testo più naturale e scorrevole, senza cambiare significato.",
+      "source": "Nel brief per il podcast scrivo cosa evitare: sigle troppo lunghe, tono pubblicitario, durata. Per la durata indico un intervallo, senza fissare un tempo unico.",
+      "outputs": {
+        "candidate": "Nel brief per il podcast scrivo di evitare sigle troppo lunghe e un tono pubblicitario. Per la durata indico un intervallo, senza fissare un tempo unico.",
+        "final": "Nel brief per il podcast scrivo di evitare le sigle troppo lunghe e il tono pubblicitario. Per la durata indico un intervallo, senza fissare un tempo unico.",
+        "release": "Nel brief per il podcast scrivo di evitare sigle troppo lunghe e un tono pubblicitario. Per la durata indico un intervallo, senza fissare un tempo unico."
+      },
+      "assessment": "Durata distinta dalle esclusioni sulla base della seconda frase della fonte; intervallo e assenza di un tempo unico conservati."
+    },
+    {
+      "id": "ordine_neutro",
+      "instruction": "Rendi questo elenco più naturale, se serve, mantenendo il significato.",
+      "source": "Nell'ordine indico: materiale, finitura e quantità.",
+      "outputs": {
+        "candidate": "Nell'ordine indico materiale, finitura e quantità.",
+        "final": "Nell'ordine indico materiale, finitura e quantità.",
+        "release": "Nell'ordine indico materiale, finitura e quantità."
+      },
+      "assessment": "Sola rimozione dei due punti: categorie e loro funzione conservate."
+    },
+    {
+      "id": "messaggio_preventivi",
+      "instruction": "Rendi il testo più scorrevole, conservando indicazioni e modalità di comunicazione.",
+      "source": "Scrivo al gruppo tre cose: niente allegati, rispondere entro giovedì, i preventivi da confrontare. I preventivi li riporto nel corpo della mail.",
+      "outputs": {
+        "candidate": "Nella mail al gruppo chiedo di non inviare allegati e di rispondere entro giovedì. Riporto i preventivi da confrontare nel corpo della mail.",
+        "final": "Scrivo al gruppo tre cose: niente allegati, risposta entro giovedì e preventivi da confrontare, che riporto nel corpo della mail.",
+        "release": "Scrivo al gruppo tre cose: niente allegati, risposte entro giovedì e i preventivi da confrontare, che riporto nel corpo della mail."
+      },
+      "assessment": "Nel primo tentativo il divieto ambiguo è stato attribuito ai destinatari. Nel secondo e nel terzo resta neutro; giovedì e preventivi nel corpo della mail sono conservati. 'Risposte' non esplicita un attore aggiuntivo."
+    }
+  ],
+  "checks": {
+    "skill_contract": "6 passed, 4 subtests passed",
+    "semantic_equivalence": "not_verified_automatically",
+    "mail_audit": {
+      "exit_code": 0,
+      "result": {
+        "schema_version": "1.0",
+        "operation": "rewrite",
+        "unchanged": false,
+        "comparison_scope": {
+          "name": "full_text",
+          "source_history_excluded": false,
+          "revision_history_excluded": false
+        },
+        "deterministic_status": "passed",
+        "review_status": "not_required",
+        "semantic_equivalence": "not_verified",
+        "human_review_required": true,
+        "findings": [],
+        "review_flags": [],
+        "counts": {
+          "source_characters": 144,
+          "revision_characters": 131
+        },
+        "limitations": [
+          "I controlli meccanici possono segnalare variazioni lecite di forma o ripetizione.",
+          "Nomi, unità, responsabilità, causalità, fatti aggiunti e significato richiedono una verifica separata.",
+          "L'assenza di segnalazioni non dimostra equivalenza semantica o verità del testo."
+        ]
+      }
+    },
+    "final_agent_review": "No substantial meaning changes found in the three synthetic controls. The user-post comparison identifies length guidance as a plausible interpretation of the ambiguous original."
+  },
+  "limits": [
+    "Development cases reused to refine instructions, not an independent validation.",
+    "No controlled comparison against the previous installed skill or Humanizer; the user's Humanizer sample is discussed in the conversation.",
+    "No global fluency score or superiority claim. The user post is not stored in this report."
+  ]
+}

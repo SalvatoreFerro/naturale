@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-15",
+  "status": "not_validated",
+  "method": {
+    "kind": "targeted_development_trial",
+    "generator": "fresh agent for the user post; separate fresh agent for three synthetic controls",
+    "generations_per_input": 1,
+    "no_post_generation_edits": true,
+    "review": "separate agent; post variants labelled A/B without naming their source",
+    "human_reviews": 0,
+    "exact_model_version": "not_recorded",
+    "sampling_parameters": "not_controlled",
+    "baseline_generation": false
+  },
+  "snapshots": {
+    "before": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "687b83d5764f6d311e312a3152a882ed95cbee18af78dbc165b27b7e30db1a8a",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "131802feec187ba4ef30d7887dca897c714ed429b1cf0d871ffabb2dedeb3fc5",
+      "references/examples.md": "4755be008caad966bbba21003a95f62afa93d643d88795dd4a88faea64bbf22f",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    },
+    "candidate": {
+      "INSTALL.md": "e7027de06bfbf3f7d4919868c44dcc2aa24c900125769da0dd82fa33e3bab272",
+      "LICENSE": "3f3eea61314d088ff32ed5f42b2a94a7d62d1bad6a784fbd79044819ddd6fa01",
+      "requirements.txt": "aef03d62c433f0428c707f4dbd43b279fea30af98f34b6632061bd8b6568a199",
+      "SKILL.md": "abf20cdde4f97071fcfe8f370fd41ed0edb09399dcf73ebc514ae9c8d6bd6396",
+      "THIRD_PARTY_NOTICES.md": "c459c166c8d20abc87ab252bd9a03ddf046dd9e2d5cb732a90ea66fa5cbcd1b4",
+      "VERSION": "be98f0e67023f46ff8c80f0f64406d49a7b9a5b6e9576b77b86d07a4dffd2310",
+      "references/editorial.md": "60518f1a383da0feccf534c38fea975de4efa6dd4175a52ea26662cd5727f56a",
+      "references/examples.md": "2c03a1d947717e1ff90735a498d28d621081fc5e3e2d13694661d5d37d4b176a",
+      "references/images.md": "74d906315c30dbe933df462453afb1dd425c4974a43b3826f9ab574246ae324a",
+      "references/italian.md": "1ff70852ddb46c06142525412ad99e93c08ae1e363ff8c59f9eba1394a05ee18",
+      "references/text-tools.md": "cab2519cd5a5de308f3afc351b0b8223975f230ad7f5799311f071960b661b13",
+      "scripts/exiftool_runtime.py": "73df61a62a14b0bb8fedfc05e882dc2b07c511470124ccd0f514099e69458d6e",
+      "scripts/images.py": "90efa4a782661bb05ad1edfecdc5469c3275ad6d541d3ab8ac4957c38bec6377",
+      "scripts/text.py": "bf468872979ba6466aaa932de99bc37a0f93d4ff0dca3901af5a52dfe21a116d"
+    }
+  },
+  "cases": [
+    {
+      "id": "tipografo",
+      "source": "Scrivo al tipografo per indicare il tipo di carta e dare indicazioni sulla rilegatura. Il preventivo deve comprendere entrambe le voci.",
+      "revision": "Scrivo al tipografo per specificare il tipo di carta e dare indicazioni sulla rilegatura. Il preventivo deve comprendere entrambe le voci.",
+      "instruction": "Rendilo più naturale e scorrevole, mantenendo tutte le informazioni.",
+      "agent_review": "La sostituzione elimina l'eco indicare/indicazioni. Il revisore non rileva un guadagno evidente di scorrevolezza e nota la lieve sfumatura di maggiore precisione di specificare; contenuti e requisito del preventivo restano."
+    },
+    {
+      "id": "procedura_reale",
+      "source": "Per archiviare la pratica seguo questi due passaggi, nell'ordine indicato: controllo che ci sia la firma; solo dopo carico il documento. Se manca la firma, mi fermo.",
+      "revision": "Per archiviare la pratica seguo due passaggi in quest'ordine: controllo che ci sia la firma e solo dopo carico il documento. Se manca la firma, mi fermo.",
+      "instruction": "Rendilo più naturale e scorrevole, mantenendo tutte le informazioni.",
+      "agent_review": "Introduzione e collegamento più brevi; conservati i due passaggi, l'ordine obbligatorio e l'arresto se manca la firma."
+    },
+    {
+      "id": "mostra",
+      "source": "Nella mail a Sara scrivo quando apre la mostra e dove ritirare i biglietti. Le chiedo anche se vuole venire con noi.",
+      "revision": "Nella mail a Sara scrivo quando apre la mostra e dove ritirare i biglietti. Le chiedo anche se vuole venire con noi.",
+      "instruction": "Rendilo più naturale e scorrevole, mantenendo tutte le informazioni.",
+      "agent_review": "Invariato: conserva una formulazione già diretta senza aggiungere una cornice."
+    }
+  ],
+  "post_comparison": {
+    "storage": "full source and output remain in conversation",
+    "procedural_intro": "not introduced; original direct introduction retained",
+    "lexical_echo": "Indico/do indicazioni not introduced",
+    "fidelity": "majority, explicit quality claim, general time estimate, reader perspective and side-by-side instruction retained",
+    "caveats": [
+      "Length guidance interprets an ambiguous source rather than preserving its literal negative framing.",
+      "Ma in cambio slightly emphasizes the existing exchange.",
+      "Fifth list item still differs in grammatical function from the preceding items; also present in the supplied Humanizer sample."
+    ],
+    "general_superiority": "not_established"
+  },
+  "checks": {
+    "skill_contract": "6 passed, 4 subtests passed",
+    "whitespace": "git diff --check passed",
+    "generic_skill_validator": "rejects pre-existing compatibility frontmatter field; same field present in before snapshot"
+  }
+}
